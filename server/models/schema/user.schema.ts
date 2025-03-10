@@ -31,6 +31,7 @@ const userSchema: Schema = new Schema(
     karma: {
       type: Number,
       default: 0,
+      min: 0,
     },
   },
   { collection: 'User' },
