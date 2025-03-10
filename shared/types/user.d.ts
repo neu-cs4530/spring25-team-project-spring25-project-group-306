@@ -17,7 +17,7 @@ export interface UserCredentials {
  * - `password`: The user's password.
  * - `dateJoined`: The date when the user registered.
  * - `biography`: A short description or bio of the user (optional).
- * - `karma`: The user's karma score based on upvotes and downvotes received.
+ * - `karma`: The user's karma score based on upvotes and downvotes received (optional).
  */
 export interface User extends UserCredentials {
   dateJoined: Date;
