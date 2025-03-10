@@ -9,7 +9,7 @@ import { Schema } from 'mongoose';
  * - `password`: The encrypted password securing the user's account.
  * - `dateJoined`: The date the user joined the platform.
  * - `biography`: A short description or bio of the user (optional).
- * - `karma`: The user's karma score based on upvotes and downvotes received.
+ * - `karma`: The user's karma score based on upvotes and downvotes received (optional).
  */
 const userSchema: Schema = new Schema(
   {
