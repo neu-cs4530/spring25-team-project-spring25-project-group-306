@@ -8,6 +8,8 @@ import { Schema } from 'mongoose';
  * - `username`: The username of the user.
  * - `password`: The encrypted password securing the user's account.
  * - `dateJoined`: The date the user joined the platform.
+ * - `biography`: A short description or bio of the user (optional).
+ * - `karma`: The user's karma score based on upvotes and downvotes received.
  */
 const userSchema: Schema = new Schema(
   {
@@ -25,6 +27,10 @@ const userSchema: Schema = new Schema(
     biography: {
       type: String,
       default: '',
+    },
+    karma: {
+      type: Number,
+      default: 0,
     },
   },
   { collection: 'User' },
