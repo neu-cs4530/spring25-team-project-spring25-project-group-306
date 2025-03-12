@@ -21,6 +21,10 @@ const answerSchema: Schema = new Schema(
       type: Date,
     },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    image: {
+      type: String,
+      required: false,
+    },
   },
   { collection: 'Answer' },
 );
