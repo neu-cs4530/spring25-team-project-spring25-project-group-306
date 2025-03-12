@@ -1,3 +1,4 @@
+import { QueryOptions } from 'mongoose';
 import {
   Answer,
   AnswerResponse,
@@ -6,6 +7,7 @@ import {
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
   QuestionResponse,
+  VoteResponse
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
@@ -42,6 +44,91 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
     return { error: 'Error when saving an answer' };
   }
 };
+
+/**
+ * Adds vote to answer.
+ * @param {string} aid - The answer ID
+ * @param {string} username - The username who voted
+ * @param {'upvote' | 'downvote'} voteType - The vote type
+ * @returns {Promise<AnswerVoteRequest>} - The updated vote result
+ */
+export const addVoteToAnswer = async (
+  aid: string,
+  username: string,
+  voteType: 'upvote' | 'downvote',
+): Promise<VoteResponse> => {
+  let updateOperation: QueryOptions;
+
+  if (voteType === 'upvote') {
+    updateOperation = [
+      {
+        $set: {
+          upVotes: {
+            $cond: [
+              { $in: [username, '$upVotes'] },
+              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
+              { $concatArrays: ['$upVotes', [username]] },
+            ],
+          },
+          downVotes: {
+            $cond: [
+              { $in: [username, '$upVotes'] },
+              '$downVotes',
+              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
+            ],
+          },
+        },
+      },
+    ];
+  } else {
+    updateOperation = [
+      {
+        $set: {
+          downVotes: {
+            $cond: [
+              { $in: [username, '$downVotes'] },
+              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
+              { $concatArrays: ['$downVotes', [username]] },
+            ],
+          },
+          upVotes: {
+            $cond: [
+              { $in: [username, '$downVotes'] },
+              '$upVotes',
+              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
+            ],
+          },
+        },
+      },
+    ];
+  }
+
+  try {
+    const result: DatabaseAnswer | null = await AnswerModel.findOneAndUpdate(
+      { _id: aid },
+      updateOperation,
+      { new: true },
+    );
+
+    if (result === null) {
+      throw new Error('Error when adding vote to answer');
+    }
+
+    let msg = '';
+
+    if (voteType === 'upvote') {
+      msg = result.upVotes.includes(username) ? 'Answer upvoted successfully' : 'Upvote cancelled successfully';
+
+    }
+    else {
+      msg = result.downVotes.includes(username) ? 'Answer downvoted successfully' : 'Downvote cancelled successfully';
+    }
+    return {msg, upVotes: result.upVotes || [], downVotes: result.downVotes || []};
+  } catch (error) {
+    return { error: voteType === 'upvote' ? 'Error when adding upvote to question': 'Error when adding downvote to question', };
+  }
+}
+
 
 /**
  * Adds an existing answer to a specified question in the database.
