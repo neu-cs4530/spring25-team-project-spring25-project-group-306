@@ -8,6 +8,8 @@ import { Schema } from 'mongoose';
  * - `ansBy`: The username of the user who provided the answer.
  * - `ansDateTime`: The date and time when the answer was given.
  * - `comments`: Comments that have been added to the answer by users.
+ * - 'upvotes': The usernames of the users who have upvoted the answer.
+ * - 'downvotes': The usernames of the users who have downvoted the answer.
  */
 const answerSchema: Schema = new Schema(
   {
@@ -25,6 +27,8 @@ const answerSchema: Schema = new Schema(
       type: String,
       required: false,
     },
+    upvotes: [{ type: String }],
+    downvotes: [{ type: String }],
   },
   { collection: 'Answer' },
 );
