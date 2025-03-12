@@ -35,6 +35,10 @@ const questionSchema: Schema = new Schema(
     upVotes: [{ type: String }],
     downVotes: [{ type: String }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    image: {
+      type: String,
+      required: false,
+    },
   },
   { collection: 'Question' },
 );
