@@ -27,8 +27,8 @@ const answerSchema: Schema = new Schema(
       type: String,
       required: false,
     },
-    upvotes: [{ type: String }],
-    downvotes: [{ type: String }],
+    upVotes: [{ type: String }],
+    downVotes: [{ type: String }],
   },
   { collection: 'Answer' },
 );
