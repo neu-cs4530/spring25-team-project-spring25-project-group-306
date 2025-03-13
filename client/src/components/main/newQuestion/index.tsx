@@ -17,12 +17,9 @@ const NewQuestionPage = () => {
     setText,
     tagNames,
     setTagNames,
-    image,
-    setImage,
     titleErr,
     textErr,
     tagErr,
-    imageErr,
     postQuestion,
     handleFileChange,
   } = useNewQuestion();
@@ -53,8 +50,15 @@ const NewQuestionPage = () => {
         setState={setTagNames}
         err={tagErr}
       />
-      <p><strong>Upload Optional Image (png, jpg, or jpeg)</strong></p>
-      <input title={"Optional Image (png, jpg, or jpeg)"} type="file" accept=".png,.jpeg,.jpg" onChange={handleFileChange} />
+      <p>
+        <strong>Upload Optional Image (png, jpg, or jpeg)</strong>
+      </p>
+      <input
+        title={'Optional Image (png, jpg, or jpeg)'}
+        type='file'
+        accept='.png,.jpeg,.jpg'
+        onChange={handleFileChange}
+      />
       <div className='btn_indicator_container'>
         <button
           className='form_postBtn'

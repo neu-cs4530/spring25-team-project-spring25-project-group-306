@@ -34,10 +34,6 @@ const useAnswerForm = () => {
     setQuestionID(qid);
   }, [qid, navigate]);
 
-  useEffect(() => {
-    console.log(image);
-  }, [image]);
-
   /**
    * Function to post an answer to a question.
    * It validates the answer text and posts the answer if it is valid.
