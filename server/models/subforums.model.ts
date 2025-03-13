@@ -1,6 +1,6 @@
 import mongoose, { Model } from 'mongoose';
-import subforumSchema from './schema/subforum.schema';
 import { DatabaseSubforum } from '@fake-stack-overflow/shared/types/types';
+import subforumSchema from './schema/subforum.schema';
 
 /**
  * Mongoose model for the `Subforum` collection.
