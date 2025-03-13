@@ -4,7 +4,7 @@ import { validateHyperlink } from '../tool';
 import addAnswer from '../services/answerService';
 import useUserContext from './useUserContext';
 import { Answer } from '../types/types';
-import { uploadImage } from '../services/imageUploadService';
+import uploadImage from '../services/imageUploadService';
 
 /**
  * Custom hook for managing the state and logic of an answer submission form.
