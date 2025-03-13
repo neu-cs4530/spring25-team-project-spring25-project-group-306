@@ -52,6 +52,10 @@ const ProfileSettings: React.FC = () => {
               <strong>Username:</strong> {userData.username}
             </p>
 
+            <p>
+              <strong>Karma:</strong> {userData.karma ?? 0}
+            </p>
+
             {/* ---- Biography Section ---- */}
             {!editBioMode && (
               <p>

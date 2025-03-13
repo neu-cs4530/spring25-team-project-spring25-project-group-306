@@ -1,4 +1,3 @@
-import React from 'react';
 import { handleHyperlink } from '../../../../tool';
 import CommentSection from '../../commentSection';
 import './index.css';
@@ -16,6 +15,7 @@ import { Comment, DatabaseComment } from '../../../../types/types';
 interface AnswerProps {
   text: string;
   ansBy: string;
+  karma: number;
   meta: string;
   image?: string;
   comments: DatabaseComment[];
@@ -32,13 +32,25 @@ interface AnswerProps {
  * @param comments An array of comments associated with the answer.
  * @param handleAddComment Function to handle adding a new comment.
  */
-const AnswerView = ({ text, ansBy, meta, image, comments, handleAddComment }: AnswerProps) => (
+
+const AnswerView = ({
+  text,
+  ansBy,
+  meta,
+  karma,
+  image,
+  comments,
+  handleAddComment,
+}: AnswerProps) => (
   <div className='answer right_padding'>
     <div id='answerText' className='answerText'>
       {handleHyperlink(text)}
     </div>
     <div className='answerAuthor'>
-      <div className='answer_author'>{ansBy}</div>
+      <div>
+        <div className='answer_author'>{ansBy}</div>
+        <div className='answer_karma'>{karma} karma</div>
+      </div>
       <div className='answer_question_meta'>{meta}</div>
       {image && (
         <img

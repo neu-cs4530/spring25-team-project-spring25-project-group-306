@@ -15,6 +15,7 @@ interface QuestionBodyProps {
   text: string;
   image?: string;
   askby: string;
+  karma: number;
   meta: string;
 }
 
@@ -28,12 +29,15 @@ interface QuestionBodyProps {
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
  */
-const QuestionBody = ({ views, text, image, askby, meta }: QuestionBodyProps) => (
+const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyProps) => (
   <div id='questionBody' className='questionBody right_padding'>
     <div className='bold_title answer_question_view'>{views} views</div>
     <div className='answer_question_text'>{handleHyperlink(text)}</div>
     <div className='answer_question_right'>
-      <div className='question_author'>{askby}</div>
+      <div>
+        <div className='question_author'>{askby}</div>
+        <div className='question_karma'>{karma} karma</div>
+      </div>
       <div className='answer_question_meta'>asked {meta}</div>
       {image && (
         <img

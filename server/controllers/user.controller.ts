@@ -132,6 +132,30 @@ const userController = (socket: FakeSOSocket) => {
   };
 
   /**
+   * Retrieves a user's karma by their username.
+   * @param req The request containing the username as a route parameter.
+   * @param res The response, either returning the user or an error.
+   * @returns A promise resolving to void.
+   */
+  const getUserKarma = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
+    try {
+      const { username } = req.params;
+
+      const user = await getUserByUsername(username);
+
+      if ('error' in user) {
+        throw Error(user.error);
+      }
+
+      const karma = user.karma ?? 0;
+
+      res.status(200).json({ username: user.username, karma });
+    } catch (error) {
+      res.status(500).send(`Error when getting user by username: ${error}`);
+    }
+  };
+
+  /**
    * Retrieves all users from the database.
    * @param res The response, either returning the users or an error.
    * @returns A promise resolving to void.
@@ -241,6 +265,7 @@ const userController = (socket: FakeSOSocket) => {
   router.post('/login', userLogin);
   router.patch('/resetPassword', resetPassword);
   router.get('/getUser/:username', getUser);
+  router.get('/getUserKarma/:username', getUserKarma);
   router.get('/getUsers', getUsers);
   router.delete('/deleteUser/:username', deleteUser);
   router.patch('/updateBiography', updateBiography);

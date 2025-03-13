@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb';
  * Represents a comment on a question or an answer.
  * - `text`: The content of the comment.
  * - `commentBy`: The author of the comment.
+ * - `karma`: The karma of author.
  * - `commentDateTime`: The timestamp when the comment was made.
  */
 export interface Comment {
@@ -18,6 +19,7 @@ export interface Comment {
  * - `_id`: Unique identifier for the comment.
  * - `text`: The content of the comment.
  * - `commentBy`: The author of the comment.
+ * - `karma`: The karma of author.
  * - `commentDateTime`: The timestamp when the comment was made.
  */
 export interface DatabaseComment extends Comment {
