@@ -18,7 +18,6 @@ export interface Answer {
   comments: Comment[];
   upVotes: string[];
   downVotes: string[];
-
 }
 
 /**
