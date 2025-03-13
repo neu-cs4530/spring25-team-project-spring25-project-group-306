@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
-import { saveAnswer, addAnswerToQuestion } from '../../services/answer.service';
-import { DatabaseAnswer, DatabaseQuestion } from '../../types/types';
+import { saveAnswer, addAnswerToQuestion, addVoteToAnswer } from '../../services/answer.service';
+import { DatabaseAnswer, DatabaseQuestion, VoteResponse } from '../../types/types';
 import { QUESTIONS, ans1, ans4 } from '../mockData.models';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -20,6 +20,8 @@ describe('Answer model', () => {
         ansBy: 'dummyUserId',
         ansDateTime: new Date('2024-06-06'),
         comments: [],
+        upVotes: [],
+        downVotes: [],
       };
       const mockDBAnswer = {
         ...mockAnswer,
@@ -82,6 +84,37 @@ describe('Answer model', () => {
 
       expect(addAnswerToQuestion(qid, invalidAnswer as DatabaseAnswer)).resolves.toEqual({
         error: 'Error when adding answer to question',
+      });
+    });
+  });
+  describe('addVoteToAnswer', () => {
+    test('addVoteToAnswer should return expected message and updated votes', async () => {
+      const username = 'testUser';
+      const aid = 'testID';
+      const voteType = 'upvote';
+
+      const mockAnswer = {
+        _id: aid,
+        upVotes: [],
+        downVotes: [],
+      };
+
+      const updatedAnswer = {
+        ...mockAnswer,
+        upVotes: [username],
+        downVotes: [],
+      };
+
+      //await saveAnswer(mockAnswer) as DatabaseAnswer;
+
+      mockingoose(AnswerModel).toReturn(updatedAnswer, 'findOneAndUpdate');
+
+      const result = await addVoteToAnswer(aid, username, voteType);
+
+      expect(result).toEqual({
+        msg: 'Answer upvoted successfully',
+        upVotes: ['testUser'],
+        downVotes: [],
       });
     });
   });

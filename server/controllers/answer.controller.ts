@@ -144,6 +144,8 @@ const answerController = (socket: FakeSOSocket) => {
 
   // add appropriate HTTP verbs and their endpoints to the router.
   router.post('/addAnswer', addAnswer);
+  router.post('/answerUpvote', upvoteAnswer);
+  router.post('/answerDownvote', downvoteAnswer);
 
   return router;
 };

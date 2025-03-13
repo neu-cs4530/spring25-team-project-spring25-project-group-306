@@ -125,7 +125,7 @@ export const addVoteToAnswer = async (
     }
     return {msg, upVotes: result.upVotes || [], downVotes: result.downVotes || []};
   } catch (error) {
-    return { error: voteType === 'upvote' ? 'Error when adding upvote to question': 'Error when adding downvote to question', };
+    return { error: voteType === 'upvote' ? 'Error when adding upvote to answer ' + error : 'Error when adding downvote to answer '+ error, };
   }
 }
 
