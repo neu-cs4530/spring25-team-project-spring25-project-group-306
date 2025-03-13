@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import addAnswer from '../services/answerService';
 import useUserContext from './useUserContext';
 import { Answer } from '../types/types';
+import uploadImage from '../services/imageUploadService';
 
 /**
  * Custom hook for managing the state and logic of an answer submission form.
@@ -21,6 +22,7 @@ const useAnswerForm = () => {
   const [text, setText] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
   const [questionID, setQuestionID] = useState<string>('');
+  const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!qid) {
@@ -61,6 +63,7 @@ const useAnswerForm = () => {
       comments: [],
       upVotes: [],
       downVotes: [],
+      image: image || undefined,
     };
 
     const res = await addAnswer(questionID, answer);
@@ -71,11 +74,27 @@ const useAnswerForm = () => {
     }
   };
 
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+      return;
+    }
+    const file = e.target.files[0];
+
+    try {
+      const imageURL = await uploadImage(file);
+      setImage(imageURL);
+    } catch (err) {
+      setTextErr('Error uploading image');
+    }
+  };
+
   return {
     text,
     textErr,
     setText,
     postAnswer,
+    handleFileChange,
+    image,
   };
 };
 

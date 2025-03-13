@@ -89,6 +89,13 @@ A class diagram for the schema definition is shown below:
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
 
+
+### `/images`
+
+| Endpoint | Method | Description           |
+| -------- | ------ | --------------------- |
+| /upload  | POST   | Create a new image    |
+
 ## Running Stryker Mutation Testing
 
 Mutation testing helps you measure the effectiveness of your tests by introducing small changes (mutations) to your code and checking if your tests catch them. To run mutation testing with Stryker, use the following command in `server/`:
