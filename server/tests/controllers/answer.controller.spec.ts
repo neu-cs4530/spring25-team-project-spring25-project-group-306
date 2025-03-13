@@ -72,6 +72,8 @@ describe('POST /addAnswer', () => {
       ansBy: 'dummyUserId',
       ansDateTime: mockAnswer.ansDateTime.toISOString(),
       comments: [],
+      upVotes: [],
+      downVotes: [],
     });
   });
 
@@ -261,6 +263,21 @@ describe('POST /answerUpvote', () => {
     expect(response.status).toBe(400);
   });
 
+
+  it('should return bad request error if answer ID is missing', async () => {
+    const mockReqBody = {
+      username: 'test',
+    };
+    
+    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
+
+    expect(response.status).toBe(400);
+  });
+
+
+});
+
+describe('POST /answerDownvote', () => {
   it('should downvote an answer', async () => {
     const validAid = new mongoose.Types.ObjectId();
     const mockReqBody = {
@@ -285,16 +302,4 @@ describe('POST /answerUpvote', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockAnswer);
   });
-
-  it('should return bad request error if answer ID is missing', async () => {
-    const mockReqBody = {
-      username: 'test',
-    };
-    
-    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
-
-    expect(response.status).toBe(400);
-  });
-
-  
 });
