@@ -8,6 +8,7 @@ import * as databaseUtil from '../../utils/database.util';
 const saveAnswerSpy = jest.spyOn(answerUtil, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
+const voteAnswerSpy = jest.spyOn(answerUtil, 'addVoteToAnswer');
 
 describe('POST /addAnswer', () => {
   it('should add a new answer to the question', async () => {
@@ -28,6 +29,8 @@ describe('POST /addAnswer', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [],
+      upVotes: [],
+      downVotes: [],
     };
     saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
 
@@ -68,6 +71,8 @@ describe('POST /addAnswer', () => {
       ansBy: 'dummyUserId',
       ansDateTime: mockAnswer.ansDateTime.toISOString(),
       comments: [],
+      upVotes: [],
+      downVotes: [],
     });
   });
 
@@ -168,6 +173,8 @@ describe('POST /addAnswer', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [],
+      upVotes: [],
+      downVotes: [],
     };
 
     saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
@@ -195,6 +202,8 @@ describe('POST /addAnswer', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [],
+      upVotes: [],
+      downVotes: [],
     };
 
     const mockQuestion = {
@@ -218,5 +227,75 @@ describe('POST /addAnswer', () => {
     const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
 
     expect(response.status).toBe(500);
+  });
+});
+
+describe('POST /answerUpvote', () => {
+  it('should upvote an answer', async () => {
+    const validAid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      aid: validAid,
+      username: 'test',
+    };
+
+    const mockAnswer = {
+      msg: 'Answer upvoted successfully',
+      upVotes: ['test'],
+      downVotes: [],
+    };
+
+    voteAnswerSpy.mockResolvedValueOnce({
+      msg: 'Answer upvoted successfully',
+      upVotes: ['test'],
+      downVotes: [],
+    });
+
+    const response = await supertest(app).post('/answer/answerUpvote').send(mockReqBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(mockAnswer);
+  });
+
+  it('should return bad request error if request body is missing', async () => {
+    const response = await supertest(app).post('/answer/answerUpvote');
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return bad request error if answer ID is missing', async () => {
+    const mockReqBody = {
+      username: 'test',
+    };
+
+    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
+
+    expect(response.status).toBe(400);
+  });
+});
+
+describe('POST /answerDownvote', () => {
+  it('should downvote an answer', async () => {
+    const validAid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      aid: validAid,
+      username: 'test',
+    };
+
+    const mockAnswer = {
+      msg: 'Answer downvoted successfully',
+      upVotes: [],
+      downVotes: ['test'],
+    };
+
+    voteAnswerSpy.mockResolvedValueOnce({
+      msg: 'Answer downvoted successfully',
+      upVotes: [],
+      downVotes: ['test'],
+    });
+
+    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(mockAnswer);
   });
 });
