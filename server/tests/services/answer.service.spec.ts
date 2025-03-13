@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
 import { saveAnswer, addAnswerToQuestion, addVoteToAnswer } from '../../services/answer.service';
-import { DatabaseAnswer, DatabaseQuestion, VoteResponse } from '../../types/types';
+import { DatabaseAnswer, DatabaseQuestion } from '../../types/types';
 import { QUESTIONS, ans1, ans4 } from '../mockData.models';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -91,7 +91,7 @@ describe('Answer model', () => {
     test('addVoteToAnswer should return expected message and updated votes', async () => {
       const username = 'testUser';
       const aid = 'testID';
-      const voteType = 'upvote';
+      const voteType = 'upVote';
 
       const mockAnswer = {
         _id: aid,
@@ -105,8 +105,6 @@ describe('Answer model', () => {
         downVotes: [],
       };
 
-      //await saveAnswer(mockAnswer) as DatabaseAnswer;
-
       mockingoose(AnswerModel).toReturn(updatedAnswer, 'findOneAndUpdate');
 
       const result = await addVoteToAnswer(aid, username, voteType);
@@ -117,5 +115,49 @@ describe('Answer model', () => {
         downVotes: [],
       });
     });
+
+    test('addVoteToAnswer should return an object with error if findOneAndUpdate throws an error', async () => {
+      const username = 'testUser';
+      const aid = 'testID';
+      const voteType = 'upVote';
+
+      mockingoose(AnswerModel).toReturn(new Error('error'), 'findOneAndUpdate');
+
+      const result = await addVoteToAnswer(aid, username, voteType);
+
+      expect(result).toHaveProperty('error');
+    });
+
+    test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
+      const username = 'testUser';
+      const aid = 'testID';
+      const voteType = 'upVote';
+
+      mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await addVoteToAnswer(aid, username, voteType);
+
+      expect(result).toHaveProperty('error');
+      if ('error' in result) {
+        expect(result.error).toEqual('Error when adding upvote to answer');
+      }
+    });
+
+    test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
+      const username = 'testUser';
+      const aid = 'testID';
+      const voteType = 'downVote';
+
+      mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await addVoteToAnswer(aid, username, voteType);
+
+      expect(result).toHaveProperty('error');
+      if ('error' in result) {
+        expect(result.error).toEqual('Error when adding downvote to answer');
+      }
+    });
+
+
   });
 });

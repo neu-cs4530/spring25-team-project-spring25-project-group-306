@@ -104,7 +104,6 @@ const ans3: PopulatedDatabaseAnswer = {
   comments: [],
   upVotes: [],
   downVotes: [],
-
 };
 
 const ans4: PopulatedDatabaseAnswer = {

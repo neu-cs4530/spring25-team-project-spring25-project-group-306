@@ -1,6 +1,12 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer, AnswerVoteRequest } from '../types/types';
+import {
+  Answer,
+  AddAnswerRequest,
+  FakeSOSocket,
+  PopulatedDatabaseAnswer,
+  AnswerVoteRequest,
+} from '../types/types';
 import { addAnswerToQuestion, saveAnswer, addVoteToAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
 
@@ -39,24 +45,32 @@ const answerController = (socket: FakeSOSocket) => {
    *
    * @returns A Promise that resolves to void.
    */
-  const handleVote = async (req: AnswerVoteRequest, res: Response, voteType: 'upvote' | 'downvote'): Promise<void> => {
+  const handleVote = async (
+    req: AnswerVoteRequest,
+    res: Response,
+    voteType: 'upVote' | 'downVote',
+  ): Promise<void> => {
     if (!req.body.aid || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
-    
+
     const { aid, username } = req.body;
 
-    try{
+    try {
       const status = await addVoteToAnswer(aid, username, voteType);
 
       if (status && 'error' in status) {
         res.status(500).send(status.error);
         return;
       }
-      
+
       // Emit the updated vote counts to all connected clients
-      socket.emit('answerVoteUpdate', { aid, upVotes: status.upVotes, downVotes: status.downVotes });
+      socket.emit('answerVoteUpdate', {
+        aid,
+        upVotes: status.upVotes,
+        downVotes: status.downVotes,
+      });
       res.json(status);
     } catch (err) {
       res.status(500).send(`Error when ${voteType}ing: ${(err as Error).message}`);
@@ -65,29 +79,28 @@ const answerController = (socket: FakeSOSocket) => {
   /**
    * Handles upvoting an answer. The request contains an answer ID and the username of the user
    * If the request is invalid or an error occurs, the appropriate HTTP response status and message are returned.
-   * 
+   *
    * @param req The request object containing the answer ID and username.
    * @param res The HTTP response object used to send back the result of the operation.
-   * 
+   *
    * @returns A Promise that resolves to void.
    */
   const upvoteAnswer = async (req: AnswerVoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'upvote'); 
+    handleVote(req, res, 'upVote');
   };
 
   /**
    * Handles downvoting an answer. The request contains an answer ID and the username of the user
    * If the request is invalid or an error occurs, the appropriate HTTP response status and message are returned.
-   * 
+   *
    * @param req The request object containing the answer ID and username.
    * @param res The HTTP response object used to send back the result of the operation.
-   * 
+   *
    * @returns A Promise that resolves to void.
    */
   const downvoteAnswer = async (req: AnswerVoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'downvote');
+    handleVote(req, res, 'downVote');
   };
-
 
   /**
    * Adds a new answer to a question in the database. The answer request and answer are

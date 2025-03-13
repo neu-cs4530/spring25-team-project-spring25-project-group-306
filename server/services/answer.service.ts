@@ -7,7 +7,7 @@ import {
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
   QuestionResponse,
-  VoteResponse
+  VoteResponse,
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
@@ -55,11 +55,11 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
 export const addVoteToAnswer = async (
   aid: string,
   username: string,
-  voteType: 'upvote' | 'downvote',
+  voteType: 'upVote' | 'downVote',
 ): Promise<VoteResponse> => {
   let updateOperation: QueryOptions;
 
-  if (voteType === 'upvote') {
+  if (voteType === 'upVote') {
     updateOperation = [
       {
         $set: {
@@ -111,24 +111,30 @@ export const addVoteToAnswer = async (
     );
 
     if (result === null) {
-      throw new Error('Error when adding vote to answer');
+      throw new Error('');
     }
 
     let msg = '';
 
-    if (voteType === 'upvote') {
-      msg = result.upVotes.includes(username) ? 'Answer upvoted successfully' : 'Upvote cancelled successfully';
-
+    if (voteType === 'upVote') {
+      msg = result.upVotes.includes(username)
+        ? 'Answer upvoted successfully'
+        : 'Upvote cancelled successfully';
+    } else {
+      msg = result.downVotes.includes(username)
+        ? 'Answer downvoted successfully'
+        : 'Downvote cancelled successfully';
     }
-    else {
-      msg = result.downVotes.includes(username) ? 'Answer downvoted successfully' : 'Downvote cancelled successfully';
-    }
-    return {msg, upVotes: result.upVotes || [], downVotes: result.downVotes || []};
+    return { msg, upVotes: result.upVotes || [], downVotes: result.downVotes || [] };
   } catch (error) {
-    return { error: voteType === 'upvote' ? 'Error when adding upvote to answer ' + error : 'Error when adding downvote to answer '+ error, };
+    return {
+      error:
+        voteType === 'upVote'
+          ? `Error when adding upvote to answer`
+          : `Error when adding downvote to answer`,
+    };
   }
-}
-
+};
 
 /**
  * Adds an existing answer to a specified question in the database.
