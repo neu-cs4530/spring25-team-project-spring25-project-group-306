@@ -157,7 +157,5 @@ describe('Answer model', () => {
         expect(result.error).toEqual('Error when adding downvote to answer');
       }
     });
-
-
   });
 });

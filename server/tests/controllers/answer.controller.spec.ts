@@ -10,7 +10,6 @@ const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
 const voteAnswerSpy = jest.spyOn(answerUtil, 'addVoteToAnswer');
 
-
 describe('POST /addAnswer', () => {
   it('should add a new answer to the question', async () => {
     const validQid = new mongoose.Types.ObjectId();
@@ -263,18 +262,15 @@ describe('POST /answerUpvote', () => {
     expect(response.status).toBe(400);
   });
 
-
   it('should return bad request error if answer ID is missing', async () => {
     const mockReqBody = {
       username: 'test',
     };
-    
+
     const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
 
     expect(response.status).toBe(400);
   });
-
-
 });
 
 describe('POST /answerDownvote', () => {
