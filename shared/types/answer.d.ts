@@ -8,6 +8,8 @@ import { Comment, DatabaseComment } from './comment';
  * - `ansBy`: The author of the answer.
  * - `ansDateTime`: The timestamp of when the answer was given.
  * - `comments`: A list of comments associated with the answer.
+ * - `upvotes`: A list of usernames that have upvoted the answer.
+ * - 'downvotes': A list of usernames that have downvoted the answer.
  */
 export interface Answer {
   text: string;
@@ -15,6 +17,8 @@ export interface Answer {
   ansDateTime: Date;
   comments: Comment[];
   image?: string;
+  upVotes: string[];
+  downVotes: string[];
 }
 
 /**
@@ -52,3 +56,15 @@ export interface AddAnswerRequest extends Request {
  * - Either a `DatabaseAnswer` object or an error message.
  */
 export type AnswerResponse = DatabaseAnswer | { error: string };
+
+/**
+ * Interface for the request body when upvoting or downvoting an answer.
+ * - `aid`: The unique identifier of the answer.
+ * - `username`: The username of the user performing the vote.
+ */
+export interface AnswerVoteRequest extends Request {
+  body: {
+    aid: string;
+    username: string;
+  };
+}

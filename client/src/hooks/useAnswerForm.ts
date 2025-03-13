@@ -61,6 +61,8 @@ const useAnswerForm = () => {
       ansBy: user.username,
       ansDateTime: new Date(),
       comments: [],
+      upVotes: [],
+      downVotes: [],
       image: image || undefined,
     };
 
