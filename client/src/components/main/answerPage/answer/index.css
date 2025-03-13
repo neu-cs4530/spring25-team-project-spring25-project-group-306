@@ -15,4 +15,16 @@
 
 .answer_author {
   color: green;
+  display: inline-block;
+}
+
+.answer_karma {
+  border-radius: 25px;
+  width: fit-content;
+  height: fit-content;
+  padding: 5px;
+  color: white;
+  background: gray;
+  display: inline-block;
+  margin-left: 5px;
 }

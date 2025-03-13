@@ -28,11 +28,11 @@ const UserCardView = (props: UserProps) => {
       <div className='user_mid'>
         <div className='userUsername'>{user.username}</div>
       </div>
+      <div className='karma'>
+        <div>{user.karma ?? 0} karma</div>
+      </div>
       <div className='userStats'>
         <div>joined {new Date(user.dateJoined).toUTCString()}</div>
-      </div>
-      <div className='userKarma'>
-        <div>{user.karma ?? 0} karma</div>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import useUsersListPage from '../../../hooks/useUsersListPage';
 import { SafeDatabaseUser } from '../../../types/types';
 
 /**
- * Interface representing the props for the UsersListPage component.
+ * Interface representing the props for the LeaderboardPage component.
  * handleUserSelect - The function to handle the click event on the user card.
  */
 interface UserListPageProps {
@@ -14,11 +14,11 @@ interface UserListPageProps {
 }
 
 /**
- * UsersListPage component renders a page displaying a list of users
+ * LeaderboardPage component renders a page displaying a list of users
  * based on search content filtering.
  * It includes a header with a search bar.
  */
-const UsersListPage = (props: UserListPageProps) => {
+const LeaderboardPage = (props: UserListPageProps) => {
   const { userList } = useUsersListPage();
   const { handleUserSelect = null } = props;
   const navigate = useNavigate();
@@ -59,4 +59,4 @@ const UsersListPage = (props: UserListPageProps) => {
   );
 };
 
-export default UsersListPage;
+export default LeaderboardPage;

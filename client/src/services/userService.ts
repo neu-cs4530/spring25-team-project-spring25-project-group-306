@@ -123,6 +123,20 @@ const updateBiography = async (
   return res.data;
 };
 
+/**
+ * Function to get user karma
+ *
+ * @throws Error if there is an issue fetching users.
+ */
+const getKarmaByUsername = async (username: string): Promise<number> => {
+  const res = await api.get(`${USER_API_URL}/getUser/${username}`);
+  if (res.status !== 200) {
+    throw new Error('Error when fetching user');
+  }
+  const karma = res.data.karma ?? 0;
+  return karma;
+};
+
 export {
   getUsers,
   getUserByUsername,
@@ -131,4 +145,5 @@ export {
   deleteUser,
   resetPassword,
   updateBiography,
+  getKarmaByUsername,
 };

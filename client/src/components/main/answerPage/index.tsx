@@ -1,4 +1,3 @@
-import React from 'react';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
@@ -8,13 +7,17 @@ import QuestionBody from './questionBody';
 import VoteComponent from '../voteComponent';
 import CommentSection from '../commentSection';
 import useAnswerPage from '../../../hooks/useAnswerPage';
+import useFetchKarma from '../../../hooks/useFetchKarma';
 
 /**
  * AnswerPage component that displays the full content of a question along with its answers.
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage = () => {
-  const { questionID, question, handleNewComment, handleNewAnswer } = useAnswerPage();
+  const { questionID, question, karma, handleNewComment, handleNewAnswer } = useAnswerPage();
+
+  const answerUsernames = question ? [...new Set(question.answers.map(a => a.ansBy))] : [];
+  const karmaMap = useFetchKarma(answerUsernames);
 
   if (!question) {
     return null;
@@ -28,6 +31,7 @@ const AnswerPage = () => {
         views={question.views.length}
         text={question.text}
         askby={question.askedBy}
+        karma={karma}
         meta={getMetaData(new Date(question.askDateTime))}
       />
       <CommentSection
@@ -39,6 +43,7 @@ const AnswerPage = () => {
           key={String(a._id)}
           text={a.text}
           ansBy={a.ansBy}
+          karma={karmaMap[a.ansBy] || 0}
           meta={getMetaData(new Date(a.ansDateTime))}
           comments={a.comments}
           handleAddComment={(comment: Comment) =>

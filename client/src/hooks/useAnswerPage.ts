@@ -10,6 +10,7 @@ import {
 import useUserContext from './useUserContext';
 import addComment from '../services/commentService';
 import { getQuestionById } from '../services/questionService';
+import { getKarmaByUsername } from '../services/userService';
 
 /**
  * Custom hook for managing the answer page's state, navigation, and real-time updates.
@@ -26,6 +27,7 @@ const useAnswerPage = () => {
   const { user, socket } = useUserContext();
   const [questionID, setQuestionID] = useState<string>(qid || '');
   const [question, setQuestion] = useState<PopulatedDatabaseQuestion | null>(null);
+  const [karma, setKarma] = useState<number>(0);
 
   /**
    * Function to handle navigation to the "New Answer" page.
@@ -75,6 +77,11 @@ const useAnswerPage = () => {
       try {
         const res = await getQuestionById(questionID, user.username);
         setQuestion(res || null);
+
+        if (res?.askedBy) {
+          const userKarma = await getKarmaByUsername(res.askedBy);
+          setKarma(userKarma);
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching question:', error);
@@ -188,6 +195,7 @@ const useAnswerPage = () => {
   return {
     questionID,
     question,
+    karma,
     handleNewComment,
     handleNewAnswer,
   };
