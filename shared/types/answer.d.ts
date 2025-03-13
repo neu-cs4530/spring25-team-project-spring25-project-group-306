@@ -14,6 +14,7 @@ export interface Answer {
   ansBy: string;
   ansDateTime: Date;
   comments: Comment[];
+  image?: string;
 }
 
 /**

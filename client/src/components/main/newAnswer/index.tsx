@@ -8,7 +8,7 @@ import useAnswerForm from '../../../hooks/useAnswerForm';
  * NewAnswerPage component allows users to submit an answer to a specific question.
  */
 const NewAnswerPage = () => {
-  const { text, textErr, setText, postAnswer } = useAnswerForm();
+  const { text, textErr, setText, postAnswer, handleFileChange } = useAnswerForm();
 
   return (
     <Form>
@@ -19,6 +19,10 @@ const NewAnswerPage = () => {
         setState={setText}
         err={textErr}
       />
+      <p>
+        <strong>Upload Optional Image (png, jpg, or jpeg)</strong>
+      </p>
+      <input type='file' accept='.png,.jpeg,.jpg' onChange={handleFileChange} />
       <div className='btn_indicator_container'>
         <button className='form_postBtn' onClick={postAnswer}>
           Post Answer

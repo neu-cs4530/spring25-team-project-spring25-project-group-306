@@ -28,6 +28,7 @@ const AnswerPage = () => {
         views={question.views.length}
         text={question.text}
         askby={question.askedBy}
+        image={question.image}
         meta={getMetaData(new Date(question.askDateTime))}
       />
       <CommentSection
@@ -41,6 +42,7 @@ const AnswerPage = () => {
           ansBy={a.ansBy}
           meta={getMetaData(new Date(a.ansDateTime))}
           comments={a.comments}
+          image={a.image}
           handleAddComment={(comment: Comment) =>
             handleNewComment(comment, 'answer', String(a._id))
           }

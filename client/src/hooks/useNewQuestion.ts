@@ -4,6 +4,7 @@ import { validateHyperlink } from '../tool';
 import { addQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
 import { Question } from '../types/types';
+import { uploadImage } from '../services/imageUploadService';
 
 /**
  * Custom hook to handle question submission and form validation
@@ -14,6 +15,7 @@ import { Question } from '../types/types';
  * @returns titleErr - Error message for the title field, if any.
  * @returns textErr - Error message for the text field, if any.
  * @returns tagErr - Error message for the tag field, if any.
+ * @returns image - The current value of the image input.
  * @returns postQuestion - Function to validate the form and submit a new question.
  */
 const useNewQuestion = () => {
@@ -22,10 +24,12 @@ const useNewQuestion = () => {
   const [title, setTitle] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [tagNames, setTagNames] = useState<string>('');
+  const [image, setImage] = useState<string | null>(null);
 
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
   const [tagErr, setTagErr] = useState<string>('');
+  const [imageErr, setImageErr] = useState<string>('');
 
   /**
    * Function to validate the form before submitting the question.
@@ -102,12 +106,29 @@ const useNewQuestion = () => {
       downVotes: [],
       views: [],
       comments: [],
+      image: image || undefined,
     };
 
     const res = await addQuestion(question);
 
     if (res && res._id) {
       navigate('/home');
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+      setImageErr('No file selected');
+      return;
+    }
+    const file = e.target.files[0];
+
+    try {
+      const imageURL = await uploadImage(file);
+      setImage(imageURL);
+      setImageErr('');
+    } catch (err) {
+      setImageErr('Failed to upload image');
     }
   };
 
@@ -118,10 +139,14 @@ const useNewQuestion = () => {
     setText,
     tagNames,
     setTagNames,
+    image,
+    setImage,
     titleErr,
     textErr,
     tagErr,
+    imageErr,
     postQuestion,
+    handleFileChange,
   };
 };
 

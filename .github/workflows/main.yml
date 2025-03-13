@@ -44,6 +44,10 @@ jobs:
         if: ${{ always() }}
         env:
           REACT_APP_SERVER_URL: http://localhost:8000
+          REACT_APP_AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
+          REACT_APP_AWS_SECRET_ACCESS_KEY: LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
+          REACT_APP_AWS_REGION: us-east-1
+          REACT_APP_AWS_S3_BUCKET_NAME: fakesoimgs
         run: cd client; npm run build
 
       - name: Build backend server
@@ -66,4 +70,8 @@ jobs:
         if: ${{ always() }}
         env:
           REACT_APP_SERVER_URL: http://localhost:8000
+          REACT_APP_AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
+          REACT_APP_AWS_SECRET_ACCESS_KEY: LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
+          REACT_APP_AWS_REGION: us-east-1
+          REACT_APP_AWS_S3_BUCKET_NAME: fakesoimgs
         run: cd server; npm test
