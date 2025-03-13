@@ -18,6 +18,7 @@ interface AnswerProps {
   ansBy: string;
   karma: number;
   meta: string;
+  image?: string;
   comments: DatabaseComment[];
   handleAddComment: (comment: Comment) => void;
 }
@@ -32,7 +33,8 @@ interface AnswerProps {
  * @param comments An array of comments associated with the answer.
  * @param handleAddComment Function to handle adding a new comment.
  */
-const AnswerView = ({ text, ansBy, karma, meta, comments, handleAddComment }: AnswerProps) => (
+
+const AnswerView = ({ text, ansBy, meta, karma, image, comments, handleAddComment }: AnswerProps) => (
   <div className='answer right_padding'>
     <div id='answerText' className='answerText'>
       {handleHyperlink(text)}
@@ -43,6 +45,14 @@ const AnswerView = ({ text, ansBy, karma, meta, comments, handleAddComment }: An
         <div className='answer_karma'>{karma} karma</div>
       </div>
       <div className='answer_question_meta'>{meta}</div>
+      {image && (
+        <img
+          src={image}
+          alt='answer'
+          className='answer_image'
+          style={{ width: '300px', height: '300px' }}
+        />
+      )}
     </div>
     <CommentSection comments={comments} handleAddComment={handleAddComment} />
   </div>

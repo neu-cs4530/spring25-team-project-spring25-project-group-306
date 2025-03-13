@@ -32,6 +32,7 @@ const AnswerPage = () => {
         text={question.text}
         askby={question.askedBy}
         karma={karma}
+        image={question.image}
         meta={getMetaData(new Date(question.askDateTime))}
       />
       <CommentSection
@@ -46,6 +47,7 @@ const AnswerPage = () => {
           karma={karmaMap[a.ansBy] || 0}
           meta={getMetaData(new Date(a.ansDateTime))}
           comments={a.comments}
+          image={a.image}
           handleAddComment={(comment: Comment) =>
             handleNewComment(comment, 'answer', String(a._id))
           }
