@@ -1,4 +1,3 @@
-import React from 'react';
 import { handleHyperlink } from '../../../../tool';
 import CommentSection from '../../commentSection';
 import './index.css';
@@ -34,7 +33,15 @@ interface AnswerProps {
  * @param handleAddComment Function to handle adding a new comment.
  */
 
-const AnswerView = ({ text, ansBy, meta, karma, image, comments, handleAddComment }: AnswerProps) => (
+const AnswerView = ({
+  text,
+  ansBy,
+  meta,
+  karma,
+  image,
+  comments,
+  handleAddComment,
+}: AnswerProps) => (
   <div className='answer right_padding'>
     <div id='answerText' className='answerText'>
       {handleHyperlink(text)}
