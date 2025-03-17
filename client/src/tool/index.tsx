@@ -1,4 +1,8 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { jsx } from 'react/jsx-runtime';
 
 /**
  * List of all the months of the year.
@@ -131,4 +135,42 @@ const handleHyperlink = (text: string) => {
   return <div>{content}</div>;
 };
 
-export { getMetaData, handleHyperlink, validateHyperlink };
+/**
+ * MarkdownRenderer: Renders markdown text with syntax highlighting and validated hyperlinks.
+ *
+ * @param text - The markdown text to be rendered.
+ */
+const MarkdownRenderer = ({ text }: { text: string }) => (
+  <ReactMarkdown
+    components={{
+      a: ({ href, children, ...props }) => {
+        const isValidURL = /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/.test(href || '');
+        return isValidURL ? (
+          <a href={href} target='_blank' rel='noopener noreferrer' {...props}>
+            {children}
+          </a>
+        ) : (
+          <span style={{ color: 'red', fontWeight: 'bold' }} title='Invalid URL'>
+            {children} (Invalid URL)
+          </span>
+        );
+      },
+
+      code({ className, children, ...props }) {
+        const match = /language-(\w+)/.exec(className || '');
+        return match ? (
+          <SyntaxHighlighter style={dark} language={match[1]} PreTag='div' {...props}>
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+        ) : (
+          <code className={className} {...props}>
+            {children}
+          </code>
+        );
+      },
+    }}>
+    {text}
+  </ReactMarkdown>
+);
+
+export { getMetaData, handleHyperlink, validateHyperlink, MarkdownRenderer };
