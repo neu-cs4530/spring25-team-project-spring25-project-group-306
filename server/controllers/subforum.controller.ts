@@ -17,16 +17,13 @@ const subforumController = (socket: FakeSOSocket) => {
    * @param {Subforum} subforum - The subforum object to validate
    * @returns {boolean} - True if the subforum is valid, false otherwise
    */
-  const isSubforumValid = (subforum: Subforum): boolean => {
-    return (
-      !!subforum.title &&
-      !!subforum.description &&
-      !!subforum.moderators &&
-      Array.isArray(subforum.moderators) &&
-      subforum.moderators.length > 0 &&
-      subforum.moderators.every(moderator => typeof moderator === 'string' && moderator.length > 0)
-    );
-  };
+  const isSubforumValid = (subforum: Subforum): boolean =>
+    !!subforum.title &&
+    !!subforum.description &&
+    !!subforum.moderators &&
+    Array.isArray(subforum.moderators) &&
+    subforum.moderators.length > 0 &&
+    subforum.moderators.every(moderator => typeof moderator === 'string' && moderator.length > 0);
 
   /**
    * Creates a new subforum.
@@ -54,7 +51,6 @@ const subforumController = (socket: FakeSOSocket) => {
       }
       res.status(201).json(result);
     } catch (error) {
-      console.error('Error creating subforum:', error);
       res.status(500).json({ error: 'Failed to create subforum' });
     }
   };
@@ -100,7 +96,6 @@ const subforumController = (socket: FakeSOSocket) => {
       }
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error in updateSubforum controller:', error);
       res.status(500).json({ error: 'Failed to update subforum' });
     }
   };
@@ -125,7 +120,6 @@ const subforumController = (socket: FakeSOSocket) => {
       }
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error in getSubforum controller:', error);
       res.status(500).json({ error: 'Failed to fetch subforum' });
     }
   };
@@ -140,7 +134,6 @@ const subforumController = (socket: FakeSOSocket) => {
       const result = await getAllSubforums();
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error in getSubforums controller:', error);
       res.status(500).json({ error: 'Failed to fetch subforums' });
     }
   };
@@ -165,7 +158,6 @@ const subforumController = (socket: FakeSOSocket) => {
       }
       res.status(200).json({ message: 'Subforum deleted successfully' });
     } catch (error) {
-      console.error('Error in deleteSubforum controller:', error);
       res.status(500).json({ error: 'Failed to delete subforum' });
     }
   };

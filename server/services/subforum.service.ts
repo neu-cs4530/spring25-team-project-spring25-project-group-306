@@ -10,8 +10,6 @@ export const saveSubforum = async (
   subforum: Subforum,
 ): Promise<DatabaseSubforum | { error: string }> => {
   try {
-    console.log('Attempting to save subforum:', subforum);
-
     // Validate moderator usernames
     if (!subforum.moderators || subforum.moderators.length === 0) {
       return { error: 'At least one moderator is required' };
@@ -24,10 +22,8 @@ export const saveSubforum = async (
       isActive: true,
       questionCount: 0,
     });
-    console.log('Successfully saved subforum:', result);
     return result;
   } catch (error) {
-    console.error('Error in saveSubforum:', error);
     if (error instanceof Error) {
       return { error: `Error when saving a subforum: ${error.message}` };
     }
@@ -54,7 +50,6 @@ export const updateSubforumById = async (
 
     return await SubforumModel.findByIdAndUpdate(id, dbUpdateData, { new: true });
   } catch (error) {
-    console.error('Error in updateSubforumById:', error);
     return null;
   }
 };
@@ -68,7 +63,6 @@ export const getSubforumById = async (id: string): Promise<DatabaseSubforum | nu
   try {
     return await SubforumModel.findById(id);
   } catch (error) {
-    console.error('Error in getSubforumById:', error);
     return null;
   }
 };
@@ -81,7 +75,6 @@ export const getAllSubforums = async (): Promise<DatabaseSubforum[]> => {
   try {
     return await SubforumModel.find();
   } catch (error) {
-    console.error('Error in getAllSubforums:', error);
     return [];
   }
 };
@@ -96,7 +89,6 @@ export const deleteSubforumById = async (id: string): Promise<boolean> => {
     const result = await SubforumModel.findByIdAndDelete(id);
     return result !== null;
   } catch (error) {
-    console.error('Error in deleteSubforumById:', error);
     return false;
   }
 };
