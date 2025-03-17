@@ -1,86 +1,82 @@
-import { populateDocument } from '../utils/database.util';
-import express, {Response} from 'express';
+import express, { RequestHandler } from 'express';
 import { FakeSOSocket, CreateSubforumRequest } from '../types/types';
-import { saveSubforum } from '../services/subforum.service'
+import { saveSubforum, updateSubforumById } from '../services/subforum.service';
 
 const subforumController = (socket: FakeSOSocket) => {
-    const router = express.Router();
+  const router = express.Router();
 
-    const isSubforumRequestValid = (req: CreateSubforumRequest): boolean => {
-        const { title, description, moderators } = req.body;
-        return !!title && !!description && !!moderators && Array.isArray(moderators) && moderators.length > 0;
+  const isSubforumRequestValid = (req: CreateSubforumRequest): boolean => {
+    const { title, description, moderators } = req.body;
+    return (
+      !!title && !!description && !!moderators && Array.isArray(moderators) && moderators.length > 0
+    );
+  };
+
+  /**
+   * Creates a new subforum.
+   * @param req The incoming request containing subforum data.
+   * @param res The response to send back to the client.
+   * @returns The newly created subforum.
+   * @throws {Error} Throws an error if the subforum creation fails.
+   */
+  const createSubforum: RequestHandler = async (req, res) => {
+    if (!isSubforumRequestValid(req.body)) {
+      res.status(400).json({ error: 'Invalid subforum data' });
+      return;
     }
 
-    /**
-     * Creates a new subforum.
-     * @param req The incoming request containing subforum data.
-     * @param res The response to send back to the client.
-     * @returns The newly created subforum.
-     * @throws {Error} Throws an error if the subforum creation fails.
-     */
-    const createSubforum = async (req: CreateSubforumRequest, res: Response): Promise<void> => {
-        if (!isSubforumRequestValid(req)) {
-            res.status(400).json({ error: 'Invalid subforum data' });
-            return;
-        }
+    try {
+      const createdSubforum = await saveSubforum(req.body);
+      res.status(200).json(createdSubforum);
+      return;
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to create subforum' });
+      return;
+    }
+  };
 
-        const { title, description, moderators, tags, rules } = req.body;
-
-        const newSubforum = {
-            title,
-            description,
-            moderators,
-            tags,
-            rules,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isActive: true
-        }
-
-        try {
-            const createdSubforum = await saveSubforum({newSubforum});
-
-            if ('error' in newSubforum) {
-                res.status(500).json({ error: newSubforum.error });
-                return;
-            }
-
-            socket.emit('subforumUpdate', {
-                subforum: createdSubforum,
-                type: 'created'
-            });
-            res.status(200).json(createdSubforum);  
-            return;          
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to create subforum' });
-            return;
-        }
+  const updateSubforum = async (req: express.Request, res: express.Response) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      res.status(400).json({ error: 'No data provided for update' });
+      return;
     }
 
-    const updateSubforum = async (req: express.Request, res: express.Response) => {
-        return res.status(501).send('Not implemented');
+    const { title, description, moderators, tags, rules, isActive } = req.body;
+    const updateData = {
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
+      ...(moderators ? { moderators } : {}),
+      ...(tags ? { tags } : {}),
+      ...(rules ? { rules } : {}),
+      ...(isActive !== undefined ? { isActive } : {}),
+      updatedAt: new Date(),
+    };
+
+    try {
+      const updatedSubforum = await updateSubforumById(req.params.id, updateData);
+      if (!updatedSubforum) {
+        res.status(404).json({ error: 'Subforum not found' });
+        return;
+      }
+      res.status(200).json(updatedSubforum);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update subforum' });
     }
+  };
 
-    const getSubforum = async (req: express.Request, res: express.Response) => {
-        return res.status(501).send('Not implemented');
-    }
+  const getSubforum = async (req: express.Request, res: express.Response) => {
+    return res.status(501).send('Not implemented');
+  };
 
-    const getSubforums = async (req: express.Request, res: express.Response) => {
-        return res.status(501).send('Not implemented');
-    }
+  const getSubforums = async (req: express.Request, res: express.Response) => {
+    return res.status(501).send('Not implemented');
+  };
 
-    const deleteSubforum = async (req: express.Request, res: express.Response) => {
-        return res.status(501).send('Not implemented');
-    }
+  const deleteSubforum = async (req: express.Request, res: express.Response) => {
+    return res.status(501).send('Not implemented');
+  };
 
-    socket.on('connection', conn => {
-
-    });
-
-    router.post('/createSubforum', createSubforum);
-
-    return router
-
-
-
+  router.post('/createSubforum', createSubforum);
+  router.put('/updateSubforum/:id', updateSubforum);
+  return router;
 };
