@@ -1,4 +1,4 @@
-import express, { RequestHandler } from 'express';
+import express, { Request, Response } from 'express';
 import { FakeSOSocket, CreateSubforumRequest } from '../types/types';
 import { saveSubforum, updateSubforumById } from '../services/subforum.service';
 
@@ -19,7 +19,7 @@ const subforumController = (socket: FakeSOSocket) => {
    * @returns The newly created subforum.
    * @throws {Error} Throws an error if the subforum creation fails.
    */
-  const createSubforum: RequestHandler = async (req, res) => {
+  const createSubforum = async (req: Request, res: Response) => {
     if (!isSubforumRequestValid(req.body)) {
       res.status(400).json({ error: 'Invalid subforum data' });
       return;
@@ -35,7 +35,7 @@ const subforumController = (socket: FakeSOSocket) => {
     }
   };
 
-  const updateSubforum = async (req: express.Request, res: express.Response) => {
+  const updateSubforum = async (req: Request, res: Response) => {
     if (!req.body || Object.keys(req.body).length === 0) {
       res.status(400).json({ error: 'No data provided for update' });
       return;
