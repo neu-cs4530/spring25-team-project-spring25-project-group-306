@@ -51,21 +51,23 @@ export interface DatabaseSubforum extends Subforum {
  *
  * This includes only the fields required when creating a new subforum.
  */
-export interface CreateSubforumRequest {
+export interface CreateSubforumRequest extends Request{
+  body: {
   /** Title of the subforum */
-  title: string;
+    title: string;
 
-  /** Description of the subforum */
-  description: string;
+    /** Description of the subforum */
+    description: string;
 
-  /** Array of user IDs who are moderators of this subforum */
-  moderators: string[];
+    /** Array of user IDs who are moderators of this subforum */
+    moderators: string[];
 
-  /** Tags associated with this subforum (optional) */
-  tags?: string[];
+    /** Tags associated with this subforum (optional) */
+    tags?: string[];
 
-  /** Rules specific to this subforum (optional) */
-  rules?: string[];
+    /** Rules specific to this subforum (optional) */
+    rules?: string[];
+  }
 }
 
 /**
