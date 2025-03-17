@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 /**
  * Interface for a Subforum object.
  *
@@ -14,7 +16,7 @@ export interface Subforum {
   /** Description of the subforum */
   description: string;
 
-  /** Array of user IDs who are moderators of this subforum */
+  /** Array of usernames who are moderators of this subforum */
   moderators: string[];
 
   /** Date when the subforum was created */
@@ -51,15 +53,15 @@ export interface DatabaseSubforum extends Subforum {
  *
  * This includes only the fields required when creating a new subforum.
  */
-export interface CreateSubforumRequest extends Request{
+export interface CreateSubforumRequest extends Request {
   body: {
-  /** Title of the subforum */
+    /** Title of the subforum */
     title: string;
 
     /** Description of the subforum */
     description: string;
 
-    /** Array of user IDs who are moderators of this subforum */
+    /** Array of usernames who are moderators of this subforum */
     moderators: string[];
 
     /** Tags associated with this subforum (optional) */
@@ -67,7 +69,7 @@ export interface CreateSubforumRequest extends Request{
 
     /** Rules specific to this subforum (optional) */
     rules?: string[];
-  }
+  };
 }
 
 /**
@@ -82,7 +84,7 @@ export interface UpdateSubforumRequest {
   /** Description of the subforum (optional) */
   description?: string;
 
-  /** Array of user IDs who are moderators of this subforum (optional) */
+  /** Array of usernames who are moderators of this subforum (optional) */
   moderators?: string[];
 
   /** Tags associated with this subforum (optional) */
@@ -93,4 +95,32 @@ export interface UpdateSubforumRequest {
 
   /** Whether the subforum is active or archived (optional) */
   isActive?: boolean;
+}
+
+/**
+ * Interface for updating an existing subforum in the database.
+ *
+ * This includes fields that can be updated for an existing subforum.
+ */
+export interface DatabaseUpdateSubforumRequest {
+  /** Title of the subforum (optional) */
+  title?: string;
+
+  /** Description of the subforum (optional) */
+  description?: string;
+
+  /** Array of usernames who are moderators of this subforum (optional) */
+  moderators?: string[];
+
+  /** Tags associated with this subforum (optional) */
+  tags?: string[];
+
+  /** Rules specific to this subforum (optional) */
+  rules?: string[];
+
+  /** Whether the subforum is active or archived (optional) */
+  isActive?: boolean;
+
+  /** Date when the subforum was last updated */
+  updatedAt: Date;
 }

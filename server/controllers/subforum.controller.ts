@@ -1,82 +1,183 @@
-import express, { Request, Response } from 'express';
-import { FakeSOSocket, CreateSubforumRequest } from '../types/types';
-import { saveSubforum, updateSubforumById } from '../services/subforum.service';
+import express, { Response } from 'express';
+import { ObjectId } from 'mongodb';
+import { FakeSOSocket, Subforum } from '../types/types';
+import {
+  saveSubforum,
+  updateSubforumById,
+  getSubforumById,
+  getAllSubforums,
+  deleteSubforumById,
+} from '../services/subforum.service';
 
 const subforumController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
-  const isSubforumRequestValid = (req: CreateSubforumRequest): boolean => {
-    const { title, description, moderators } = req.body;
+  /**
+   * Validates the subforum object to ensure it contains all the necessary fields.
+   * @param {Subforum} subforum - The subforum object to validate
+   * @returns {boolean} - True if the subforum is valid, false otherwise
+   */
+  const isSubforumValid = (subforum: Subforum): boolean => {
     return (
-      !!title && !!description && !!moderators && Array.isArray(moderators) && moderators.length > 0
+      !!subforum.title &&
+      !!subforum.description &&
+      !!subforum.moderators &&
+      Array.isArray(subforum.moderators) &&
+      subforum.moderators.length > 0 &&
+      subforum.moderators.every(moderator => typeof moderator === 'string' && moderator.length > 0)
     );
   };
 
   /**
    * Creates a new subforum.
-   * @param req The incoming request containing subforum data.
-   * @param res The response to send back to the client.
-   * @returns The newly created subforum.
-   * @throws {Error} Throws an error if the subforum creation fails.
+   * @param {express.Request} req - The request object containing subforum data
+   * @param {Response} res - The response object
    */
-  const createSubforum = async (req: Request, res: Response) => {
-    if (!isSubforumRequestValid(req.body)) {
-      res.status(400).json({ error: 'Invalid subforum data' });
+  const createSubforum = async (req: express.Request, res: Response): Promise<void> => {
+    if (!req.body) {
+      res.status(400).json({ error: 'No request body provided' });
+      return;
+    }
+
+    if (!isSubforumValid(req.body)) {
+      res.status(400).json({
+        error:
+          'Invalid subforum data. Title, description, and at least one moderator username are required.',
+      });
       return;
     }
 
     try {
-      const createdSubforum = await saveSubforum(req.body);
-      res.status(200).json(createdSubforum);
-      return;
+      const result = await saveSubforum(req.body);
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      res.status(201).json(result);
     } catch (error) {
+      console.error('Error creating subforum:', error);
       res.status(500).json({ error: 'Failed to create subforum' });
-      return;
     }
   };
 
-  const updateSubforum = async (req: Request, res: Response) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      res.status(400).json({ error: 'No data provided for update' });
+  /**
+   * Updates an existing subforum.
+   * @param {express.Request} req - The request object containing update data
+   * @param {Response} res - The response object
+   */
+  const updateSubforum = async (req: express.Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid subforum ID' });
       return;
     }
 
-    const { title, description, moderators, tags, rules, isActive } = req.body;
-    const updateData = {
-      ...(title ? { title } : {}),
-      ...(description ? { description } : {}),
-      ...(moderators ? { moderators } : {}),
-      ...(tags ? { tags } : {}),
-      ...(rules ? { rules } : {}),
-      ...(isActive !== undefined ? { isActive } : {}),
-      updatedAt: new Date(),
-    };
+    if (!req.body || Object.keys(req.body).length === 0) {
+      res.status(400).json({ error: 'No update data provided' });
+      return;
+    }
+
+    // Validate moderators if they are being updated
+    if (req.body.moderators) {
+      if (!Array.isArray(req.body.moderators) || req.body.moderators.length === 0) {
+        res.status(400).json({ error: 'At least one moderator username is required' });
+        return;
+      }
+      if (
+        !req.body.moderators.every(
+          (moderator: string) => typeof moderator === 'string' && moderator.length > 0,
+        )
+      ) {
+        res.status(400).json({ error: 'All moderator usernames must be non-empty strings' });
+        return;
+      }
+    }
 
     try {
-      const updatedSubforum = await updateSubforumById(req.params.id, updateData);
-      if (!updatedSubforum) {
+      const result = await updateSubforumById(id, req.body);
+      if (!result) {
         res.status(404).json({ error: 'Subforum not found' });
         return;
       }
-      res.status(200).json(updatedSubforum);
+      res.status(200).json(result);
     } catch (error) {
+      console.error('Error in updateSubforum controller:', error);
       res.status(500).json({ error: 'Failed to update subforum' });
     }
   };
 
-  const getSubforum = async (req: express.Request, res: express.Response) => {
-    return res.status(501).send('Not implemented');
+  /**
+   * Retrieves a subforum by its ID.
+   * @param {express.Request} req - The request object containing the subforum ID
+   * @param {Response} res - The response object
+   */
+  const getSubforum = async (req: express.Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid subforum ID' });
+      return;
+    }
+
+    try {
+      const result = await getSubforumById(id);
+      if (!result) {
+        res.status(404).json({ error: 'Subforum not found' });
+        return;
+      }
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error in getSubforum controller:', error);
+      res.status(500).json({ error: 'Failed to fetch subforum' });
+    }
   };
 
-  const getSubforums = async (req: express.Request, res: express.Response) => {
-    return res.status(501).send('Not implemented');
+  /**
+   * Retrieves all subforums.
+   * @param {express.Request} req - The request object
+   * @param {Response} res - The response object
+   */
+  const getSubforums = async (req: express.Request, res: Response): Promise<void> => {
+    try {
+      const result = await getAllSubforums();
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error in getSubforums controller:', error);
+      res.status(500).json({ error: 'Failed to fetch subforums' });
+    }
   };
 
-  const deleteSubforum = async (req: express.Request, res: express.Response) => {
-    return res.status(501).send('Not implemented');
+  /**
+   * Deletes a subforum by its ID.
+   * @param {express.Request} req - The request object containing the subforum ID
+   * @param {Response} res - The response object
+   */
+  const deleteSubforum = async (req: express.Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid subforum ID' });
+      return;
+    }
+
+    try {
+      const result = await deleteSubforumById(id);
+      if (!result) {
+        res.status(404).json({ error: 'Subforum not found' });
+        return;
+      }
+      res.status(200).json({ message: 'Subforum deleted successfully' });
+    } catch (error) {
+      console.error('Error in deleteSubforum controller:', error);
+      res.status(500).json({ error: 'Failed to delete subforum' });
+    }
   };
 
-  router.post('/subforums', createSubforum);
-  router.put('/subforums/:id', updateSubforum);
+  // Define routes
+  router.post('/', createSubforum);
+  router.put('/:id', updateSubforum);
+  router.get('/:id', getSubforum);
+  router.get('/', getSubforums);
+  router.delete('/:id', deleteSubforum);
+
   return router;
 };
+
+export default subforumController;
