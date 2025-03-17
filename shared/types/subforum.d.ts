@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 /**
  * Interface for a Subforum object.
  *
