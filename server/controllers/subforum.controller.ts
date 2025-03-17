@@ -76,7 +76,7 @@ const subforumController = (socket: FakeSOSocket) => {
     return res.status(501).send('Not implemented');
   };
 
-  router.post('/createSubforum', createSubforum);
-  router.put('/updateSubforum/:id', updateSubforum);
+  router.post('/subforums', createSubforum);
+  router.put('/subforums/:id', updateSubforum);
   return router;
 };
