@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 /**
  * Interface for a Subforum object.
  *
@@ -75,24 +77,29 @@ export interface CreateSubforumRequest extends Request {
  *
  * This includes fields that can be updated for an existing subforum.
  */
-export interface UpdateSubforumRequest {
-  /** Title of the subforum (optional) */
-  title?: string;
+export interface UpdateSubforumRequest extends Request {
+  params: {
+    id: string;
+  };
+  body: {
+    /** Title of the subforum (optional) */
+    title?: string;
 
-  /** Description of the subforum (optional) */
-  description?: string;
+    /** Description of the subforum (optional) */
+    description?: string;
 
-  /** Array of usernames who are moderators of this subforum (optional) */
-  moderators?: string[];
+    /** Array of usernames who are moderators of this subforum (optional) */
+    moderators?: string[];
 
-  /** Tags associated with this subforum (optional) */
-  tags?: string[];
+    /** Tags associated with this subforum (optional) */
+    tags?: string[];
 
-  /** Rules specific to this subforum (optional) */
-  rules?: string[];
+    /** Rules specific to this subforum (optional) */
+    rules?: string[];
 
-  /** Whether the subforum is active or archived (optional) */
-  isActive?: boolean;
+    /** Whether the subforum is active or archived (optional) */
+    isActive?: boolean;
+  };
 }
 
 /**

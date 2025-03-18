@@ -1,13 +1,13 @@
 import SubforumModel from '../models/subforums.model';
-import { DatabaseSubforum, Subforum, DatabaseUpdateSubforumRequest } from '../types/types';
+import { DatabaseSubforum, CreateSubforumRequest, UpdateSubforumRequest } from '../types/types';
 
 /**
  * Saves a new subforum to the database.
- * @param {Subforum} subforum - The subforum to save
+ * @param {CreateSubforumRequest['body']} subforum - The subforum to save
  * @returns {Promise<DatabaseSubforum | { error: string }>} - The saved subforum or error message
  */
 export const saveSubforum = async (
-  subforum: Subforum,
+  subforum: CreateSubforumRequest['body'],
 ): Promise<DatabaseSubforum | { error: string }> => {
   try {
     // Validate moderator usernames
@@ -34,16 +34,16 @@ export const saveSubforum = async (
 /**
  * Updates a subforum by its ID.
  * @param {string} id - The subforum ID
- * @param {Partial<Subforum>} updateData - The data to update
+ * @param {UpdateSubforumRequest['body']} updateData - The data to update
  * @returns {Promise<DatabaseSubforum | null>} - The updated subforum or null if not found
  */
 export const updateSubforumById = async (
   id: string,
-  updateData: Partial<Subforum>,
+  updateData: UpdateSubforumRequest['body'],
 ): Promise<DatabaseSubforum | null> => {
   try {
     // Create a new object for database update
-    const dbUpdateData: DatabaseUpdateSubforumRequest = {
+    const dbUpdateData = {
       ...updateData,
       updatedAt: new Date(),
     };
