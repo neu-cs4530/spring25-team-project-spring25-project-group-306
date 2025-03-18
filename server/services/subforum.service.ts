@@ -61,7 +61,7 @@ export const updateSubforumById = async (
  */
 export const getSubforumById = async (id: string): Promise<DatabaseSubforum | null> => {
   try {
-    return await SubforumModel.findById(id);
+    return await SubforumModel.findById(id).lean();
   } catch (error) {
     return null;
   }
@@ -73,7 +73,7 @@ export const getSubforumById = async (id: string): Promise<DatabaseSubforum | nu
  */
 export const getAllSubforums = async (): Promise<DatabaseSubforum[]> => {
   try {
-    return await SubforumModel.find();
+    return await SubforumModel.find().lean();
   } catch (error) {
     return [];
   }

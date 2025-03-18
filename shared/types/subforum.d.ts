@@ -7,9 +7,6 @@ import { Request } from 'express';
  * A subforum is a dedicated space for discussions on a specific topic.
  */
 export interface Subforum {
-  /** Unique identifier for the subforum */
-  id: string;
-
   /** Title of the subforum */
   title: string;
 
