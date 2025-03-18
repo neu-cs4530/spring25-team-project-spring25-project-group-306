@@ -1,11 +1,6 @@
-import express, { Response } from 'express';
+import express, { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
-import {
-  CreateSubforumRequest,
-  FakeSOSocket,
-  Subforum,
-  UpdateSubforumRequest,
-} from '../types/types';
+import { CreateSubforumRequest, FakeSOSocket, UpdateSubforumRequest } from '../types/types';
 import {
   saveSubforum,
   updateSubforumById,
@@ -107,10 +102,10 @@ const subforumController = (socket: FakeSOSocket) => {
 
   /**
    * Retrieves a subforum by its ID.
-   * @param {express.Request} req - The request object containing the subforum ID
+   * @param {Request} req - The request object containing the subforum ID
    * @param {Response} res - The response object
    */
-  const getSubforum = async (req: express.Request, res: Response): Promise<void> => {
+  const getSubforum = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {
       res.status(400).json({ error: 'Invalid subforum ID' });
@@ -131,10 +126,10 @@ const subforumController = (socket: FakeSOSocket) => {
 
   /**
    * Retrieves all subforums.
-   * @param {express.Request} req - The request object
+   * @param {Request} req - The request object
    * @param {Response} res - The response object
    */
-  const getSubforums = async (req: express.Request, res: Response): Promise<void> => {
+  const getSubforums = async (req: Request, res: Response): Promise<void> => {
     try {
       const result = await getAllSubforums();
       res.status(200).json(result);
@@ -145,10 +140,10 @@ const subforumController = (socket: FakeSOSocket) => {
 
   /**
    * Deletes a subforum by its ID.
-   * @param {express.Request} req - The request object containing the subforum ID
+   * @param {Request} req - The request object containing the subforum ID
    * @param {Response} res - The response object
    */
-  const deleteSubforum = async (req: express.Request, res: Response): Promise<void> => {
+  const deleteSubforum = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {
       res.status(400).json({ error: 'Invalid subforum ID' });
