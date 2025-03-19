@@ -8,6 +8,7 @@ import {
   PopulatedDatabaseChat,
   PopulatedDatabaseQuestion,
 } from '../types/types';
+import { VoteResponse } from '../../shared/types/post';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
@@ -15,6 +16,7 @@ import CommentModel from '../models/comments.model';
 import ChatModel from '../models/chat.model';
 import UserModel from '../models/users.model';
 import MessageModel from '../models/messages.model';
+import { QueryOptions } from 'mongoose';
 
 /**
  * Fetches and populates a question document with its related tags, answers, and comments.
@@ -150,4 +152,35 @@ export const populateDocument = async (
   } catch (error) {
     return { error: `Error when fetching and populating a document: ${(error as Error).message}` };
   }
+};
+
+
+/**
+ * 
+ * 
+ * */
+export const updateVoteOperation = async (
+  username: string,
+  voteType: 'upvote' | 'downvote',
+): Promise<QueryOptions> => {
+  let updateOperation: QueryOptions;
+  if (voteType === 'upvote') {
+    updateOperation = [
+      {
+        $addToSet: { upVotes: username },
+        $pull: { downVotes: username },
+      },
+      { new: true },
+    ];
+  } else {
+    updateOperation = [
+      {
+        $addToSet: { downVotes: username },
+        $pull: { upVotes: username },
+      },
+      { new: true },
+    ];
+  }
+
+  return { updateOperation };
 };

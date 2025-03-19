@@ -12,8 +12,8 @@ import {
   PopulatedDatabaseQuestion,
   Question,
   Tag,
-  VoteResponse,
 } from '../../types/types';
+import { VoteResponse } from '../../../shared/types/post';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -316,8 +316,9 @@ describe('Test questionController', () => {
 
   describe('POST /upvoteQuestion', () => {
     it('should upvote a question successfully', async () => {
+      const validPid = new mongoose.Types.ObjectId();
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: validPid,
         username: 'new-user',
       };
 
@@ -331,13 +332,14 @@ describe('Test questionController', () => {
 
       const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
-      expect(response.status).toBe(200);
       expect(response.body).toEqual(mockResponse);
+      expect(response.status).toBe(200);
+      
     });
 
     it('should cancel the upvote successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
         username: 'some-user',
       };
 
@@ -371,7 +373,7 @@ describe('Test questionController', () => {
 
     it('should handle upvote and then downvote by the same user', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
         username: 'new-user',
       };
 
@@ -416,7 +418,7 @@ describe('Test questionController', () => {
 
     it('should return bad request error if the request had username missing', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
       };
 
       const response = await supertest(app).post(`/question/upvoteQuestion`).send(mockReqBody);
@@ -428,7 +430,7 @@ describe('Test questionController', () => {
   describe('POST /downvoteQuestion', () => {
     it('should downvote a question successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
         username: 'new-user',
       };
 
@@ -448,7 +450,7 @@ describe('Test questionController', () => {
 
     it('should cancel the downvote successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
         username: 'some-user',
       };
 
@@ -484,7 +486,7 @@ describe('Test questionController', () => {
 
     it('should handle downvote and then upvote by the same user', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
         username: 'new-user',
       };
 

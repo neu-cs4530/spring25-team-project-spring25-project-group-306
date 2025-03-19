@@ -5,10 +5,10 @@ import {
   FindQuestionRequest,
   FindQuestionByIdRequest,
   AddQuestionRequest,
-  VoteRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
 } from '../types/types';
+import {  VoteRequest } from '../../shared/types/post';
 import {
   addVoteToQuestion,
   fetchAndIncrementQuestionViewsById,
@@ -182,20 +182,20 @@ const questionController = (socket: FakeSOSocket) => {
     res: Response,
     type: 'upvote' | 'downvote',
   ): Promise<void> => {
-    if (!req.body.qid || !req.body.username) {
+    if (!req.body.pid || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
 
-    const { qid, username } = req.body;
+    const { pid, username } = req.body;
 
     try {
       let status;
 
       if (type === 'upvote') {
-        status = await addVoteToQuestion(qid, username, type);
+        status = await addVoteToQuestion(pid, username, type);
       } else {
-        status = await addVoteToQuestion(qid, username, type);
+        status = await addVoteToQuestion(pid, username, type);
       }
 
       if (status && 'error' in status) {
@@ -203,7 +203,7 @@ const questionController = (socket: FakeSOSocket) => {
       }
 
       // Emit the updated vote counts to all connected clients
-      socket.emit('voteUpdate', { qid, upVotes: status.upVotes, downVotes: status.downVotes });
+      socket.emit('voteUpdate', { pid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json(status);
     } catch (err) {
       res.status(500).send(`Error when ${type}ing: ${(err as Error).message}`);

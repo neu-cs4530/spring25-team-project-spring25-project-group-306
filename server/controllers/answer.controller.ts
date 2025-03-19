@@ -5,8 +5,8 @@ import {
   AddAnswerRequest,
   FakeSOSocket,
   PopulatedDatabaseAnswer,
-  AnswerVoteRequest,
 } from '../types/types';
+import { VoteRequest } from '../../shared/types/post';
 import { addAnswerToQuestion, saveAnswer, addVoteToAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
 
@@ -46,19 +46,19 @@ const answerController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const handleVote = async (
-    req: AnswerVoteRequest,
+    req: VoteRequest,
     res: Response,
-    voteType: 'upVote' | 'downVote',
+    voteType: 'upvote' | 'downvote',
   ): Promise<void> => {
-    if (!req.body.aid || !req.body.username) {
+    if (!req.body.pid || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
 
-    const { aid, username } = req.body;
+    const { pid, username } = req.body;
 
     try {
-      const status = await addVoteToAnswer(aid, username, voteType);
+      const status = await addVoteToAnswer(pid, username, voteType);
 
       if (status && 'error' in status) {
         res.status(500).send(status.error);
@@ -66,8 +66,8 @@ const answerController = (socket: FakeSOSocket) => {
       }
 
       // Emit the updated vote counts to all connected clients
-      socket.emit('answerVoteUpdate', {
-        aid,
+      socket.emit('voteUpdate', {
+        pid,
         upVotes: status.upVotes,
         downVotes: status.downVotes,
       });
@@ -85,8 +85,8 @@ const answerController = (socket: FakeSOSocket) => {
    *
    * @returns A Promise that resolves to void.
    */
-  const upvoteAnswer = async (req: AnswerVoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'upVote');
+  const upvoteAnswer = async (req: VoteRequest, res: Response): Promise<void> => {
+    handleVote(req, res, 'upvote');
   };
 
   /**
@@ -98,8 +98,8 @@ const answerController = (socket: FakeSOSocket) => {
    *
    * @returns A Promise that resolves to void.
    */
-  const downvoteAnswer = async (req: AnswerVoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'downVote');
+  const downvoteAnswer = async (req: VoteRequest, res: Response): Promise<void> => {
+    handleVote(req, res, 'downvote');
   };
 
   /**

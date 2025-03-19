@@ -35,27 +35,16 @@ export interface GameErrorPayload {
 
 /**
  * Payload for a vote update event.
- * - `qid`: The unique identifier of the question.
+ * - `pid`: The unique identifier of the post.
  * - `upVotes`: An array of usernames who upvoted the question.
  * - `downVotes`: An array of usernames who downvoted the question.
  */
 export interface VoteUpdatePayload {
-  qid: string;
+  pid: string;
   upVotes: string[];
   downVotes: string[];
 }
 
-/**
- * Payload for an answer vote update event.
- * - `aid`: The unique identifier of the answer.
- * - `upVotes`: An array of usernames who upvoted the answer.
- * - `downVotes`: An array of usernames who downvoted the answer.
- */
-export interface AnswerVoteUpdatePayload {
-  aid: string;
-  upVotes: string[];
-  downVotes: string[];
-}
 
 /**
  * Payload for a chat update event.
@@ -145,5 +134,4 @@ export interface ServerToClientEvents {
   gameUpdate: (game: GameUpdatePayload) => void;
   gameError: (error: GameErrorPayload) => void;
   chatUpdate: (chat: ChatUpdatePayload) => void;
-  answerVoteUpdate: (vote: AnswerVoteUpdatePayload) => void;
 }
