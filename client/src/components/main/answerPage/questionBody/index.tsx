@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import { handleHyperlink } from '../../../../tool';
+import { MarkdownRenderer } from '../../../../tool';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -32,7 +32,8 @@ interface QuestionBodyProps {
 const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyProps) => (
   <div id='questionBody' className='questionBody right_padding'>
     <div className='bold_title answer_question_view'>{views} views</div>
-    <div className='answer_question_text'>{handleHyperlink(text)}</div>
+    {/* <div className='answer_question_text'>{handleHyperlink(text)}</div> */}
+    <MarkdownRenderer text={text} />
     <div className='answer_question_right'>
       <div>
         <div className='question_author'>{askby}</div>
