@@ -19,15 +19,13 @@ const getAllSubforumsSpy = jest.spyOn(subforumService, 'getAllSubforums');
 const deleteSubforumByIdSpy = jest.spyOn(subforumService, 'deleteSubforumById');
 
 describe('Subforum Controller', () => {
-    describe('POST /', () => {
-        it('should create a new subforum successfully', async () => {
-            const subforum = {
-                title: 'Test Subforum',
-                description: 'A test subforum',
-                moderators: ['testmoderator'],
-            };
-
-            
-        });
+  describe('POST /', () => {
+    it('should create a new subforum successfully', async () => {
+      const subforum = {
+        title: 'Test Subforum',
+        description: 'A test subforum',
+        moderators: ['testmoderator'],
+      };
     });
+  });
 });

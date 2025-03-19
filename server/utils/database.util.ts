@@ -1,3 +1,5 @@
+import { QueryOptions } from 'mongoose';
+import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
 import {
   DatabaseComment,
   DatabaseMessage,
@@ -8,7 +10,6 @@ import {
   PopulatedDatabaseChat,
   PopulatedDatabaseQuestion,
 } from '../types/types';
-import { VoteResponse } from '../../shared/types/post';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
@@ -16,7 +17,6 @@ import CommentModel from '../models/comments.model';
 import ChatModel from '../models/chat.model';
 import UserModel from '../models/users.model';
 import MessageModel from '../models/messages.model';
-import { QueryOptions } from 'mongoose';
 
 /**
  * Fetches and populates a question document with its related tags, answers, and comments.
@@ -154,10 +154,9 @@ export const populateDocument = async (
   }
 };
 
-
 /**
- * 
- * 
+ *
+ *
  * */
 export const updateVoteOperation = async (
   username: string,
