@@ -6,8 +6,5 @@
     "client",
     "server",
     "shared"
-  ],
-  "dependencies": {
-    "react-markdown": "^10.1.0"
-  }
+  ]
 }

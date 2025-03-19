@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { jsx } from 'react/jsx-runtime';
+import remarkBreaks from 'remark-breaks';
+import { PluggableList } from 'unified';
+import './index.css';
 
 /**
  * List of all the months of the year.
@@ -142,6 +142,8 @@ const handleHyperlink = (text: string) => {
  */
 const MarkdownRenderer = ({ text }: { text: string }) => (
   <ReactMarkdown
+    className='markdown-container'
+    remarkPlugins={[remarkBreaks] as PluggableList}
     components={{
       a: ({ href, children, ...props }) => {
         const isValidURL = /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/.test(href || '');
@@ -153,19 +155,6 @@ const MarkdownRenderer = ({ text }: { text: string }) => (
           <span style={{ color: 'red', fontWeight: 'bold' }} title='Invalid URL'>
             {children} (Invalid URL)
           </span>
-        );
-      },
-
-      code({ className, children, ...props }) {
-        const match = /language-(\w+)/.exec(className || '');
-        return match ? (
-          <SyntaxHighlighter style={dark} language={match[1]} PreTag='div' {...props}>
-            {String(children).replace(/\n$/, '')}
-          </SyntaxHighlighter>
-        ) : (
-          <code className={className} {...props}>
-            {children}
-          </code>
         );
       },
     }}>
