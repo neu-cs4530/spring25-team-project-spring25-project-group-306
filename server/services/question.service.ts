@@ -118,7 +118,7 @@ export const filterQuestionsBySearch = (
 
 /**
  * Fetches a question by ID and increments its view count.
- * @param {string} qid - The question ID
+ * @param {string} qid - The question id
  * @param {string} username - The username requesting the question
  * @returns {Promise<QuestionResponse | null>} - The question with incremented views or error message
  */
@@ -175,7 +175,7 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
  */
 export const addVoteToQuestion = async (
   pid: string,
-  username: string,
+  username: string, 
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
   const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
