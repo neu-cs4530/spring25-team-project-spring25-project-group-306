@@ -1,6 +1,5 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { VoteRequest } from '@fake-stack-overflow/shared/types/post';
 import {
   Question,
   FindQuestionRequest,
@@ -9,6 +8,7 @@ import {
   FakeSOSocket,
   PopulatedDatabaseQuestion,
 } from '../types/types';
+import {  VoteRequest } from '../../shared/types/post';
 import {
   addVoteToQuestion,
   fetchAndIncrementQuestionViewsById,

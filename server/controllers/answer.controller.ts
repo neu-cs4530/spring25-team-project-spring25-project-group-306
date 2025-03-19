@@ -1,7 +1,12 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { VoteRequest } from '@fake-stack-overflow/shared/types/post';
-import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
+import {
+  Answer,
+  AddAnswerRequest,
+  FakeSOSocket,
+  PopulatedDatabaseAnswer,
+} from '../types/types';
+import { VoteRequest } from '../../shared/types/post';
 import { addAnswerToQuestion, saveAnswer, addVoteToAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
 

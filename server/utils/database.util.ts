@@ -1,5 +1,4 @@
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
 import {
   DatabaseComment,
   DatabaseMessage,
@@ -10,6 +9,7 @@ import {
   PopulatedDatabaseChat,
   PopulatedDatabaseQuestion,
 } from '../types/types';
+import { VoteResponse } from '../../shared/types/post';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import TagModel from '../models/tags.model';
@@ -154,9 +154,10 @@ export const populateDocument = async (
   }
 };
 
+
 /**
- *
- *
+ * 
+ * 
  * */
 export const updateVoteOperation = async (
   username: string,

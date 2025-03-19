@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
 import {
   DatabaseComment,
   DatabaseQuestion,
@@ -9,7 +8,7 @@ import {
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
   Question,
-  QuestionResponse,
+  QuestionResponse, 
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
@@ -17,6 +16,7 @@ import TagModel from '../models/tags.model';
 import CommentModel from '../models/comments.model';
 import { parseKeyword, parseTags } from '../utils/parse.util';
 import { checkTagInQuestion } from './tag.service';
+import { VoteResponse } from '../../shared/types/post';
 import {
   sortQuestionsByActive,
   sortQuestionsByMostViews,
@@ -175,10 +175,12 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
  */
 export const addVoteToQuestion = async (
   pid: string,
-  username: string, 
+  username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-  const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
+  let updateOperation: QueryOptions;
+
+  updateOperation = updateVoteOperation(username, voteType);
 
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(

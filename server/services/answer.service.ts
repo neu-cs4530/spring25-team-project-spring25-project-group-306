@@ -1,5 +1,4 @@
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
 import {
   Answer,
   AnswerResponse,
@@ -9,6 +8,7 @@ import {
   PopulatedDatabaseQuestion,
   QuestionResponse,
 } from '../types/types';
+import { VoteResponse } from '../../shared/types/post';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
 import { updateVoteOperation } from '../utils/database.util';
@@ -58,7 +58,9 @@ export const addVoteToAnswer = async (
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-  const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
+  let updateOperation: QueryOptions;
+
+  updateOperation = updateVoteOperation(username, voteType);
 
   try {
     const result: DatabaseAnswer | null = await AnswerModel.findOneAndUpdate(

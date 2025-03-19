@@ -252,6 +252,7 @@ describe('POST /answerUpvote', () => {
 
     const response = await supertest(app).post('/answer/answerUpvote').send(mockReqBody);
 
+    
     expect(response.body).toEqual(mockAnswer);
     expect(response.status).toBe(200);
   });
