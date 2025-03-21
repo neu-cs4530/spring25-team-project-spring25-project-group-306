@@ -289,7 +289,6 @@ describe('Subforum service', () => {
       expect(result).toEqual([]);
       expect(result.length).toBe(0);
     });
-
   });
 
   describe('deleteSubforumById', () => {
