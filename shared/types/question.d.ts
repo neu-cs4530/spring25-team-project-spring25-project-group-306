@@ -128,7 +128,7 @@ export interface AddQuestionRequest extends Request {
  */
 export interface VoteRequest extends Request {
   body: {
-    qid: string;
+    question: PopulatedDatabaseQuestion;
     username: string;
   };
 }

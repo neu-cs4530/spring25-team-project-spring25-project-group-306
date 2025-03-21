@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import QuestionModel from '../../models/questions.model';
 import {
   filterQuestionsBySearch,
@@ -315,19 +316,32 @@ describe('Question model', () => {
   });
 
   describe('addVoteToQuestion', () => {
-    test('addVoteToQuestion should upvote a question', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: [],
-      };
+    const mockQuestion: PopulatedDatabaseQuestion = {
+      _id: new ObjectId(),
+      title: 'title',
+      text: 'text',
+      tags: [],
+      askedBy: 'user1',
+      askDateTime: new Date(),
+      answers: [],
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      comments: [],
+      image: undefined,
+    };
 
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test('addVoteToQuestion should upvote a question', async () => {
       mockingoose(QuestionModel).toReturn(
         { ...mockQuestion, upVotes: ['testUser'], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -337,18 +351,14 @@ describe('Question model', () => {
     });
 
     test('If a downvoter upvotes, add them to upvotes and remove them from downvotes', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: ['testUser'],
-      };
+      const updatedQuestion = { ...mockQuestion, downVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: ['testUser'], downVotes: [] },
+        { ...updatedQuestion, upVotes: ['testUser'], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'upvote');
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -358,18 +368,14 @@ describe('Question model', () => {
     });
 
     test('should cancel the upvote if already upvoted', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: ['testUser'],
-        downVotes: [],
-      };
+      const updatedQuestion = { ...mockQuestion, upVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: [] },
+        { ...updatedQuestion, upVotes: [], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'upvote');
 
       expect(result).toEqual({
         msg: 'Upvote cancelled successfully',
@@ -381,7 +387,7 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion('nonExistentId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -389,24 +395,18 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding an upvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
 
       expect(result).toEqual({ error: 'Error when adding upvote to question' });
     });
 
     test('addVoteToQuestion should downvote a question', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: [],
-      };
-
       mockingoose(QuestionModel).toReturn(
         { ...mockQuestion, upVotes: [], downVotes: ['testUser'] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -416,18 +416,14 @@ describe('Question model', () => {
     });
 
     test('If an upvoter downvotes, add them to downvotes and remove them from upvotes', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: ['testUser'],
-        downVotes: [],
-      };
+      const updatedQuestion = { ...mockQuestion, upVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: ['testUser'] },
+        { ...updatedQuestion, upVotes: [], downVotes: ['testUser'] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'downvote');
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -437,18 +433,14 @@ describe('Question model', () => {
     });
 
     test('should cancel the downvote if already downvoted', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: ['testUser'],
-      };
+      const updatedQuestion = { ...mockQuestion, downVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: [] },
+        { ...updatedQuestion, upVotes: [], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'downvote');
 
       expect(result).toEqual({
         msg: 'Downvote cancelled successfully',
@@ -460,7 +452,7 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion('nonExistentId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -468,7 +460,7 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding a downvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
 
       expect(result).toEqual({ error: 'Error when adding downvote to question' });
     });

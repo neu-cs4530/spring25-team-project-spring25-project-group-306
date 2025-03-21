@@ -23,6 +23,7 @@ import {
   sortQuestionsByNewest,
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
+import { updateUserKarma } from './user.service';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -173,7 +174,7 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
  * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToQuestion = async (
-  qid: string,
+  question: PopulatedDatabaseQuestion,
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
@@ -225,7 +226,7 @@ export const addVoteToQuestion = async (
 
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(
-      { _id: qid },
+      { _id: question._id },
       updateOperation,
       { new: true },
     );
@@ -237,13 +238,19 @@ export const addVoteToQuestion = async (
     let msg = '';
 
     if (voteType === 'upvote') {
-      msg = result.upVotes.includes(username)
-        ? 'Question upvoted successfully'
-        : 'Upvote cancelled successfully';
+      if (result.upVotes.includes(username)) {
+        msg = 'Question upvoted successfully';
+        await updateUserKarma(question.askedBy, 1);
+      } else {
+        msg = 'Upvote cancelled successfully';
+        await updateUserKarma(question.askedBy, -1);
+      }
+    } else if (result.downVotes.includes(username)) {
+      msg = 'Question downvoted successfully';
+      await updateUserKarma(question.askedBy, -1);
     } else {
-      msg = result.downVotes.includes(username)
-        ? 'Question downvoted successfully'
-        : 'Downvote cancelled successfully';
+      msg = 'Downvote cancelled successfully';
+      await updateUserKarma(question.askedBy, 1);
     }
 
     return {

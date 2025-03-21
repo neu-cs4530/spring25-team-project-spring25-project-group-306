@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
-import { addQuestion } from '../services/questionService';
+import { addQuestion, upvoteQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
 import { Question } from '../types/types';
 import uploadImage from '../services/imageUploadService';
+import { changeKarmaBy } from '../services/userService';
 
 /**
  * Custom hook to handle question submission and form validation
@@ -110,6 +111,8 @@ const useNewQuestion = () => {
     };
 
     const res = await addQuestion(question);
+
+    await upvoteQuestion(res, question.askedBy);
 
     if (res && res._id) {
       navigate('/home');
