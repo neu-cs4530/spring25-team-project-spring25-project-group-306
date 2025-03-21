@@ -9,7 +9,7 @@ import {
 } from '../../services/subforum.service';
 import { DatabaseSubforum } from '../../types/types';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requirescl
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
 describe('Subforum service', () => {
@@ -87,7 +87,6 @@ describe('Subforum service', () => {
 
       expect(result).toEqual({ error: 'Error when saving a subforum: Database error' });
     });
-  
   });
 
   describe('updateSubforumById', () => {
@@ -290,7 +289,6 @@ describe('Subforum service', () => {
       expect(result).toEqual([]);
       expect(result.length).toBe(0);
     });
-  });
 
     test('should return an object with error', async () => {
       mockingoose(SubforumModel).toReturn(new Error('error'), 'find');
@@ -299,7 +297,7 @@ describe('Subforum service', () => {
 
       expect(result).toEqual({ error: 'Error when retrieving subforums' });
     });
-
+  });
 
   describe('deleteSubforumById', () => {
     test('should successfully delete an existing subforum', async () => {
