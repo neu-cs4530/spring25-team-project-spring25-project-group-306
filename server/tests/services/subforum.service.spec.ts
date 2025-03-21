@@ -290,13 +290,6 @@ describe('Subforum service', () => {
       expect(result.length).toBe(0);
     });
 
-    test('should return an object with error', async () => {
-      mockingoose(SubforumModel).toReturn(new Error('error'), 'find');
-
-      const result = await getAllSubforums();
-
-      expect(result).toEqual({ error: 'Error when retrieving subforums' });
-    });
   });
 
   describe('deleteSubforumById', () => {
