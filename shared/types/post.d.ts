@@ -1,6 +1,5 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { VoteInterface, VoteResponse } from './question';
 
 /**
  * Represents a question or an answer, and includes their shared functionality: upvotes and downvotes.

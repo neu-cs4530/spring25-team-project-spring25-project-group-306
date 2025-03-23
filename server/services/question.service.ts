@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
+import { VoteResponse } from '../../shared/types/post';
 import {
   DatabaseComment,
   DatabaseQuestion,
@@ -178,7 +178,6 @@ export const addVoteToQuestion = async (
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-
   const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
 
   try {

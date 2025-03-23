@@ -1,5 +1,5 @@
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
+import { VoteResponse } from '../../shared/types/post';
 import {
   Answer,
   AnswerResponse,
@@ -58,7 +58,6 @@ export const addVoteToAnswer = async (
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-
   const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
 
   try {

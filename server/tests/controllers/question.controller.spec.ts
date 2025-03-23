@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
-import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
+import { VoteResponse } from '../../../shared/types/post'; 
 import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';

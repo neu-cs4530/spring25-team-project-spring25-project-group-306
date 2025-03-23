@@ -56,4 +56,3 @@ export interface AddAnswerRequest extends Request {
  */
 export type AnswerResponse = DatabaseAnswer | { error: string };
 
-
