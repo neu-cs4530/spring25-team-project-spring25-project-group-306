@@ -45,7 +45,6 @@ export interface VoteUpdatePayload {
   downVotes: string[];
 }
 
-
 /**
  * Payload for a chat update event.
  * - `chat`: The updated chat object.

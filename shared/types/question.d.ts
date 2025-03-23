@@ -106,5 +106,3 @@ export interface FindQuestionByIdRequest extends Request {
 export interface AddQuestionRequest extends Request {
   body: Question;
 }
-
-
