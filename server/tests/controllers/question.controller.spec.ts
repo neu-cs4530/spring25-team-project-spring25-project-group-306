@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
+import { VoteResponse } from '@fake-stack-overflow/shared/types/post';
 import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';
@@ -13,7 +14,6 @@ import {
   Question,
   Tag,
 } from '../../types/types';
-import { VoteResponse } from '../../../shared/types/post';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -334,7 +334,6 @@ describe('Test questionController', () => {
 
       expect(response.body).toEqual(mockResponse);
       expect(response.status).toBe(200);
-      
     });
 
     it('should cancel the upvote successfully', async () => {
