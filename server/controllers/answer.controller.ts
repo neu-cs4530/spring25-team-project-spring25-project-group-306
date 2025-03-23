@@ -1,6 +1,6 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { VoteRequest } from '../../shared/types/post';
+import { VoteRequest } from '../types/types';
 import { Answer, AddAnswerRequest, FakeSOSocket, PopulatedDatabaseAnswer } from '../types/types';
 import { addAnswerToQuestion, saveAnswer, addVoteToAnswer } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';

@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '../../shared/types/post';
+import { VoteResponse } from '../types/types';
 import {
   DatabaseComment,
   DatabaseQuestion,
