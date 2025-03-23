@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
-import { VoteResponse } from '../../types/types'; 
 import { app } from '../../app';
 import * as questionUtil from '../../services/question.service';
 import * as tagUtil from '../../services/tag.service';
@@ -13,6 +12,7 @@ import {
   PopulatedDatabaseQuestion,
   Question,
   Tag,
+  VoteResponse,
 } from '../../types/types';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');

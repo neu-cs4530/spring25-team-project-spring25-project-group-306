@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '../types/types';
 import {
   DatabaseComment,
   DatabaseQuestion,
@@ -10,6 +9,7 @@ import {
   PopulatedDatabaseQuestion,
   Question,
   QuestionResponse,
+  VoteResponse,
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';

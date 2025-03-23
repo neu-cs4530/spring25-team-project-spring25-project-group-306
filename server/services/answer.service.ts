@@ -1,5 +1,4 @@
 import { QueryOptions } from 'mongoose';
-import { VoteResponse } from '../types/types';
 import {
   Answer,
   AnswerResponse,
@@ -8,6 +7,7 @@ import {
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
   QuestionResponse,
+  VoteResponse,
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';

@@ -1,6 +1,5 @@
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { VoteRequest } from '../types/types';
 import {
   Question,
   FindQuestionRequest,
@@ -8,6 +7,7 @@ import {
   AddQuestionRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
+  VoteRequest,
 } from '../types/types';
 import {
   addVoteToQuestion,
