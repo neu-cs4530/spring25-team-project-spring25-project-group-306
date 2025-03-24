@@ -110,11 +110,11 @@ const useNewQuestion = () => {
       image: image || undefined,
     };
 
-    const res = await addQuestion(question);
+    const resQuestion = await addQuestion(question);
 
-    await upvoteQuestion(res, question.askedBy);
+    await upvoteQuestion(resQuestion, question.askedBy);
 
-    if (res && res._id) {
+    if (resQuestion && resQuestion._id) {
       navigate('/home');
     }
   };

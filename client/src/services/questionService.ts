@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { PopulatedDatabaseQuestion, Question, VoteInterface } from '../types/types';
 import api from './config';
 
@@ -64,10 +63,10 @@ const addQuestion = async (q: Question): Promise<PopulatedDatabaseQuestion> => {
  * @throws Error if there is an issue upvoting the question.
  */
 const upvoteQuestion = async (
-  q: PopulatedDatabaseQuestion,
+  question: PopulatedDatabaseQuestion,
   username: string,
 ): Promise<VoteInterface> => {
-  const data = { q, username };
+  const data = { question, username };
   const res = await api.post(`${QUESTION_API_URL}/upvoteQuestion`, data);
   if (res.status !== 200) {
     throw new Error('Error while upvoting the question');
@@ -86,7 +85,7 @@ const downvoteQuestion = async (
   q: PopulatedDatabaseQuestion,
   username: string,
 ): Promise<VoteInterface> => {
-  const data = { q, username };
+  const data = { question: q, username };
   const res = await api.post(`${QUESTION_API_URL}/downvoteQuestion`, data);
   if (res.status !== 200) {
     throw new Error('Error while downvoting the question');

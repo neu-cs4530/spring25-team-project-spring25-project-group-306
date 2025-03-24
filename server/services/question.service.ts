@@ -168,7 +168,7 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
 
 /**
  * Adds a vote to a question.
- * @param {string} qid - The question ID
+ * @param {string} question - The question
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
  * @returns {Promise<VoteResponse>} - The updated vote result
@@ -236,21 +236,34 @@ export const addVoteToQuestion = async (
     }
 
     let msg = '';
+    let karmaChange = 0;
+    const alreadyUpvoted = question.upVotes.includes(username);
+    const alreadyDownvoted = question.downVotes.includes(username);
 
     if (voteType === 'upvote') {
-      if (result.upVotes.includes(username)) {
+      if (alreadyDownvoted) {
         msg = 'Question upvoted successfully';
-        await updateUserKarma(question.askedBy, 1);
+        karmaChange = 2;
+      } else if (!alreadyUpvoted) {
+        msg = 'Question upvoted successfully';
+        karmaChange = 1;
       } else {
         msg = 'Upvote cancelled successfully';
-        await updateUserKarma(question.askedBy, -1);
+        karmaChange = -1;
       }
-    } else if (result.downVotes.includes(username)) {
+    } else if (alreadyUpvoted) {
       msg = 'Question downvoted successfully';
-      await updateUserKarma(question.askedBy, -1);
+      karmaChange = -2;
+    } else if (!alreadyDownvoted) {
+      msg = 'Question downvoted successfully';
+      karmaChange = -1;
     } else {
       msg = 'Downvote cancelled successfully';
-      await updateUserKarma(question.askedBy, 1);
+      karmaChange = 1;
+    }
+
+    if (karmaChange !== 0) {
+      await updateUserKarma(question.askedBy, karmaChange);
     }
 
     return {

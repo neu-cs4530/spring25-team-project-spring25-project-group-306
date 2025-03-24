@@ -123,7 +123,7 @@ export interface AddQuestionRequest extends Request {
 
 /**
  * Interface for the request body when upvoting or downvoting a question.
- * - `qid`: The unique identifier of the question being voted on (body).
+ * - `question`: The populated database question being voted on (body).
  * - `username`: The username of the user casting the vote (body).
  */
 export interface VoteRequest extends Request {
