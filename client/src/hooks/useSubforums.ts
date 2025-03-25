@@ -23,7 +23,7 @@ const useSubforums = () => {
   const fetchSubforums = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/subforums', {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/subforums`, {
         headers: {
           'Content-Type': 'application/json',
         },

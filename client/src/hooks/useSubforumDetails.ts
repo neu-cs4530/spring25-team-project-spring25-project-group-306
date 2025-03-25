@@ -20,12 +20,15 @@ const useSubforumDetails = (subforumId: string | undefined) => {
 
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/subforums/${subforumId}`, {
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/subforums/${subforumId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
           },
-          credentials: 'include',
-        });
+        );
 
         if (!response.ok) {
           const errorData = await response.text();

@@ -36,12 +36,15 @@ const useSubforumSettings = (subforumId: string | undefined) => {
 
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/subforums/${subforumId}`, {
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/subforums/${subforumId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
           },
-          credentials: 'include',
-        });
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch subforum');
@@ -144,7 +147,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     };
 
     try {
-      const response = await fetch(`http://localhost:8000/subforums/${subforumId}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/subforums/${subforumId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +172,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     if (!subforumId) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/subforums/${subforumId}`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/subforums/${subforumId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

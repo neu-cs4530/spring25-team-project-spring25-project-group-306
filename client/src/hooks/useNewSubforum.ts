@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateSubforumRequest } from '@fake-stack-overflow/shared/types/subforum';
-import useUserContext from './useUserContext';
 
 /**
  * Custom hook to handle subforum creation and form validation
@@ -9,25 +8,29 @@ import useUserContext from './useUserContext';
  * @returns title - The current value of the title input
  * @returns description - The current value of the description input
  * @returns tags - The current value of the tags input
+ * @returns moderators - The current value of the moderators input
  * @returns rules - The current value of the rules input
  * @returns titleErr - Error message for the title field
  * @returns descriptionErr - Error message for the description field
  * @returns tagsErr - Error message for the tags field
+ * @returns moderatorsErr - Error message for the moderators field
  * @returns rulesErr - Error message for the rules field
+ * @returns error - Error message for the subforum creation
  * @returns createSubforum - Function to validate the form and create a new subforum
  */
 const useNewSubforum = () => {
   const navigate = useNavigate();
-  const { user } = useUserContext();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
+  const [moderators, setModerators] = useState('');
   const [rules, setRules] = useState('');
-
   const [titleErr, setTitleErr] = useState('');
   const [descriptionErr, setDescriptionErr] = useState('');
   const [tagsErr, setTagsErr] = useState('');
+  const [moderatorsErr, setModeratorsErr] = useState('');
   const [rulesErr, setRulesErr] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -74,6 +77,14 @@ const useNewSubforum = () => {
       setRulesErr('');
     }
 
+    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
+    if (moderatorsList.length === 0) {
+      setModeratorsErr('Must have at least one moderator');
+      isValid = false;
+    } else {
+      setModeratorsErr('');
+    }
+
     return isValid;
   };
 
@@ -82,17 +93,18 @@ const useNewSubforum = () => {
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     const rulesList = rules.split('\n').filter(rule => rule.trim() !== '');
+    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
 
     const subforumData: CreateSubforumRequest['body'] = {
       title,
       description,
-      moderators: [user.username],
+      moderators: moderatorsList,
       tags: tagList,
       rules: rulesList,
     };
 
     try {
-      const response = await fetch('http://localhost:8000/subforums', {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/subforums`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,10 +118,9 @@ const useNewSubforum = () => {
         throw new Error(`Failed to create subforum: ${errorData}`);
       }
 
-      const data = await response.json();
-      navigate(`/subforums/${data._id}`);
+      navigate('/subforums');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to create subforum');
+      setError(err instanceof Error ? err.message : 'Failed to create subforum');
     }
   };
 
@@ -120,12 +131,16 @@ const useNewSubforum = () => {
     setDescription,
     tags,
     setTags,
+    moderators,
+    setModerators,
     rules,
     setRules,
     titleErr,
     descriptionErr,
     tagsErr,
+    moderatorsErr,
     rulesErr,
+    error,
     createSubforum,
   };
 };
