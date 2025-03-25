@@ -119,7 +119,10 @@ const useSubforumSettings = (subforumId: string | undefined) => {
       setRulesErr('');
     }
 
-    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
+    const moderatorsList = moderators
+      .split('\n')
+      .map(mod => mod.trim())
+      .filter(mod => mod !== '');
     if (moderatorsList.length === 0) {
       setModeratorsErr('Must have at least one moderator');
       isValid = false;
@@ -135,7 +138,10 @@ const useSubforumSettings = (subforumId: string | undefined) => {
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     const rulesList = rules.split('\n').filter(rule => rule.trim() !== '');
-    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
+    const moderatorsList = moderators
+      .split('\n')
+      .map(mod => mod.trim())
+      .filter(mod => mod !== '');
 
     const updateData: DatabaseUpdateSubforumRequest = {
       title,

@@ -14,6 +14,7 @@ export const SubforumDetailsPage: React.FC = () => {
     error: subforumError,
     isModerator,
     navigateToSettings,
+    refetch: refetchSubforum,
   } = useSubforumDetails(subforumId);
   const {
     questions,
@@ -43,7 +44,7 @@ export const SubforumDetailsPage: React.FC = () => {
     return questions.map(question => (
       <div key={question._id} className='question-card'>
         <h3>{question.title}</h3>
-        <p className='question-preview'>{question.text.substring(0, 200)}...</p>
+        <p className='question-preview'>{question.text.substring(0, 200)}</p>
         <div className='question-meta'>
           <span>Asked by {question.askedBy}</span>
           <span>{new Date(question.askDateTime).toLocaleDateString()}</span>
@@ -137,7 +138,10 @@ export const SubforumDetailsPage: React.FC = () => {
           isOpen={isAskQuestionModalOpen}
           onClose={() => setIsAskQuestionModalOpen(false)}
           subforumId={subforumId || ''}
-          onQuestionAdded={refetchQuestions}
+          onQuestionAdded={() => {
+            refetchQuestions();
+            refetchSubforum();
+          }}
         />
       )}
     </div>

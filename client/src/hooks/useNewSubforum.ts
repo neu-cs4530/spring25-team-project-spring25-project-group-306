@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateSubforumRequest } from '@fake-stack-overflow/shared/types/subforum';
+import useUserContext from './useUserContext';
 
 /**
  * Custom hook to handle subforum creation and form validation
@@ -20,6 +21,7 @@ import { CreateSubforumRequest } from '@fake-stack-overflow/shared/types/subforu
  */
 const useNewSubforum = () => {
   const navigate = useNavigate();
+  const { user } = useUserContext();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
@@ -35,6 +37,11 @@ const useNewSubforum = () => {
   const validateForm = (): boolean => {
     let isValid = true;
 
+    if (!user) {
+      setError('You must be logged in to create a subforum');
+      return false;
+    }
+
     if (!title) {
       setTitleErr('Title cannot be empty');
       isValid = false;
@@ -45,12 +52,8 @@ const useNewSubforum = () => {
       setTitleErr('');
     }
 
-    if (!description) {
-      setDescriptionErr('Description cannot be empty');
-      isValid = false;
-    } else {
-      setDescriptionErr('');
-    }
+    // Description is optional
+    setDescriptionErr('');
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     if (tagList.length > 5) {
@@ -77,13 +80,8 @@ const useNewSubforum = () => {
       setRulesErr('');
     }
 
-    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
-    if (moderatorsList.length === 0) {
-      setModeratorsErr('Must have at least one moderator');
-      isValid = false;
-    } else {
-      setModeratorsErr('');
-    }
+    // Moderators are optional (current user will be added automatically)
+    setModeratorsErr('');
 
     return isValid;
   };
@@ -93,7 +91,15 @@ const useNewSubforum = () => {
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     const rulesList = rules.split('\n').filter(rule => rule.trim() !== '');
-    const moderatorsList = moderators.split('\n').filter(mod => mod.trim() !== '');
+    const moderatorsList = moderators
+      .split('\n')
+      .map(mod => mod.trim())
+      .filter(mod => mod !== '');
+
+    // Ensure current user is included as a moderator
+    if (!moderatorsList.includes(user.username)) {
+      moderatorsList.push(user.username);
+    }
 
     const subforumData: CreateSubforumRequest['body'] = {
       title,
