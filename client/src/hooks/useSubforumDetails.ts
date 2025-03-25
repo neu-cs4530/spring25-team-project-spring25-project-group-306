@@ -36,7 +36,6 @@ const useSubforumDetails = (subforumId: string | undefined) => {
         setSubforum(data);
         setError(null);
       } catch (err) {
-        console.error('Error fetching subforum:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
         setSubforum(null);
       } finally {

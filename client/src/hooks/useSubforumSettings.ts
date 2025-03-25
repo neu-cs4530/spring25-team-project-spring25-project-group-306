@@ -11,6 +11,8 @@ const useSubforumSettings = (subforumId: string | undefined) => {
   const { user } = useUserContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -60,7 +62,6 @@ const useSubforumSettings = (subforumId: string | undefined) => {
         setModerators(data.moderators.join('\n'));
         setError(null);
       } catch (err) {
-        console.error('Error fetching subforum:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
@@ -154,13 +155,13 @@ const useSubforumSettings = (subforumId: string | undefined) => {
 
       if (!response.ok) {
         const errorData = await response.text();
+
         throw new Error(`Failed to update subforum: ${errorData}`);
       }
 
       navigate(`/subforums/${subforumId}`);
     } catch (err) {
-      console.error('Error updating subforum:', err);
-      alert(err instanceof Error ? err.message : 'Failed to update subforum');
+      setUpdateError(err instanceof Error ? err.message : 'Failed to update subforum');
     }
   };
 
@@ -180,8 +181,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
 
       navigate('/subforums');
     } catch (err) {
-      console.error('Error deleting subforum:', err);
-      alert(err instanceof Error ? err.message : 'Failed to delete subforum');
+      setUpdateError(err instanceof Error ? err.message : 'Failed to delete subforum');
     }
   };
 
@@ -203,6 +203,9 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     moderatorsErr,
     loading,
     error,
+    updateError,
+    showDeleteConfirm,
+    setShowDeleteConfirm,
     updateSubforum,
     deleteSubforum,
   };

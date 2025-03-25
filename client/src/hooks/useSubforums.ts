@@ -46,7 +46,6 @@ const useSubforums = () => {
       setSubforums(data);
       setError(null);
     } catch (err) {
-      console.error('Error fetching subforums:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
       setSubforums([]); // Reset subforums on error
     } finally {

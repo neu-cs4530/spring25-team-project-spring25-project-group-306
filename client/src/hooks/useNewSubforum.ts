@@ -109,8 +109,6 @@ const useNewSubforum = () => {
       const data = await response.json();
       navigate(`/subforums/${data._id}`);
     } catch (err) {
-      console.error('Error creating subforum:', err);
-      // You might want to show this error to the user in a more user-friendly way
       alert(err instanceof Error ? err.message : 'Failed to create subforum');
     }
   };

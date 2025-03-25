@@ -26,6 +26,9 @@ const SubforumSettingsPage: React.FC = () => {
     moderatorsErr,
     loading,
     error,
+    updateError,
+    showDeleteConfirm,
+    setShowDeleteConfirm,
     updateSubforum,
     deleteSubforum,
   } = useSubforumSettings(subforumId);
@@ -38,17 +41,10 @@ const SubforumSettingsPage: React.FC = () => {
     return <div className='error'>Error: {error}</div>;
   }
 
-  const handleDelete = () => {
-    if (
-      window.confirm('Are you sure you want to delete this subforum? This action cannot be undone.')
-    ) {
-      deleteSubforum();
-    }
-  };
-
   return (
     <div className='subforum-settings-container'>
       <h1>Edit Subforum Settings</h1>
+      {updateError && <div className='error update-error'>{updateError}</div>}
       <Form>
         <Input
           title='Subforum Title *'
@@ -94,11 +90,33 @@ const SubforumSettingsPage: React.FC = () => {
           <button className='save-button' onClick={updateSubforum}>
             Save Changes
           </button>
-          <button className='delete-button' onClick={handleDelete}>
+          <button className='delete-button' onClick={() => setShowDeleteConfirm(true)}>
             Delete Subforum
           </button>
         </div>
       </Form>
+
+      {showDeleteConfirm && (
+        <div className='delete-confirmation-overlay'>
+          <div className='delete-confirmation-dialog'>
+            <h2>Delete Subforum</h2>
+            <p>Are you sure you want to delete this subforum? This action cannot be undone.</p>
+            <div className='delete-confirmation-actions'>
+              <button className='cancel-button' onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </button>
+              <button
+                className='confirm-delete-button'
+                onClick={() => {
+                  deleteSubforum();
+                  setShowDeleteConfirm(false);
+                }}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
