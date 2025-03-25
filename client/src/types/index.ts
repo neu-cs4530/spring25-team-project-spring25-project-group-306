@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 export interface Tag {
   name: string;
   description: string;
@@ -10,6 +12,6 @@ export interface Question {
   tags: Tag[];
   askedBy: string;
   askDateTime: Date;
-  answers?: any[];
+  answers?: ObjectId[];
   subforumId?: string;
 }
