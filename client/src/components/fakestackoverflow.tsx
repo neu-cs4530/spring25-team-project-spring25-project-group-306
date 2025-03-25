@@ -18,6 +18,10 @@ import ProfileSettings from './profileSettings';
 import AllGamesPage from './main/games/allGamesPage';
 import GamePage from './main/games/gamePage';
 import LeaderboardPage from './main/leaderboardPage';
+import SubforumPage from './main/subforumPage';
+import NewSubforumPage from './main/newSubforum';
+import SubforumDetailsPage from './main/subforumDetails';
+import SubforumSettingsPage from './main/subforumSettings';
 
 const ProtectedRoute = ({
   user,
@@ -68,6 +72,10 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/user/:username' element={<ProfileSettings />} />
             <Route path='/games' element={<AllGamesPage />} />
             <Route path='/games/:gameID' element={<GamePage />} />
+            <Route path='/subforums' element={<SubforumPage />} />
+            <Route path='/new/subforum' element={<NewSubforumPage />} />
+            <Route path='/subforums/:subforumId' element={<SubforumDetailsPage />} />
+            <Route path='/subforums/:subforumId/settings' element={<SubforumSettingsPage />} />
           </Route>
         }
       </Routes>
