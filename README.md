@@ -90,12 +90,21 @@ A class diagram for the schema definition is shown below:
 | /leave   | POST   | Leave a game          |
 | /games   | GET    | Retrieve all games    |
 
+### `/subforums`
+
+| Endpoint | Method | Description             |
+| -------- | ------ | ----------------------- |
+| /        | POST   | Create a new subforum   |
+| /        | GET    | Get all subforums       |
+| /:id     | GET    | Get a subforum by ID    |
+| /:id     | PUT    | Update a subforum by ID |
+| /:id     | DELETE | Delete a subforum by ID |
 
 ### `/images`
 
-| Endpoint | Method | Description           |
-| -------- | ------ | --------------------- |
-| /upload  | POST   | Create a new image    |
+| Endpoint | Method | Description        |
+| -------- | ------ | ------------------ |
+| /upload  | POST   | Create a new image |
 
 ## Running Stryker Mutation Testing
 

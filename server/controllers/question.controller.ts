@@ -5,9 +5,9 @@ import {
   FindQuestionRequest,
   FindQuestionByIdRequest,
   AddQuestionRequest,
-  VoteRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
+  VoteRequest,
 } from '../types/types';
 import {
   addVoteToQuestion,
@@ -182,20 +182,20 @@ const questionController = (socket: FakeSOSocket) => {
     res: Response,
     type: 'upvote' | 'downvote',
   ): Promise<void> => {
-    if (!req.body.question || !req.body.username) {
+    if (!req.body.post || !req.body.pid || !req.body.creatorUsername || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
 
-    const { question, username } = req.body;
+    const { post, pid, creatorUsername, username } = req.body;
 
     try {
       let status;
 
       if (type === 'upvote') {
-        status = await addVoteToQuestion(question, username, type);
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, type);
       } else {
-        status = await addVoteToQuestion(question, username, type);
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, type);
       }
 
       if (status && 'error' in status) {
@@ -203,8 +203,7 @@ const questionController = (socket: FakeSOSocket) => {
       }
 
       // Emit the updated vote counts to all connected clients
-      const qid = String(question._id);
-      socket.emit('voteUpdate', { qid, upVotes: status.upVotes, downVotes: status.downVotes });
+      socket.emit('voteUpdate', { pid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json(status);
     } catch (err) {
       res.status(500).send(`Error when ${type}ing: ${(err as Error).message}`);

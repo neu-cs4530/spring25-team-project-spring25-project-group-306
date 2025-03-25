@@ -47,19 +47,19 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
 
 /**
  * Adds vote to answer.
- * @param {string} aid - The answer ID
+ * @param {string} pid - The answer ID
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
- * @returns {Promise<AnswerVoteRequest>} - The updated vote result
+ * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToAnswer = async (
-  aid: string,
+  pid: string,
   username: string,
-  voteType: 'upVote' | 'downVote',
+  voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
   let updateOperation: QueryOptions;
 
-  if (voteType === 'upVote') {
+  if (voteType === 'upvote') {
     updateOperation = [
       {
         $set: {
@@ -105,7 +105,7 @@ export const addVoteToAnswer = async (
 
   try {
     const result: DatabaseAnswer | null = await AnswerModel.findOneAndUpdate(
-      { _id: aid },
+      { _id: pid },
       updateOperation,
       { new: true },
     );
@@ -116,7 +116,7 @@ export const addVoteToAnswer = async (
 
     let msg = '';
 
-    if (voteType === 'upVote') {
+    if (voteType === 'upvote') {
       msg = result.upVotes.includes(username)
         ? 'Answer upvoted successfully'
         : 'Upvote cancelled successfully';
@@ -129,7 +129,7 @@ export const addVoteToAnswer = async (
   } catch (error) {
     return {
       error:
-        voteType === 'upVote'
+        voteType === 'upvote'
           ? `Error when adding upvote to answer`
           : `Error when adding downvote to answer`,
     };

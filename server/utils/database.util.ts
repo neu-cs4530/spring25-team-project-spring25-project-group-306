@@ -1,3 +1,4 @@
+import { QueryOptions } from 'mongoose';
 import {
   DatabaseComment,
   DatabaseMessage,

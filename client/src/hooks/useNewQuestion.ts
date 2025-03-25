@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import { addQuestion, upvoteQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
-import { Question } from '../types/types';
+import { Post, Question } from '../types/types';
 import uploadImage from '../services/imageUploadService';
 import { changeKarmaBy } from '../services/userService';
 
@@ -112,7 +112,12 @@ const useNewQuestion = () => {
 
     const resQuestion = await addQuestion(question);
 
-    await upvoteQuestion(resQuestion, question.askedBy);
+    await upvoteQuestion(
+      resQuestion as Post,
+      String(resQuestion._id),
+      resQuestion.askedBy,
+      user.username,
+    );
 
     if (resQuestion && resQuestion._id) {
       navigate('/home');

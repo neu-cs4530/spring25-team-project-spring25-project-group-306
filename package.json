@@ -7,7 +7,10 @@
     "server",
     "shared"
   ],
-  "dependencies": {
-    "aws-sdk": "^2.1692.0"
+  "devDependencies": {
+    "aws-sdk": "^2.1692.0",
+    "react-markdown": "^10.1.0",
+    "remark-breaks": "^4.0.0",
+    "unified": "^11.0.5"
   }
 }

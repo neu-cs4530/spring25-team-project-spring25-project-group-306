@@ -1,7 +1,7 @@
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
-import { Comment } from '../../../types/types';
+import { Comment, Post } from '../../../types/types';
 import './index.css';
 import QuestionBody from './questionBody';
 import VoteComponent from '../voteComponent';
@@ -25,7 +25,12 @@ const AnswerPage = () => {
 
   return (
     <>
-      <VoteComponent question={question} />
+      <VoteComponent
+        post={question as Post}
+        pid={String(question._id)}
+        creatorUsername={question.askedBy}
+        postType={'question'}
+      />
       <AnswerHeader ansCount={question.answers.length} title={question.title} />
       <QuestionBody
         views={question.views.length}

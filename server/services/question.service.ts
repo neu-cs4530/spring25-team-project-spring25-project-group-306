@@ -7,6 +7,7 @@ import {
   OrderType,
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
+  Post,
   Question,
   QuestionResponse,
   VoteResponse,
@@ -118,7 +119,7 @@ export const filterQuestionsBySearch = (
 
 /**
  * Fetches a question by ID and increments its view count.
- * @param {string} qid - The question ID
+ * @param {string} qid - The question id
  * @param {string} username - The username requesting the question
  * @returns {Promise<QuestionResponse | null>} - The question with incremented views or error message
  */
@@ -168,13 +169,17 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
 
 /**
  * Adds a vote to a question.
- * @param {string} question - The question
+ * @param {Post} post - The post
+ * @param {string} pid - The id of the post object
+ * @param {string} creatorUsername - The username of the creator of the post
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
  * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToQuestion = async (
-  question: PopulatedDatabaseQuestion,
+  post: Post,
+  pid: string,
+  creatorUsername: string,
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
@@ -226,7 +231,7 @@ export const addVoteToQuestion = async (
 
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(
-      { _id: question._id },
+      { _id: pid },
       updateOperation,
       { new: true },
     );
@@ -237,8 +242,8 @@ export const addVoteToQuestion = async (
 
     let msg = '';
     let karmaChange = 0;
-    const alreadyUpvoted = question.upVotes.includes(username);
-    const alreadyDownvoted = question.downVotes.includes(username);
+    const alreadyUpvoted = post.upVotes.includes(username);
+    const alreadyDownvoted = post.downVotes.includes(username);
 
     if (voteType === 'upvote') {
       if (alreadyDownvoted) {
@@ -263,7 +268,7 @@ export const addVoteToQuestion = async (
     }
 
     if (karmaChange !== 0) {
-      await updateUserKarma(question.askedBy, karmaChange);
+      await updateUserKarma(creatorUsername, karmaChange);
     }
 
     return {

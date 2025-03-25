@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 /**
  * Interface for a Subforum object.
  *
@@ -5,16 +7,13 @@
  * A subforum is a dedicated space for discussions on a specific topic.
  */
 export interface Subforum {
-  /** Unique identifier for the subforum */
-  id: string;
-
   /** Title of the subforum */
   title: string;
 
   /** Description of the subforum */
   description: string;
 
-  /** Array of user IDs who are moderators of this subforum */
+  /** Array of usernames who are moderators of this subforum */
   moderators: string[];
 
   /** Date when the subforum was created */
@@ -51,21 +50,23 @@ export interface DatabaseSubforum extends Subforum {
  *
  * This includes only the fields required when creating a new subforum.
  */
-export interface CreateSubforumRequest {
-  /** Title of the subforum */
-  title: string;
+export interface CreateSubforumRequest extends Request {
+  body: {
+    /** Title of the subforum */
+    title: string;
 
-  /** Description of the subforum */
-  description: string;
+    /** Description of the subforum */
+    description: string;
 
-  /** Array of user IDs who are moderators of this subforum */
-  moderators: string[];
+    /** Array of usernames who are moderators of this subforum */
+    moderators: string[];
 
-  /** Tags associated with this subforum (optional) */
-  tags?: string[];
+    /** Tags associated with this subforum (optional) */
+    tags?: string[];
 
-  /** Rules specific to this subforum (optional) */
-  rules?: string[];
+    /** Rules specific to this subforum (optional) */
+    rules?: string[];
+  };
 }
 
 /**
@@ -73,14 +74,44 @@ export interface CreateSubforumRequest {
  *
  * This includes fields that can be updated for an existing subforum.
  */
-export interface UpdateSubforumRequest {
+export interface UpdateSubforumRequest extends Request {
+  params: {
+    id: string;
+  };
+  body: {
+    /** Title of the subforum (optional) */
+    title?: string;
+
+    /** Description of the subforum (optional) */
+    description?: string;
+
+    /** Array of usernames who are moderators of this subforum (optional) */
+    moderators?: string[];
+
+    /** Tags associated with this subforum (optional) */
+    tags?: string[];
+
+    /** Rules specific to this subforum (optional) */
+    rules?: string[];
+
+    /** Whether the subforum is active or archived (optional) */
+    isActive?: boolean;
+  };
+}
+
+/**
+ * Interface for updating an existing subforum in the database.
+ *
+ * This includes fields that can be updated for an existing subforum.
+ */
+export interface DatabaseUpdateSubforumRequest {
   /** Title of the subforum (optional) */
   title?: string;
 
   /** Description of the subforum (optional) */
   description?: string;
 
-  /** Array of user IDs who are moderators of this subforum (optional) */
+  /** Array of usernames who are moderators of this subforum (optional) */
   moderators?: string[];
 
   /** Tags associated with this subforum (optional) */
@@ -91,4 +122,7 @@ export interface UpdateSubforumRequest {
 
   /** Whether the subforum is active or archived (optional) */
   isActive?: boolean;
+
+  /** Date when the subforum was last updated */
+  updatedAt: Date;
 }
