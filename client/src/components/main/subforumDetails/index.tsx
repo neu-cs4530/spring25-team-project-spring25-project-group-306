@@ -1,24 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Tag } from '../../../types';
 import useSubforumDetails from '../../../hooks/useSubforumDetails';
+import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
+import AskQuestionModal from './AskQuestionModal';
 import './index.css';
 
-const SubforumDetailsPage: React.FC = () => {
+export const SubforumDetailsPage: React.FC = () => {
   const { subforumId } = useParams<{ subforumId: string }>();
-  const { subforum, loading, error, isModerator, navigateToSettings } =
-    useSubforumDetails(subforumId);
+  const {
+    subforum,
+    loading: subforumLoading,
+    error: subforumError,
+    isModerator,
+    navigateToSettings,
+  } = useSubforumDetails(subforumId);
+  const {
+    questions,
+    loading: questionsLoading,
+    error: questionsError,
+  } = useSubforumQuestions(subforumId);
+  const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
 
-  if (loading) {
+  if (subforumLoading || questionsLoading) {
     return <div className='loading'>Loading subforum details...</div>;
   }
 
-  if (error) {
-    return <div className='error'>Error: {error}</div>;
+  if (subforumError || !subforum) {
+    return <div className='error'>Error: {subforumError || 'Subforum not found'}</div>;
   }
 
-  if (!subforum) {
-    return <div className='error'>Subforum not found</div>;
-  }
+  const renderQuestionsList = () => {
+    if (questionsError) {
+      return <div className='error'>Error loading questions: {questionsError}</div>;
+    }
+
+    if (questions.length === 0) {
+      return <p>No questions yet. Be the first to ask a question!</p>;
+    }
+
+    return questions.map(question => (
+      <div key={question._id} className='question-card'>
+        <h3>{question.title}</h3>
+        <p className='question-preview'>{question.text.substring(0, 200)}...</p>
+        <div className='question-meta'>
+          <span>Asked by {question.askedBy}</span>
+          <span>{new Date(question.askDateTime).toLocaleDateString()}</span>
+          <span>{question.answers?.length || 0} answers</span>
+        </div>
+        <div className='question-tags'>
+          {question.tags.map((tag: Tag, index: number) => (
+            <span key={index} className='tag'>
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    ));
+  };
 
   return (
     <div className='subforum-details-container'>
@@ -84,15 +123,21 @@ const SubforumDetailsPage: React.FC = () => {
         <div className='subforum-questions'>
           <div className='questions-header'>
             <h2>Questions</h2>
-            <button className='ask-question-btn'>Ask Question</button>
+            <button className='ask-question-btn' onClick={() => setIsAskQuestionModalOpen(true)}>
+              Ask a Question
+            </button>
           </div>
-          {/* Questions list will be added here */}
-          <div className='questions-list'>
-            {/* This will be implemented in a separate task */}
-            <p>Questions will be displayed here</p>
-          </div>
+          <div className='questions-list'>{renderQuestionsList()}</div>
         </div>
       </div>
+
+      {isAskQuestionModalOpen && (
+        <AskQuestionModal
+          isOpen={isAskQuestionModalOpen}
+          onClose={() => setIsAskQuestionModalOpen(false)}
+          subforumId={subforumId || ''}
+        />
+      )}
     </div>
   );
 };
