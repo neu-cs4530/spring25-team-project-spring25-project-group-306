@@ -74,8 +74,8 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim() || tags.length === 0) {
-      setError('Please fill in all required fields');
+
+    if (!validateForm()) {
       return;
     }
 
