@@ -232,9 +232,9 @@ describe('POST /addAnswer', () => {
 
 describe('POST /answerUpvote', () => {
   it('should upvote an answer', async () => {
-    const validAid = new mongoose.Types.ObjectId();
+    const validPid = new mongoose.Types.ObjectId();
     const mockReqBody = {
-      aid: validAid,
+      pid: validPid,
       username: 'test',
     };
 
@@ -252,8 +252,8 @@ describe('POST /answerUpvote', () => {
 
     const response = await supertest(app).post('/answer/answerUpvote').send(mockReqBody);
 
-    expect(response.status).toBe(200);
     expect(response.body).toEqual(mockAnswer);
+    expect(response.status).toBe(200);
   });
 
   it('should return bad request error if request body is missing', async () => {
@@ -277,7 +277,7 @@ describe('POST /answerDownvote', () => {
   it('should downvote an answer', async () => {
     const validAid = new mongoose.Types.ObjectId();
     const mockReqBody = {
-      aid: validAid,
+      pid: validAid,
       username: 'test',
     };
 

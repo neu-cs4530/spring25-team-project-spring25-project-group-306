@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 import { Comment, DatabaseComment } from './comment';
+import { Post } from './post';
 
 /**
  * Represents an answer to a question.
@@ -11,14 +12,12 @@ import { Comment, DatabaseComment } from './comment';
  * - `upvotes`: A list of usernames that have upvoted the answer.
  * - 'downvotes': A list of usernames that have downvoted the answer.
  */
-export interface Answer {
+export interface Answer extends Post {
   text: string;
   ansBy: string;
   ansDateTime: Date;
   comments: Comment[];
   image?: string;
-  upVotes: string[];
-  downVotes: string[];
 }
 
 /**
@@ -56,15 +55,3 @@ export interface AddAnswerRequest extends Request {
  * - Either a `DatabaseAnswer` object or an error message.
  */
 export type AnswerResponse = DatabaseAnswer | { error: string };
-
-/**
- * Interface for the request body when upvoting or downvoting an answer.
- * - `aid`: The unique identifier of the answer.
- * - `username`: The username of the user performing the vote.
- */
-export interface AnswerVoteRequest extends Request {
-  body: {
-    aid: string;
-    username: string;
-  };
-}

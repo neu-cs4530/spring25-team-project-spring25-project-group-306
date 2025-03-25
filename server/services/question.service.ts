@@ -23,6 +23,7 @@ import {
   sortQuestionsByNewest,
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
+import { updateVoteOperation } from '../utils/database.util';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -117,7 +118,7 @@ export const filterQuestionsBySearch = (
 
 /**
  * Fetches a question by ID and increments its view count.
- * @param {string} qid - The question ID
+ * @param {string} qid - The question id
  * @param {string} username - The username requesting the question
  * @returns {Promise<QuestionResponse | null>} - The question with incremented views or error message
  */
@@ -167,65 +168,21 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
 
 /**
  * Adds a vote to a question.
- * @param {string} qid - The question ID
+ * @param {string} pid - The question ID
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
  * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToQuestion = async (
-  qid: string,
+  pid: string,
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-  let updateOperation: QueryOptions;
-
-  if (voteType === 'upvote') {
-    updateOperation = [
-      {
-        $set: {
-          upVotes: {
-            $cond: [
-              { $in: [username, '$upVotes'] },
-              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
-              { $concatArrays: ['$upVotes', [username]] },
-            ],
-          },
-          downVotes: {
-            $cond: [
-              { $in: [username, '$upVotes'] },
-              '$downVotes',
-              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
-            ],
-          },
-        },
-      },
-    ];
-  } else {
-    updateOperation = [
-      {
-        $set: {
-          downVotes: {
-            $cond: [
-              { $in: [username, '$downVotes'] },
-              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
-              { $concatArrays: ['$downVotes', [username]] },
-            ],
-          },
-          upVotes: {
-            $cond: [
-              { $in: [username, '$downVotes'] },
-              '$upVotes',
-              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
-            ],
-          },
-        },
-      },
-    ];
-  }
+  const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
 
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(
-      { _id: qid },
+      { _id: pid },
       updateOperation,
       { new: true },
     );

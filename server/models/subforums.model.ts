@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose';
-import { DatabaseSubforum } from '@fake-stack-overflow/shared/types/types';
+import { DatabaseSubforum } from '../types/types';
 import subforumSchema from './schema/subforum.schema';
 
 /**

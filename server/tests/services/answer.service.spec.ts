@@ -91,7 +91,7 @@ describe('Answer model', () => {
     test('addVoteToAnswer should return expected message and updated votes', async () => {
       const username = 'testUser';
       const aid = 'testID';
-      const voteType = 'upVote';
+      const voteType = 'upvote';
 
       const mockAnswer = {
         _id: aid,
@@ -119,7 +119,7 @@ describe('Answer model', () => {
     test('addVoteToAnswer should return an object with error if findOneAndUpdate throws an error', async () => {
       const username = 'testUser';
       const aid = 'testID';
-      const voteType = 'upVote';
+      const voteType = 'upvote';
 
       mockingoose(AnswerModel).toReturn(new Error('error'), 'findOneAndUpdate');
 
@@ -131,7 +131,7 @@ describe('Answer model', () => {
     test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
       const username = 'testUser';
       const aid = 'testID';
-      const voteType = 'upVote';
+      const voteType = 'upvote';
 
       mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
 
@@ -146,7 +146,7 @@ describe('Answer model', () => {
     test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
       const username = 'testUser';
       const aid = 'testID';
-      const voteType = 'downVote';
+      const voteType = 'downvote';
 
       mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
 
