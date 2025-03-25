@@ -38,11 +38,11 @@ const SubforumDetailsPage: React.FC = () => {
         <div className='subforum-sidebar'>
           <div className='subforum-stats'>
             <div className='stat-item'>
-              <span className='stat-label'>Questions</span>
+              <span className='stat-label'>Questions:</span>
               <span className='stat-value'>{subforum.questionCount || 0}</span>
             </div>
             <div className='stat-item'>
-              <span className='stat-label'>Tags</span>
+              <span className='stat-label'>Tags:</span>
               <span className='stat-value'>{subforum.tags?.length || 0}</span>
             </div>
           </div>
