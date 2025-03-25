@@ -19,6 +19,7 @@ export const SubforumDetailsPage: React.FC = () => {
     questions,
     loading: questionsLoading,
     error: questionsError,
+    refetch: refetchQuestions,
   } = useSubforumQuestions(subforumId);
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
 
@@ -136,6 +137,7 @@ export const SubforumDetailsPage: React.FC = () => {
           isOpen={isAskQuestionModalOpen}
           onClose={() => setIsAskQuestionModalOpen(false)}
           subforumId={subforumId || ''}
+          onQuestionAdded={refetchQuestions}
         />
       )}
     </div>

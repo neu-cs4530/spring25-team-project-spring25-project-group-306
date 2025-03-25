@@ -9,9 +9,15 @@ interface AskQuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
   subforumId: string;
+  onQuestionAdded?: () => void;
 }
 
-const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onClose, subforumId }) => {
+const AskQuestionModal: React.FC<AskQuestionModalProps> = ({
+  isOpen,
+  onClose,
+  subforumId,
+  onQuestionAdded,
+}) => {
   const { user } = useUserContext();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -79,6 +85,7 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onClose, su
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           title,
           text: content,
@@ -101,7 +108,9 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onClose, su
       }
 
       onClose();
-      window.location.reload();
+      if (onQuestionAdded) {
+        onQuestionAdded();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create question');
     }
