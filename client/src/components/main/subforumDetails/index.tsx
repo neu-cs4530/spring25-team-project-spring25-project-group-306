@@ -6,7 +6,7 @@ import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
 import AskQuestionModal from './AskQuestionModal';
 import './index.css';
 
-export const SubforumDetailsPage: React.FC = () => {
+const SubforumDetailsPage: React.FC = () => {
   const { subforumId } = useParams<{ subforumId: string }>();
   const {
     subforum,
