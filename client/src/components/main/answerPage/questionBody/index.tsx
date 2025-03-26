@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import MarkdownRenderer from "../../../../markdown"
+import MarkdownRenderer from '../../../../markdown';
 
 /**
  * Interface representing the props for the QuestionBody component.

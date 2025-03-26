@@ -1,7 +1,4 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
-import { PluggableList } from 'unified';
 import './index.css';
 
 /**
