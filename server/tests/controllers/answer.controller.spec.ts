@@ -230,11 +230,16 @@ describe('POST /addAnswer', () => {
   });
 });
 
-describe('POST /answerUpvote', () => {
+describe('POST /upvoteAnswer', () => {
   it('should upvote an answer', async () => {
     const validPid = new mongoose.Types.ObjectId();
     const mockReqBody = {
-      pid: validPid,
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validPid.toString(),
+      creatorUsername: 'user',
       username: 'test',
     };
 
@@ -250,14 +255,14 @@ describe('POST /answerUpvote', () => {
       downVotes: [],
     });
 
-    const response = await supertest(app).post('/answer/answerUpvote').send(mockReqBody);
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
 
     expect(response.body).toEqual(mockAnswer);
     expect(response.status).toBe(200);
   });
 
   it('should return bad request error if request body is missing', async () => {
-    const response = await supertest(app).post('/answer/answerUpvote');
+    const response = await supertest(app).post('/answer/upvoteAnswer');
 
     expect(response.status).toBe(400);
   });
@@ -267,17 +272,22 @@ describe('POST /answerUpvote', () => {
       username: 'test',
     };
 
-    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
+    const response = await supertest(app).post('/answer/downvoteAnswer').send(mockReqBody);
 
     expect(response.status).toBe(400);
   });
 });
 
-describe('POST /answerDownvote', () => {
+describe('POST /downvoteAnswer', () => {
   it('should downvote an answer', async () => {
     const validAid = new mongoose.Types.ObjectId();
     const mockReqBody = {
-      pid: validAid,
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validAid.toString(),
+      creatorUsername: 'user',
       username: 'test',
     };
 
@@ -293,7 +303,7 @@ describe('POST /answerDownvote', () => {
       downVotes: ['test'],
     });
 
-    const response = await supertest(app).post('/answer/answerDownvote').send(mockReqBody);
+    const response = await supertest(app).post('/answer/downvoteAnswer').send(mockReqBody);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockAnswer);

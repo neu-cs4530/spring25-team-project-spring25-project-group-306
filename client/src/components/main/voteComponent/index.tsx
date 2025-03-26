@@ -1,26 +1,45 @@
+import { useEffect, useState } from 'react';
 import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
+import { downvoteAnswer, upvoteAnswer } from '../../../services/answerService';
 import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
-import { PopulatedDatabaseQuestion } from '../../../types/types';
+import { Post } from '../../../types/types';
 import useVoteStatus from '../../../hooks/useVoteStatus';
 
 /**
  * Interface represents the props for the VoteComponent.
  *
- * question - The question object containing voting information.
+ * post - The post object containing voting information.
+ * pid - The id of the post object (PopulatedDatabaseQuestion or PopulatedDatabaseAnswer).
+ * creatorUsername - The username of the creator of the post.
+ * postType - If the post is a 'question' or 'answer'.
  */
 interface VoteComponentProps {
-  question: PopulatedDatabaseQuestion;
+  post: Post;
+  pid: string;
+  creatorUsername: string;
+  postType: 'question' | 'answer';
 }
 
 /**
  * A Vote component that allows users to upvote or downvote a question.
  *
- * @param question - The question object containing voting information.
+ * @param post - The post object containing voting information.
+ * @param pid - The id of the post object (PopulatedDatabaseQuestion or PopulatedDatabaseAnswer).
+ * @param creatorUsername - The username of the creator of the post.
+ * @param postType - If the post is a 'question' or 'answer'.
  */
-const VoteComponent = ({ question }: VoteComponentProps) => {
+const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentProps) => {
   const { user } = useUserContext();
-  const { count, voted } = useVoteStatus({ question });
+  const { count: initialCount, voted: initialVoted } = useVoteStatus({ post });
+
+  const [count, setCount] = useState(initialCount);
+  const [voted, setVoted] = useState(initialVoted);
+
+  useEffect(() => {
+    setCount(initialCount);
+    setVoted(initialVoted);
+  }, [initialCount, initialVoted]);
 
   /**
    * Function to handle upvoting or downvoting a question.
@@ -29,12 +48,36 @@ const VoteComponent = ({ question }: VoteComponentProps) => {
    */
   const handleVote = async (type: string) => {
     try {
-      if (question._id) {
+      if (pid) {
+        let newCount = count;
+        let newVoted = voted;
+
         if (type === 'upvote') {
-          await upvoteQuestion(question._id, user.username);
+          if (voted === 1) {
+            newCount -= 1;
+            newVoted = 0;
+          } else {
+            newCount += voted === -1 ? 2 : 1;
+            newVoted = 1;
+          }
+          if (postType === 'question')
+            await upvoteQuestion(post, pid, creatorUsername, user.username);
+          else await upvoteAnswer(post, pid, creatorUsername, user.username);
         } else if (type === 'downvote') {
-          await downvoteQuestion(question._id, user.username);
+          if (voted === -1) {
+            newCount += 1;
+            newVoted = 0;
+          } else {
+            newCount -= voted === 1 ? 2 : 1;
+            newVoted = -1;
+          }
+          if (postType === 'question')
+            await downvoteQuestion(post, pid, creatorUsername, user.username);
+          else await downvoteAnswer(post, pid, creatorUsername, user.username);
         }
+
+        setCount(newCount);
+        setVoted(newVoted);
       }
     } catch (error) {
       // Handle error
