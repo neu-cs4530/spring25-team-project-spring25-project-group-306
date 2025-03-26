@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
 import AnswerModel from '../../models/answers.model';
 import QuestionModel from '../../models/questions.model';
 import { saveAnswer, addAnswerToQuestion, addVoteToAnswer } from '../../services/answer.service';
-import { DatabaseAnswer, DatabaseQuestion } from '../../types/types';
+import { DatabaseAnswer, DatabaseQuestion, PopulatedDatabaseAnswer, Post } from '../../types/types';
 import { QUESTIONS, ans1, ans4 } from '../mockData.models';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -88,73 +89,90 @@ describe('Answer model', () => {
     });
   });
   describe('addVoteToAnswer', () => {
+    const mockAnswer: PopulatedDatabaseAnswer = {
+      _id: new ObjectId(),
+      text: 'text',
+      ansBy: 'user1',
+      ansDateTime: new Date(),
+      comments: [],
+      upVotes: [],
+      downVotes: [],
+      image: undefined,
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     test('addVoteToAnswer should return expected message and updated votes', async () => {
-      const username = 'testUser';
-      const aid = 'testID';
-      const voteType = 'upvote';
-
-      const mockAnswer = {
-        _id: aid,
-        upVotes: [],
-        downVotes: [],
-      };
-
       const updatedAnswer = {
         ...mockAnswer,
-        upVotes: [username],
+        upVotes: ['testUser'],
         downVotes: [],
       };
 
       mockingoose(AnswerModel).toReturn(updatedAnswer, 'findOneAndUpdate');
 
-      const result = await addVoteToAnswer(aid, username, voteType);
+      const result = await addVoteToAnswer(
+        updatedAnswer as Post,
+        String(updatedAnswer._id),
+        updatedAnswer.ansBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
-        msg: 'Answer upvoted successfully',
+        msg: 'Upvote cancelled successfully',
         upVotes: ['testUser'],
         downVotes: [],
       });
     });
 
     test('addVoteToAnswer should return an object with error if findOneAndUpdate throws an error', async () => {
-      const username = 'testUser';
-      const aid = 'testID';
-      const voteType = 'upvote';
-
       mockingoose(AnswerModel).toReturn(new Error('error'), 'findOneAndUpdate');
 
-      const result = await addVoteToAnswer(aid, username, voteType);
+      const result = await addVoteToAnswer(
+        mockAnswer as Post,
+        String(mockAnswer._id),
+        mockAnswer.ansBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toHaveProperty('error');
     });
 
     test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
-      const username = 'testUser';
-      const aid = 'testID';
-      const voteType = 'upvote';
-
       mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
 
-      const result = await addVoteToAnswer(aid, username, voteType);
+      const result = await addVoteToAnswer(
+        mockAnswer as Post,
+        String(mockAnswer._id),
+        mockAnswer.ansBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toHaveProperty('error');
       if ('error' in result) {
-        expect(result.error).toEqual('Error when adding upvote to answer');
+        expect(result.error).toEqual('Answer not found!');
       }
     });
 
     test('addVoteToAnswer should return an object with error if findOneAndUpdate returns null', async () => {
-      const username = 'testUser';
-      const aid = 'testID';
-      const voteType = 'downvote';
-
       mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
 
-      const result = await addVoteToAnswer(aid, username, voteType);
+      const result = await addVoteToAnswer(
+        mockAnswer as Post,
+        String(mockAnswer._id),
+        mockAnswer.ansBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toHaveProperty('error');
       if ('error' in result) {
-        expect(result.error).toEqual('Error when adding downvote to answer');
+        expect(result.error).toEqual('Answer not found!');
       }
     });
   });

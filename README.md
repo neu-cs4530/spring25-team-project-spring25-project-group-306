@@ -69,6 +69,7 @@ A class diagram for the schema definition is shown below:
 | /getUsers        | GET    | Fetch all users                |
 | /deleteUser/     | DELETE | Delete a user by username      |
 | /updateBiography | PATCH  | Update user biography          |
+| /updateKarma     | PATCH  | Update user karma              |
 
 ### `/chat`
 
