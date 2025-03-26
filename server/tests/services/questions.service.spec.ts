@@ -8,7 +8,7 @@ import {
   saveQuestion,
   addVoteToQuestion,
 } from '../../services/question.service';
-import { DatabaseQuestion, PopulatedDatabaseQuestion } from '../../types/types';
+import { DatabaseQuestion, PopulatedDatabaseQuestion, Post } from '../../types/types';
 import {
   QUESTIONS,
   tag1,
@@ -341,7 +341,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -358,7 +364,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -375,7 +387,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Upvote cancelled successfully',
@@ -387,7 +405,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -395,7 +419,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding an upvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({ error: 'Error when adding upvote to question' });
     });
@@ -406,7 +436,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -423,7 +459,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -440,7 +482,13 @@ describe('Question model', () => {
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion(updatedQuestion, 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Downvote cancelled successfully',
@@ -452,7 +500,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -460,7 +514,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding a downvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion(mockQuestion, 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({ error: 'Error when adding downvote to question' });
     });
