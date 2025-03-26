@@ -15,6 +15,7 @@ interface CodeBlockProps {
 const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const runCode = async () => {
     setIsRunning(true);
@@ -34,14 +35,23 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
     setIsRunning(false);
   };
 
+  const copyToClipboard = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 500); // reset the button after half a second
+  };
+
   return (
     <div className='code-block'>
       <SyntaxHighlighter language={language} style={atomDark}>
         {code}
       </SyntaxHighlighter>
-      <button onClick={runCode} disabled={isRunning}>
-        {isRunning ? 'Running...' : 'Run Code'}
-      </button>
+      <div className='code-block-buttons'>
+        <button onClick={runCode} disabled={isRunning}>
+          {isRunning ? 'Running...' : 'Run Code'}
+        </button>
+        <button onClick={copyToClipboard}>{copySuccess ? 'Copied!' : 'Copy Code'}</button>
+      </div>
       {output && (
         <div className='output'>
           <strong>Output:</strong>
