@@ -36,6 +36,7 @@ export interface Question extends Post {
   views: string[];
   comments: Comment[];
   image?: string;
+  subforumId?: ObjectId;
 }
 
 /**
@@ -82,6 +83,7 @@ export interface FindQuestionRequest extends Request {
     order: OrderType;
     search: string;
     askedBy: string;
+    subforumId: string;
   };
 }
 

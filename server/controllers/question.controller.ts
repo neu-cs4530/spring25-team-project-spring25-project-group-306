@@ -19,6 +19,7 @@ import {
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
+import SubforumModel from '../models/subforums.model';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -36,9 +37,15 @@ const questionController = (socket: FakeSOSocket) => {
     const { order } = req.query;
     const { search } = req.query;
     const { askedBy } = req.query;
+    const { subforumId } = req.query;
 
     try {
       let qlist: PopulatedDatabaseQuestion[] = await getQuestionsByOrder(order);
+
+      // Filter by subforumId if provided
+      if (subforumId) {
+        qlist = qlist.filter(q => q.subforumId?.toString() === subforumId);
+      }
 
       // Filter by askedBy if provided
       if (askedBy) {
@@ -148,6 +155,15 @@ const questionController = (socket: FakeSOSocket) => {
 
       if ('error' in result) {
         throw new Error(result.error);
+      }
+
+      // If the question is associated with a subforum, update the subforum's questionCount
+      if (question.subforumId) {
+        await SubforumModel.findByIdAndUpdate(
+          question.subforumId,
+          { $inc: { questionCount: 1 } },
+          { new: true },
+        );
       }
 
       // Populates the fields of the question that was added, and emits the new object

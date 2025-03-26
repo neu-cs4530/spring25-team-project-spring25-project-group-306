@@ -39,6 +39,11 @@ const questionSchema: Schema = new Schema(
       type: String,
       required: false,
     },
+    subforumId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subforum',
+      required: false,
+    },
   },
   { collection: 'Question' },
 );

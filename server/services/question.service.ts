@@ -95,8 +95,12 @@ export const filterQuestionsByAskedBy = (
  */
 export const filterQuestionsBySearch = (
   qlist: PopulatedDatabaseQuestion[],
-  search: string,
+  search: string | undefined,
 ): PopulatedDatabaseQuestion[] => {
+  if (!search) {
+    return qlist;
+  }
+
   const searchTags = parseTags(search);
   const searchKeyword = parseKeyword(search);
 
