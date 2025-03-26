@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
@@ -16,7 +17,11 @@ import useFetchKarma from '../../../hooks/useFetchKarma';
 const AnswerPage = () => {
   const { questionID, question, karma, handleNewComment, handleNewAnswer } = useAnswerPage();
 
-  const answerUsernames = question ? [...new Set(question.answers.map(a => a.ansBy))] : [];
+  const answerUsernames = useMemo(
+    () =>
+      question && question.answers ? [...new Set(question.answers.map(a => a.ansBy))].sort() : [],
+    [question],
+  );
   const karmaMap = useFetchKarma(answerUsernames);
 
   if (!question) {
@@ -45,7 +50,7 @@ const AnswerPage = () => {
         handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
       />
       {question.answers.map(a => (
-        <>
+        <React.Fragment key={String(a._id)}>
           <VoteComponent
             post={a as Post}
             pid={String(a._id)}
@@ -64,7 +69,7 @@ const AnswerPage = () => {
               handleNewComment(comment, 'answer', String(a._id))
             }
           />
-        </>
+        </React.Fragment>
       ))}
       <button
         className='bluebtn ansButton'

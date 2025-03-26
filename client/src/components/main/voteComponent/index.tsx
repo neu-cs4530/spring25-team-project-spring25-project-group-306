@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
 import { downvoteAnswer, upvoteAnswer } from '../../../services/answerService';
 import './index.css';
@@ -30,7 +31,15 @@ interface VoteComponentProps {
  */
 const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentProps) => {
   const { user } = useUserContext();
-  const { count, voted } = useVoteStatus({ post });
+  const { count: initialCount, voted: initialVoted } = useVoteStatus({ post });
+
+  const [count, setCount] = useState(initialCount);
+  const [voted, setVoted] = useState(initialVoted);
+
+  useEffect(() => {
+    setCount(initialCount);
+    setVoted(initialVoted);
+  }, [initialCount, initialVoted]);
 
   /**
    * Function to handle upvoting or downvoting a question.
@@ -40,19 +49,35 @@ const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentPr
   const handleVote = async (type: string) => {
     try {
       if (pid) {
+        let newCount = count;
+        let newVoted = voted;
+
         if (type === 'upvote') {
-          if (postType === 'question') {
+          if (voted === 1) {
+            newCount -= 1;
+            newVoted = 0;
+          } else {
+            newCount += voted === -1 ? 2 : 1;
+            newVoted = 1;
+          }
+          if (postType === 'question')
             await upvoteQuestion(post, pid, creatorUsername, user.username);
-          } else if (postType === 'answer') {
-            await upvoteAnswer(post, pid, creatorUsername, user.username);
-          }
+          else await upvoteAnswer(post, pid, creatorUsername, user.username);
         } else if (type === 'downvote') {
-          if (postType === 'question') {
-            await downvoteQuestion(post, pid, creatorUsername, user.username);
-          } else if (postType === 'answer') {
-            await downvoteAnswer(post, pid, creatorUsername, user.username);
+          if (voted === -1) {
+            newCount += 1;
+            newVoted = 0;
+          } else {
+            newCount -= voted === 1 ? 2 : 1;
+            newVoted = -1;
           }
+          if (postType === 'question')
+            await downvoteQuestion(post, pid, creatorUsername, user.username);
+          else await downvoteAnswer(post, pid, creatorUsername, user.username);
         }
+
+        setCount(newCount);
+        setVoted(newVoted);
       }
     } catch (error) {
       // Handle error
