@@ -1,4 +1,5 @@
 import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
+import { downvoteAnswer, upvoteAnswer } from '../../../services/answerService';
 import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
 import { Post } from '../../../types/types';
@@ -42,10 +43,14 @@ const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentPr
         if (type === 'upvote') {
           if (postType === 'question') {
             await upvoteQuestion(post, pid, creatorUsername, user.username);
+          } else if (postType === 'answer') {
+            await upvoteAnswer(post, pid, creatorUsername, user.username);
           }
         } else if (type === 'downvote') {
           if (postType === 'question') {
             await downvoteQuestion(post, pid, creatorUsername, user.username);
+          } else if (postType === 'answer') {
+            await downvoteAnswer(post, pid, creatorUsername, user.username);
           }
         }
       }

@@ -5,7 +5,6 @@ import { addQuestion, upvoteQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
 import { Post, Question } from '../types/types';
 import uploadImage from '../services/imageUploadService';
-import { changeKarmaBy } from '../services/userService';
 
 /**
  * Custom hook to handle question submission and form validation

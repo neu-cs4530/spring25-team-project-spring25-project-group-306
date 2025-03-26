@@ -45,18 +45,26 @@ const AnswerPage = () => {
         handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
       />
       {question.answers.map(a => (
-        <AnswerView
-          key={String(a._id)}
-          text={a.text}
-          ansBy={a.ansBy}
-          karma={karmaMap[a.ansBy] || 0}
-          meta={getMetaData(new Date(a.ansDateTime))}
-          comments={a.comments}
-          image={a.image}
-          handleAddComment={(comment: Comment) =>
-            handleNewComment(comment, 'answer', String(a._id))
-          }
-        />
+        <>
+          <VoteComponent
+            post={a as Post}
+            pid={String(a._id)}
+            creatorUsername={a.ansBy}
+            postType={'answer'}
+          />
+          <AnswerView
+            key={String(a._id)}
+            text={a.text}
+            ansBy={a.ansBy}
+            karma={karmaMap[a.ansBy] || 0}
+            meta={getMetaData(new Date(a.ansDateTime))}
+            comments={a.comments}
+            image={a.image}
+            handleAddComment={(comment: Comment) =>
+              handleNewComment(comment, 'answer', String(a._id))
+            }
+          />
+        </>
       ))}
       <button
         className='bluebtn ansButton'

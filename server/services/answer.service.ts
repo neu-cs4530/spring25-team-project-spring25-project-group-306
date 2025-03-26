@@ -6,11 +6,13 @@ import {
   DatabaseQuestion,
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
+  Post,
   QuestionResponse,
   VoteResponse,
 } from '../types/types';
 import AnswerModel from '../models/answers.model';
 import QuestionModel from '../models/questions.model';
+import { updateUserKarma } from './user.service';
 
 /**
  * Records the most recent answer time for a given question based on its answers.
@@ -47,13 +49,17 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
 
 /**
  * Adds vote to answer.
- * @param {string} pid - The answer ID
+ * @param {Post} post - The post
+ * @param {string} pid - The id of the post object
+ * @param {string} creatorUsername - The username of the creator of the post
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
  * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToAnswer = async (
+  post: Post,
   pid: string,
+  creatorUsername: string,
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
@@ -110,21 +116,41 @@ export const addVoteToAnswer = async (
       { new: true },
     );
 
-    if (result === null) {
-      throw new Error('');
+    if (!result) {
+      return { error: 'Answer not found!' };
     }
 
     let msg = '';
+    let karmaChange = 0;
+    const alreadyUpvoted = post.upVotes.includes(username);
+    const alreadyDownvoted = post.downVotes.includes(username);
 
     if (voteType === 'upvote') {
-      msg = result.upVotes.includes(username)
-        ? 'Answer upvoted successfully'
-        : 'Upvote cancelled successfully';
+      if (alreadyDownvoted) {
+        msg = 'Question upvoted successfully';
+        karmaChange = 2;
+      } else if (!alreadyUpvoted) {
+        msg = 'Question upvoted successfully';
+        karmaChange = 1;
+      } else {
+        msg = 'Upvote cancelled successfully';
+        karmaChange = -1;
+      }
+    } else if (alreadyUpvoted) {
+      msg = 'Question downvoted successfully';
+      karmaChange = -2;
+    } else if (!alreadyDownvoted) {
+      msg = 'Question downvoted successfully';
+      karmaChange = -1;
     } else {
-      msg = result.downVotes.includes(username)
-        ? 'Answer downvoted successfully'
-        : 'Downvote cancelled successfully';
+      msg = 'Downvote cancelled successfully';
+      karmaChange = 1;
     }
+
+    if (karmaChange !== 0) {
+      await updateUserKarma(creatorUsername, karmaChange);
+    }
+
     return { msg, upVotes: result.upVotes || [], downVotes: result.downVotes || [] };
   } catch (error) {
     return {

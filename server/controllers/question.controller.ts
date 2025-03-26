@@ -173,14 +173,14 @@ const questionController = (socket: FakeSOSocket) => {
    *
    * @param req The VoteRequest object containing the question ID and the username.
    * @param res The HTTP response object used to send back the result of the operation.
-   * @param type The type of vote to perform (upvote or downvote).
+   * @param voteType The type of vote to perform (upvote or downvote).
    *
    * @returns A Promise that resolves to void.
    */
   const voteQuestion = async (
     req: VoteRequest,
     res: Response,
-    type: 'upvote' | 'downvote',
+    voteType: 'upvote' | 'downvote',
   ): Promise<void> => {
     if (!req.body.post || !req.body.pid || !req.body.creatorUsername || !req.body.username) {
       res.status(400).send('Invalid request');
@@ -192,10 +192,10 @@ const questionController = (socket: FakeSOSocket) => {
     try {
       let status;
 
-      if (type === 'upvote') {
-        status = await addVoteToQuestion(post, pid, creatorUsername, username, type);
+      if (voteType === 'upvote') {
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, voteType);
       } else {
-        status = await addVoteToQuestion(post, pid, creatorUsername, username, type);
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, voteType);
       }
 
       if (status && 'error' in status) {
@@ -206,7 +206,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('voteUpdate', { pid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json(status);
     } catch (err) {
-      res.status(500).send(`Error when ${type}ing: ${(err as Error).message}`);
+      res.status(500).send(`Error when ${voteType}ing: ${(err as Error).message}`);
     }
   };
 
