@@ -1,7 +1,4 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
-import { PluggableList } from 'unified';
 import './index.css';
 
 /**
@@ -135,31 +132,4 @@ const handleHyperlink = (text: string) => {
   return <div>{content}</div>;
 };
 
-/**
- * MarkdownRenderer: Renders markdown text with syntax highlighting and validated hyperlinks.
- *
- * @param text - The markdown text to be rendered.
- */
-const MarkdownRenderer = ({ text }: { text: string }) => (
-  <ReactMarkdown
-    className='markdown-container'
-    remarkPlugins={[remarkBreaks] as PluggableList}
-    components={{
-      a: ({ href, children, ...props }) => {
-        const isValidURL = /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/.test(href || '');
-        return isValidURL ? (
-          <a href={href} target='_blank' rel='noopener noreferrer' {...props}>
-            {children}
-          </a>
-        ) : (
-          <span style={{ color: 'red', fontWeight: 'bold' }} title='Invalid URL'>
-            {children} (Invalid URL)
-          </span>
-        );
-      },
-    }}>
-    {text}
-  </ReactMarkdown>
-);
-
-export { getMetaData, handleHyperlink, validateHyperlink, MarkdownRenderer };
+export { getMetaData, handleHyperlink, validateHyperlink };
