@@ -21,6 +21,7 @@ const SubforumDetailsPage: React.FC = () => {
     loading: questionsLoading,
     error: questionsError,
     refetch: refetchQuestions,
+    deleteQuestion,
   } = useSubforumQuestions(subforumId);
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
 
@@ -57,6 +58,13 @@ const SubforumDetailsPage: React.FC = () => {
             </span>
           ))}
         </div>
+        {question._id}
+        {isModerator && (
+          <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
+            Remove
+          </button>
+        )}
+        ;
       </div>
     ));
   };

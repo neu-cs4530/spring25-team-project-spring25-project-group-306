@@ -170,6 +170,20 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
   }
 };
 
+export const deleteQuestionById = async (qid: string): Promise<QuestionResponse> => {
+  try {
+    const result: DatabaseQuestion | null = await QuestionModel.findByIdAndDelete(qid).lean();
+
+    if (!result) {
+      return { error: 'Question not found!' };
+    }
+
+    return result;
+  } catch (error) {
+    return { error: 'Error when deleting a question : ' + error };
+  }
+};
+
 /**
  * Adds a vote to a question.
  * @param {string} pid - The question ID
