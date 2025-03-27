@@ -173,20 +173,18 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
-  describe('DELETE /:qid', () => {
+  describe('DELETE /deleteQuestion/:qid', () => {
     it('should delete a question successfully', async () => {
-      const validPid = new mongoose.Types.ObjectId();
-
       jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
 
       const response = await supertest(app)
-        .delete(`/question/${mockDatabaseQuestion._id}`)
-        .send(mockQuestion);
+        .delete(`/question/deleteQuestion/${mockDatabaseQuestion._id}`)
 
       expect(response.status).toBe(200);
-      const { askDateTime, ...rest } = mockDatabaseQuestion;
-      const { askDateTime: _, ...responseBody } = response.body;
-      expect(responseBody).toEqual(rest);
+      //expect(response.body).toEqual(mockDatabaseQuestion);
+      const { askDateTime, ...expectedQuestion } = mockDatabaseQuestion;
+      const { askDateTime: _, ...actualQuestion } = response.body;
+      expect(actualQuestion).toEqual(expectedQuestion);
     });
   });
   describe('POST /addQuestion', () => {
