@@ -69,6 +69,8 @@ const useAnswerPage = () => {
     }
   };
 
+  const removeAnswer = async (aid: string) => {};
+
   useEffect(() => {
     /**
      * Function to fetch the question data based on the question ID.
@@ -198,6 +200,7 @@ const useAnswerPage = () => {
     karma,
     handleNewComment,
     handleNewAnswer,
+    removeAnswer,
   };
 };
 

@@ -180,7 +180,7 @@ export const deleteQuestionById = async (qid: string): Promise<QuestionResponse>
 
     return result;
   } catch (error) {
-    return { error: 'Error when deleting a question : ' + error };
+    return { error: `Error when deleting a question : ${error}` };
   }
 };
 

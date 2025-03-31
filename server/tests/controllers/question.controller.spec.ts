@@ -177,13 +177,16 @@ describe('Test questionController', () => {
     it('should delete a question successfully', async () => {
       jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
 
-      const response = await supertest(app)
-        .delete(`/question/deleteQuestion/${mockDatabaseQuestion._id}`)
+      const response = await supertest(app).delete(
+        `/question/deleteQuestion/${mockDatabaseQuestion._id}`,
+      );
 
       expect(response.status).toBe(200);
-      //expect(response.body).toEqual(mockDatabaseQuestion);
+
+      expect(response.body).toEqual(mockDatabaseQuestion);
+
       const { askDateTime, ...expectedQuestion } = mockDatabaseQuestion;
-      const { askDateTime: _, ...actualQuestion } = response.body;
+      const { askDateTime: responseAskDateTime, ...actualQuestion } = response.body;
       expect(actualQuestion).toEqual(expectedQuestion);
     });
   });

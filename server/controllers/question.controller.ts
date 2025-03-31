@@ -275,7 +275,7 @@ const questionController = (socket: FakeSOSocket) => {
 
       res.json(result);
     } catch (err) {
-      res.status(500).send('Error when deleting question: ' + (err as Error).message);
+      res.status(500).send(`Error when deleting question: ${(err as Error).message}`);
     }
   };
 

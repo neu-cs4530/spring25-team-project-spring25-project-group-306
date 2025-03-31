@@ -1,3 +1,4 @@
+import { useParams } from 'react-router-dom';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
@@ -8,14 +9,17 @@ import VoteComponent from '../voteComponent';
 import CommentSection from '../commentSection';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 import useFetchKarma from '../../../hooks/useFetchKarma';
+import useSubforumDetails from '../../../hooks/useSubforumDetails';
 
 /**
  * AnswerPage component that displays the full content of a question along with its answers.
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage = () => {
-  const { questionID, question, karma, handleNewComment, handleNewAnswer } = useAnswerPage();
-
+  const { questionID, question, karma, handleNewComment, handleNewAnswer, removeAnswer } =
+    useAnswerPage();
+  const { subforumId } = useParams<{ subforumId: string }>();
+  const { isModerator } = useSubforumDetails(subforumId);
   const answerUsernames = question ? [...new Set(question.answers.map(a => a.ansBy))] : [];
   const karmaMap = useFetchKarma(answerUsernames);
 
@@ -40,18 +44,28 @@ const AnswerPage = () => {
         handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
       />
       {question.answers.map(a => (
-        <AnswerView
-          key={String(a._id)}
-          text={a.text}
-          ansBy={a.ansBy}
-          karma={karmaMap[a.ansBy] || 0}
-          meta={getMetaData(new Date(a.ansDateTime))}
-          comments={a.comments}
-          image={a.image}
-          handleAddComment={(comment: Comment) =>
-            handleNewComment(comment, 'answer', String(a._id))
-          }
-        />
+        <div key={String(a._id)}>
+          <button className='remove-button' onClick={() => removeAnswer(String(a._id))}>
+            Remove
+          </button>
+          {isModerator && (
+            <button className='remove-button' onClick={() => removeAnswer(String(a._id))}>
+              Remove
+            </button>
+          )}
+          <AnswerView
+            key={String(a._id)}
+            text={a.text}
+            ansBy={a.ansBy}
+            karma={karmaMap[a.ansBy] || 0}
+            meta={getMetaData(new Date(a.ansDateTime))}
+            comments={a.comments}
+            image={a.image}
+            handleAddComment={(comment: Comment) =>
+              handleNewComment(comment, 'answer', String(a._id))
+            }
+          />
+        </div>
       ))}
       <button
         className='bluebtn ansButton'
