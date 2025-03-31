@@ -8,7 +8,6 @@ import {
   getAllSubforums,
   deleteSubforumById,
 } from '../services/subforum.service';
-import { getUserByUsername } from '../services/user.service';
 
 const subforumController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -46,26 +45,12 @@ const subforumController = (socket: FakeSOSocket) => {
     }
 
     try {
-      // The first moderator in the list is considered the creator
-      const username = req.body.moderators[0];
-      if (!username) {
-        res.status(401).json({ error: 'You must specify at least one moderator' });
-        return;
-      }
-
-      const userResult = await getUserByUsername(username);
-      if ('error' in userResult) {
-        throw new Error(userResult.error);
-      }
-
-      // Check if user has enough karma
-      if ((userResult.karma ?? 0) < 2) {
-        res.status(403).json({ error: 'You need at least 2 karma to create a subforum' });
-        return;
-      }
-
       const result = await saveSubforum(req.body);
       if ('error' in result) {
+        if (result.error.includes('karma')) {
+          res.status(403).json({ error: result.error });
+          return;
+        }
         throw new Error(result.error);
       }
       res.status(201).json(result);
