@@ -20,6 +20,30 @@
   color: #333;
 }
 
+.subforum-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.online-users-indicator {
+  color: #28a745;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.online-users-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin-right: 5px;
+}
+
 .settings-button {
   padding: 8px 16px;
   background-color: #6c757d;
@@ -74,6 +98,10 @@
   font-weight: 600;
   color: #333;
   text-align: right;
+}
+
+.online-count {
+  color: #28a745;
 }
 
 .subforum-moderators,
