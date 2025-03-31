@@ -34,6 +34,7 @@ const SubforumPage: React.FC = () => {
                 <div className='subforum-stats'>
                   <span>{subforum.questionCount || 0} questions</span>
                   <span>{tags.length} tags</span>
+                  <span className='online-users'>{subforum.onlineUsers} online</span>
                 </div>
               </div>
               <p className='subforum-description'>{subforum.description}</p>
@@ -49,7 +50,7 @@ const SubforumPage: React.FC = () => {
                   )}
                 </div>
                 <div className='subforum-moderators'>
-                  Moderators: {subforum.moderators.join(', ')}
+                  Moderators: {subforum.moderators?.join(', ') || 'None'}
                 </div>
               </div>
             </div>
