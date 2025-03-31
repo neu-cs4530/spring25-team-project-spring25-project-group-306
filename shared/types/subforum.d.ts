@@ -46,6 +46,29 @@ export interface DatabaseSubforum extends Subforum {
 }
 
 /**
+ * Interface representing runtime data for a subforum that doesn't need to be stored in the database
+ */
+export interface SubforumRuntimeData {
+  /** Number of users currently online in this subforum */
+  onlineUsers: number;
+}
+
+/**
+ * Interface for a Subforum payload as sent to the client, including runtime data
+ */
+export interface SubforumWithRuntimeData extends DatabaseSubforum, SubforumRuntimeData {}
+
+/**
+ * Interface for socket events related to subforum online users
+ */
+export interface SubforumOnlineUserEvent {
+  /** Subforum ID */
+  subforumId: string;
+  /** Number of users currently online in this subforum */
+  onlineUsers: number;
+}
+
+/**
  * Interface for creating a new subforum.
  *
  * This includes only the fields required when creating a new subforum.
