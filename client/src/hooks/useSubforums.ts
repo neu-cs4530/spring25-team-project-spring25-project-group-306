@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { DatabaseSubforum } from '@fake-stack-overflow/shared/types/subforum';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  DatabaseSubforum,
+  SubforumOnlineUserEvent,
+  SubforumWithRuntimeData,
+} from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
+
+// Interface to represent the Mongoose document structure
+interface MongooseDocument<T> {
+  _doc?: T;
+  onlineUsers?: number;
+}
 
 /**
  * Custom hook to handle subforum data fetching and state management
@@ -15,10 +25,66 @@ import useUserContext from './useUserContext';
  */
 const useSubforums = () => {
   const navigate = useNavigate();
-  const { user } = useUserContext();
-  const [subforums, setSubforums] = useState<DatabaseSubforum[]>([]);
+  const location = useLocation();
+  const { user, socket } = useUserContext();
+  const [subforums, setSubforums] = useState<SubforumWithRuntimeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentSubforumId, setCurrentSubforumId] = useState<string | null>(null);
+
+  // Extract subforum ID from URL path if present
+  useEffect(() => {
+    const match = location.pathname.match(/\/subforums\/([^/]+)/);
+    const subforumId = match ? match[1] : null;
+
+    // If we're navigating to a different subforum or away from one
+    if (currentSubforumId && subforumId !== currentSubforumId && socket) {
+      // Leave the previous subforum
+      socket.emit('leaveSubforum', currentSubforumId);
+    }
+
+    // Update current subforum ID
+    setCurrentSubforumId(subforumId);
+
+    // Join the new subforum if present
+    if (subforumId && socket) {
+      socket.emit('joinSubforum', subforumId);
+    }
+  }, [location.pathname, socket, currentSubforumId]);
+
+  // Clean up when unmounting
+  // eslint-disable-next-line arrow-body-style
+  useEffect(() => {
+    return () => {
+      if (currentSubforumId && socket) {
+        socket.emit('leaveSubforum', currentSubforumId);
+      }
+    };
+  }, [currentSubforumId, socket]);
+
+  // Function to update a single subforum's online users count
+  const updateSubforumOnlineUsers = (data: SubforumOnlineUserEvent) => {
+    setSubforums(currentSubforums =>
+      currentSubforums.map(subforum =>
+        subforum._id === data.subforumId
+          ? { ...subforum, onlineUsers: data.onlineUsers }
+          : subforum,
+      ),
+    );
+  };
+
+  // Listen for online users updates
+  useEffect(() => {
+    if (!socket) {
+      return () => {}; // Empty cleanup function
+    }
+
+    socket.on('subforumOnlineUsers', updateSubforumOnlineUsers);
+
+    return () => {
+      socket.off('subforumOnlineUsers', updateSubforumOnlineUsers);
+    };
+  }, [socket]);
 
   const fetchSubforums = async () => {
     try {
@@ -43,7 +109,18 @@ const useSubforums = () => {
       }
 
       const data = await response.json();
-      setSubforums(data);
+      // Process mongoose document objects
+      const subforumsWithOnlineUsers: SubforumWithRuntimeData[] = data.map(
+        (sf: MongooseDocument<DatabaseSubforum>) => {
+          // Extract the actual document data from _doc if it exists
+          const subforum = sf._doc ? sf._doc : (sf as unknown as DatabaseSubforum);
+          return {
+            ...subforum,
+            onlineUsers: sf.onlineUsers || 0,
+          };
+        },
+      );
+      setSubforums(subforumsWithOnlineUsers);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -58,6 +135,7 @@ const useSubforums = () => {
   }, []);
 
   const navigateToSubforum = (subforumId: string) => {
+    // The join logic is handled in the location effect
     navigate(`/subforums/${subforumId}`);
   };
 
@@ -69,7 +147,7 @@ const useSubforums = () => {
     fetchSubforums();
   };
 
-  const canCreateSubforum = () => !!user;
+  const canCreateSubforum = () => !!user && (user.karma !== undefined ? user.karma >= 2 : false);
 
   return {
     subforums,
