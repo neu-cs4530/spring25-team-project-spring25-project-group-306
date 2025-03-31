@@ -7,10 +7,81 @@ import {
   getSubforumById,
   getAllSubforums,
   deleteSubforumById,
+  setOnlineUsersMap,
 } from '../services/subforum.service';
+
+// Map to track online users count per subforum
+const subforumOnlineUsers = new Map<string, Set<string>>();
 
 const subforumController = (socket: FakeSOSocket) => {
   const router = express.Router();
+
+  // Setup socket event handlers for tracking online users
+  socket.on('connection', client => {
+    // Handle user joining a subforum
+    client.on('joinSubforum', (subforumId: string) => {
+      const clientId = client.id;
+
+      // Initialize subforum's online users set if it doesn't exist
+      if (!subforumOnlineUsers.has(subforumId)) {
+        subforumOnlineUsers.set(subforumId, new Set<string>());
+      }
+
+      // Add user to the subforum's online users
+      const users = subforumOnlineUsers.get(subforumId)!;
+      users.add(clientId);
+
+      // Update the service with the current online users map
+      setOnlineUsersMap(subforumOnlineUsers);
+
+      // Broadcast updated online users count to all clients
+      socket.emit('subforumOnlineUsers', {
+        subforumId,
+        onlineUsers: users.size,
+      });
+    });
+
+    // Handle user leaving a subforum
+    client.on('leaveSubforum', (subforumId: string) => {
+      handleUserLeaveSubforum(client.id, subforumId);
+    });
+
+    // Handle user disconnection
+    client.on('disconnect', () => {
+      // Remove user from all subforums they were in
+      subforumOnlineUsers.forEach((users, subforumId) => {
+        if (users.has(client.id)) {
+          handleUserLeaveSubforum(client.id, subforumId);
+        }
+      });
+    });
+  });
+
+  /**
+   * Handles a user leaving a subforum
+   * @param clientId Client socket id
+   * @param subforumId Subforum id
+   */
+  const handleUserLeaveSubforum = (clientId: string, subforumId: string): void => {
+    if (subforumOnlineUsers.has(subforumId)) {
+      const users = subforumOnlineUsers.get(subforumId)!;
+      users.delete(clientId);
+
+      // Update the service with the current online users map
+      setOnlineUsersMap(subforumOnlineUsers);
+
+      // Broadcast updated online users count
+      socket.emit('subforumOnlineUsers', {
+        subforumId,
+        onlineUsers: users.size,
+      });
+
+      // Clean up if no users are online in this subforum
+      if (users.size === 0) {
+        subforumOnlineUsers.delete(subforumId);
+      }
+    }
+  };
 
   /**
    * Validates the subforum object to ensure it contains all the necessary fields.
