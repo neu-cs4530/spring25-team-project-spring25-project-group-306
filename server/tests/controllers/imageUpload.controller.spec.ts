@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import { app } from '../../app';
-import uploadImageToAWS from '../../services/imageUpload.service';
+import { uploadImageToAWS } from '../../services/imageUpload.service';
+import multer from 'multer';
 
 jest.mock('../../services/imageUpload.service');
 const mockedUploadImageToAWS = uploadImageToAWS as jest.MockedFunction<typeof uploadImageToAWS>;

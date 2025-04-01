@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
-import { Readable } from 'stream';
-import uploadImageToAWS from '../../services/imageUpload.service';
+import { uploadImageToAWS } from '../../services/imageUpload.service';
+import { ObjectId } from 'mongodb';
 
 jest.mock('aws-sdk');
 
@@ -17,7 +17,7 @@ describe('uploadImageToAWS', () => {
     destination: '',
     filename: '',
     path: '',
-    stream: Readable.from(Buffer.from('dummy file content')),
+    stream: null as any,
   };
 
   const bucketName = process.env.AWS_S3_BUCKET_NAME || 'test-bucket';
@@ -35,7 +35,7 @@ describe('uploadImageToAWS', () => {
 
     mockedS3.upload = jest.fn().mockReturnValue({
       promise: jest.fn().mockResolvedValue(mockS3Response),
-    } as unknown as jest.MockedFunction<() => Promise<typeof mockS3Response>>);
+    } as any);
 
     const result = await uploadImageToAWS(mockFile);
 
@@ -52,7 +52,7 @@ describe('uploadImageToAWS', () => {
   it('should return null if the upload fails', async () => {
     mockedS3.upload = jest.fn().mockReturnValue({
       promise: jest.fn().mockRejectedValue(new Error('AWS S3 upload failed')),
-    } as unknown as jest.MockedFunction<() => Promise<null>>);
+    } as any);
 
     const result = await uploadImageToAWS(mockFile);
 

@@ -29,6 +29,7 @@ const useNewQuestion = () => {
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
   const [tagErr, setTagErr] = useState<string>('');
+  const [imageErr, setImageErr] = useState<string>('');
 
   /**
    * Function to validate the form before submitting the question.
@@ -127,7 +128,7 @@ const useNewQuestion = () => {
       setImage('No file selected');
       return;
     }
-    setImage('Uploading...');
+    setImage('Uploading...')
     const file = e.target.files[0];
 
     try {
@@ -153,6 +154,7 @@ const useNewQuestion = () => {
     titleErr,
     textErr,
     tagErr,
+    imageErr,
     postQuestion,
     handleFileChange,
   };

@@ -1,4 +1,4 @@
-import api from './config';
+import api from './config'
 
 /**
  * Executes the provided code in the specified programming language by making a POST request
@@ -12,18 +12,17 @@ import api from './config';
  * @throws Will log an error to the console if the request fails.
  */
 const executeCode = async (code: string, language: string) => {
-  try {
-    const response = await api.post(`${process.env.REACT_APP_SERVER_URL}/execute`, {
-      script: code,
-      language,
-      versionIndex: '0',
-    });
-    return response.data.output;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error executing code:', error); // log to console for debugging
-    return `Error executing code. ${error}`;
-  }
-};
+    try {
+      const response = await api.post(`${process.env.REACT_APP_SERVER_URL}/execute`, {
+        script: code,
+        language,
+        versionIndex: '0',
+      });
+      return response.data.output;
+    } catch (error) {
+      console.error('Error executing code:', error);
+      return `Error executing code. ${error}`;
+    }
+}
 
-export default executeCode;
+export default executeCode
