@@ -12,7 +12,7 @@ describe('uploadImageToAWS', () => {
     originalname: 'test-image.jpg',
     mimetype: 'image/jpeg',
     fieldname: 'file',
-    size: 12345,
+    size: 1000,
     encoding: '7bit',
     destination: '',
     filename: '',
