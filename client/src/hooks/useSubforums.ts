@@ -69,7 +69,7 @@ const useSubforums = () => {
     fetchSubforums();
   };
 
-  const canCreateSubforum = () => !!user && (user.karma !== undefined ? user.karma >= 2 : false);
+  const canCreateSubforum = () => !!user;
 
   return {
     subforums,

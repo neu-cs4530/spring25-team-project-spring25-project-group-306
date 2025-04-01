@@ -47,10 +47,6 @@ const subforumController = (socket: FakeSOSocket) => {
     try {
       const result = await saveSubforum(req.body);
       if ('error' in result) {
-        if (result.error.includes('karma')) {
-          res.status(403).json({ error: result.error });
-          return;
-        }
         throw new Error(result.error);
       }
       res.status(201).json(result);
