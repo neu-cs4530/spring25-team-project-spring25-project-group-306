@@ -51,7 +51,6 @@ jobs:
         env:
           # Pass the environmental variables for the backend tests to use
           MONGODB_URI: mongodb://localhost:27017
-          MONGODB_URI: mongodb://127.0.0.1:27017
           CLIENT_URL: http://localhost:3000
           PORT: 8000
           AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
@@ -76,8 +75,4 @@ jobs:
         if: ${{ always() }}
         env:
           REACT_APP_SERVER_URL: http://localhost:8000
-          REACT_APP_AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
-          REACT_APP_AWS_SECRET_ACCESS_KEY: LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
-          REACT_APP_AWS_REGION: us-east-1
-          REACT_APP_AWS_S3_BUCKET_NAME: fakesoimgs
         run: cd server; npm test
