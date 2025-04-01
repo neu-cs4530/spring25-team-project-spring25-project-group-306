@@ -78,17 +78,17 @@ const AnswerPage = () => {
             )}
           </div>
           <AnswerView
-              key={String(a._id)}
-              text={a.text}
-              ansBy={a.ansBy}
-              karma={karmaMap[a.ansBy] || 0}
-              meta={getMetaData(new Date(a.ansDateTime))}
-              comments={a.comments}
-              image={a.image}
-              handleAddComment={(comment: Comment) =>
-                handleNewComment(comment, 'answer', String(a._id))
-              }
-            />
+            key={String(a._id)}
+            text={a.text}
+            ansBy={a.ansBy}
+            karma={karmaMap[a.ansBy] || 0}
+            meta={getMetaData(new Date(a.ansDateTime))}
+            comments={a.comments}
+            image={a.image}
+            handleAddComment={(comment: Comment) =>
+              handleNewComment(comment, 'answer', String(a._id))
+            }
+          />
         </React.Fragment>
       ))}
       <button

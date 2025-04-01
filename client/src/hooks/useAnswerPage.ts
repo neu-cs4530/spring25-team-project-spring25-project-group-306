@@ -69,6 +69,11 @@ const useAnswerPage = () => {
     }
   };
 
+  /**
+   * Function to remove an answer from a question.
+   *
+   * @param aid - The ID of the answer to be removed.
+   */
   const removeAnswer = async (aid: string) => {
     try {
       const response = await fetch(
