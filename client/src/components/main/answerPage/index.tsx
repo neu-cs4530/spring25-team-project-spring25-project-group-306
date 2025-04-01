@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
 import { getMetaData } from '../../../tool';
 import AnswerView from './answer';
 import AnswerHeader from './header';
@@ -46,51 +45,54 @@ const AnswerPage = () => {
         creatorUsername={question.askedBy}
         postType={'question'}
       />
-      <AnswerHeader ansCount={question.answers.length} title={question.title} />
-      <QuestionBody
-        views={question.views.length}
-        text={question.text}
-        askby={question.askedBy}
-        karma={karma}
-        image={question.image}
-        meta={getMetaData(new Date(question.askDateTime))}
-      />
+      {question && question.answers && (
+        <AnswerHeader ansCount={question.answers.length} title={question.title} />
+      )}
+      {question && question.views && (
+        <QuestionBody
+          views={question.views.length}
+          text={question.text}
+          askby={question.askedBy}
+          karma={karma}
+          image={question.image}
+          meta={getMetaData(new Date(question.askDateTime))}
+        />
+      )}
       <CommentSection
         comments={question.comments}
         handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
       />
-      {question.answers.map(a => (
-        <React.Fragment key={String(a._id)}>
-          <VoteComponent
-            post={a as Post}
-            pid={String(a._id)}
-            creatorUsername={a.ansBy}
-            postType={'answer'}
-          />
-          <div key={String(a._id)}>
-            <button className='remove-button' onClick={() => removeAnswer(String(a._id))}>
-              Remove
-            </button>
-            {isModerator && (
-              <button className='remove-button' onClick={() => removeAnswer(String(a._id))}>
-                Remove
-              </button>
-            )}
-          </div>
-          <AnswerView
-            key={String(a._id)}
-            text={a.text}
-            ansBy={a.ansBy}
-            karma={karmaMap[a.ansBy] || 0}
-            meta={getMetaData(new Date(a.ansDateTime))}
-            comments={a.comments}
-            image={a.image}
-            handleAddComment={(comment: Comment) =>
-              handleNewComment(comment, 'answer', String(a._id))
-            }
-          />
-        </React.Fragment>
-      ))}
+      {question &&
+        question.answers &&
+        question.answers.map(a => (
+          <React.Fragment key={String(a._id)}>
+            <VoteComponent
+              post={a as Post}
+              pid={String(a._id)}
+              creatorUsername={a.ansBy}
+              postType={'answer'}
+            />
+            <div key={String(a._id)}>
+              {isModerator && (
+                <button className='remove-button' onClick={() => removeAnswer(String(a._id))}>
+                  Remove
+                </button>
+              )}
+            </div>
+            <AnswerView
+              key={String(a._id)}
+              text={a.text}
+              ansBy={a.ansBy}
+              karma={karmaMap[a.ansBy] || 0}
+              meta={getMetaData(new Date(a.ansDateTime))}
+              comments={a.comments}
+              image={a.image}
+              handleAddComment={(comment: Comment) =>
+                handleNewComment(comment, 'answer', String(a._id))
+              }
+            />
+          </React.Fragment>
+        ))}
       <button
         className='bluebtn ansButton'
         onClick={() => {

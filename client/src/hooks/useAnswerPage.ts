@@ -33,7 +33,7 @@ const useAnswerPage = () => {
    * Function to handle navigation to the "New Answer" page.
    */
   const handleNewAnswer = () => {
-    navigate(`/new/answer/${questionID}`);
+    navigate(`/new/answer/${subforumId}/${questionID}`);
   };
 
   useEffect(() => {
@@ -93,7 +93,15 @@ const useAnswerPage = () => {
       }
 
       const data = await response.json();
-      setQuestion(data);
+      setQuestion(prevQuestion => {
+        if (!prevQuestion) {
+          return prevQuestion;
+        }
+        return {
+          ...prevQuestion,
+          answers: prevQuestion.answers.filter(a => a._id !== data._id),
+        };
+      });
     } catch (err) {
       setQuestion(null);
     }
