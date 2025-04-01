@@ -51,15 +51,6 @@ jobs:
         env:
           # Pass the environmental variables for the backend tests to use
           MONGODB_URI: mongodb://localhost:27017
-          CLIENT_URL: http://localhost:3000
-          PORT: 8000
-          AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
-          AWS_SECRET_ACCESS_KEY: LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
-          AWS_REGION: us-east-1
-          AWS_S3_BUCKET_NAME: fakesoimgs
-          JDOODLE_API_URL: https://api.jdoodle.com/v1/execute
-          JDOODLE_CLIENT_ID: e399c7b149f48f5545400db501d4266c
-          JDOODLE_CLIENT_SECRET: 6b114d6c8810d0eb1580b2ee1b0e43a5c4ef712be99287ec803f3e5d30a317a4
         run: |
           cd server
 
