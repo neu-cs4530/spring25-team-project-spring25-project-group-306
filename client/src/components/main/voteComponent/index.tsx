@@ -19,6 +19,7 @@ interface VoteComponentProps {
   pid: string;
   creatorUsername: string;
   postType: 'question' | 'answer';
+  onVoteSuccess: () => void;
 }
 
 /**
@@ -28,8 +29,15 @@ interface VoteComponentProps {
  * @param pid - The id of the post object (PopulatedDatabaseQuestion or PopulatedDatabaseAnswer).
  * @param creatorUsername - The username of the creator of the post.
  * @param postType - If the post is a 'question' or 'answer'.
+ * @param onVoteSuccess - The hook method to call on vote success.
  */
-const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentProps) => {
+const VoteComponent = ({
+  post,
+  pid,
+  creatorUsername,
+  postType,
+  onVoteSuccess,
+}: VoteComponentProps) => {
   const { user } = useUserContext();
   const { count: initialCount, voted: initialVoted } = useVoteStatus({ post });
 
@@ -78,6 +86,7 @@ const VoteComponent = ({ post, pid, creatorUsername, postType }: VoteComponentPr
 
         setCount(newCount);
         setVoted(newVoted);
+        onVoteSuccess();
       }
     } catch (error) {
       // Handle error
