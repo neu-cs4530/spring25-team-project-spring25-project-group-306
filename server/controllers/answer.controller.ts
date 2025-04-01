@@ -50,19 +50,24 @@ const answerController = (socket: FakeSOSocket) => {
     res: Response,
     voteType: 'upvote' | 'downvote',
   ): Promise<void> => {
-    if (!req.body.pid || !req.body.username) {
+    if (!req.body.post || !req.body.pid || !req.body.creatorUsername || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
 
-    const { pid, username } = req.body;
+    const { post, pid, creatorUsername, username } = req.body;
 
     try {
-      const status = await addVoteToAnswer(pid, username, voteType);
+      let status;
+
+      if (voteType === 'upvote') {
+        status = await addVoteToAnswer(post, pid, creatorUsername, username, voteType);
+      } else {
+        status = await addVoteToAnswer(post, pid, creatorUsername, username, voteType);
+      }
 
       if (status && 'error' in status) {
-        res.status(500).send(status.error);
-        return;
+        throw new Error(status.error);
       }
 
       // Emit the updated vote counts to all connected clients
@@ -157,8 +162,8 @@ const answerController = (socket: FakeSOSocket) => {
 
   // add appropriate HTTP verbs and their endpoints to the router.
   router.post('/addAnswer', addAnswer);
-  router.post('/answerUpvote', upvoteAnswer);
-  router.post('/answerDownvote', downvoteAnswer);
+  router.post('/upvoteAnswer', upvoteAnswer);
+  router.post('/downvoteAnswer', downvoteAnswer);
 
   return router;
 };

@@ -1,5 +1,4 @@
 import { Request } from 'express';
-import { ObjectId } from 'mongodb';
 
 /**
  * Represents a question or an answer, and includes their shared functionality: upvotes and downvotes.
@@ -18,7 +17,9 @@ export interface Post {
  */
 export interface VoteRequest extends Request {
   body: {
+    post: Post;
     pid: string;
+    creatorUsername: string;
     username: string;
   };
 }

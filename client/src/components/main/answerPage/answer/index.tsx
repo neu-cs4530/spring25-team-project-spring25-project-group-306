@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from '../../../../tool';
+import MarkdownRenderer from '../../../../markdown';
 import CommentSection from '../../commentSection';
 import './index.css';
 import { Comment, DatabaseComment } from '../../../../types/types';

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getKarmaByUsername } from '../services/userService';
 
 /**
@@ -8,13 +8,14 @@ import { getKarmaByUsername } from '../services/userService';
  */
 const useFetchKarma = (usernames: string[]) => {
   const [karmaMap, setKarmaMap] = useState<Record<string, number>>({});
+  const stableUsernames = useMemo(() => [...new Set(usernames)].sort(), [usernames]);
 
   useEffect(() => {
-    if (usernames.length === 0) return;
+    if (stableUsernames.length === 0) return;
 
     const fetchKarma = async () => {
       const karmaResults = await Promise.allSettled(
-        usernames.map(async username => ({
+        stableUsernames.map(async username => ({
           username,
           karma: await getKarmaByUsername(username),
         })),
@@ -30,11 +31,13 @@ const useFetchKarma = (usernames: string[]) => {
         }
       });
 
-      setKarmaMap(newKarmaMap);
+      setKarmaMap(prevKarmaMap =>
+        JSON.stringify(prevKarmaMap) !== JSON.stringify(newKarmaMap) ? newKarmaMap : prevKarmaMap,
+      );
     };
 
     fetchKarma();
-  }, [usernames]);
+  }, [stableUsernames, usernames]);
 
   return karmaMap;
 };

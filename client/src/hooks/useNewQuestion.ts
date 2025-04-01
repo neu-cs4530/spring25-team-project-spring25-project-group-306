@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
-import { addQuestion } from '../services/questionService';
+import { addQuestion, upvoteQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
-import { Question } from '../types/types';
+import { Post, Question } from '../types/types';
 import uploadImage from '../services/imageUploadService';
 
 /**
@@ -109,9 +109,16 @@ const useNewQuestion = () => {
       image: image || undefined,
     };
 
-    const res = await addQuestion(question);
+    const resQuestion = await addQuestion(question);
 
-    if (res && res._id) {
+    await upvoteQuestion(
+      resQuestion as Post,
+      String(resQuestion._id),
+      resQuestion.askedBy,
+      user.username,
+    );
+
+    if (resQuestion && resQuestion._id) {
       navigate('/home');
     }
   };

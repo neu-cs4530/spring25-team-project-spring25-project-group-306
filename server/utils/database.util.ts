@@ -1,4 +1,3 @@
-import { QueryOptions } from 'mongoose';
 import {
   DatabaseComment,
   DatabaseMessage,
@@ -151,34 +150,4 @@ export const populateDocument = async (
   } catch (error) {
     return { error: `Error when fetching and populating a document: ${(error as Error).message}` };
   }
-};
-
-/**
- *
- *
- * */
-export const updateVoteOperation = async (
-  username: string,
-  voteType: 'upvote' | 'downvote',
-): Promise<QueryOptions> => {
-  let updateOperation: QueryOptions;
-  if (voteType === 'upvote') {
-    updateOperation = [
-      {
-        $addToSet: { upVotes: username },
-        $pull: { downVotes: username },
-      },
-      { new: true },
-    ];
-  } else {
-    updateOperation = [
-      {
-        $addToSet: { downVotes: username },
-        $pull: { upVotes: username },
-      },
-      { new: true },
-    ];
-  }
-
-  return { updateOperation };
 };
