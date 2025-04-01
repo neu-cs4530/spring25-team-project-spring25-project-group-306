@@ -17,6 +17,7 @@ const NewQuestionPage = () => {
     setText,
     tagNames,
     setTagNames,
+    image,
     titleErr,
     textErr,
     tagErr,
@@ -59,6 +60,7 @@ const NewQuestionPage = () => {
         accept='.png,.jpeg,.jpg'
         onChange={handleFileChange}
       />
+      <p>Image link: {image}</p>
       <div className='btn_indicator_container'>
         <button
           className='form_postBtn'

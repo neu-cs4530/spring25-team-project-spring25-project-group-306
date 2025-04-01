@@ -1,9 +1,12 @@
 import axios from 'axios';
 import express, { Request, Response, Router } from 'express';
+import dotenv from 'dotenv';
 
-const JDOODLE_API_URL = 'https://api.jdoodle.com/v1/execute';
-const CLIENT_ID = 'e399c7b149f48f5545400db501d4266c';
-const CLIENT_SECRET = '6b114d6c8810d0eb1580b2ee1b0e43a5c4ef712be99287ec803f3e5d30a317a4';
+dotenv.config();
+
+const JDOODLE_API_URL = process.env.JDOODLE_API_URL || '';
+const CLIENT_ID = process.env.JDOODLE_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.JDOODLE_CLIENT_SECRET || '';
 
 const compilerController = () => {
   const router: Router = express.Router();

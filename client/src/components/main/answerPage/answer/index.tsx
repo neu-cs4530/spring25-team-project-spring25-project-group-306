@@ -50,14 +50,6 @@ const AnswerView = ({
         <div className='answer_karma'>{karma} karma</div>
       </div>
       <div className='answer_question_meta'>{meta}</div>
-      {image && (
-        <img
-          src={image}
-          alt='answer'
-          className='answer_image'
-          style={{ width: '300px', height: '300px' }}
-        />
-      )}
     </div>
     <CommentSection comments={comments} handleAddComment={handleAddComment} />
   </div>
