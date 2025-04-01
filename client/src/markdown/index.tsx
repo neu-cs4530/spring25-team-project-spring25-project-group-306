@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { PluggableList } from 'unified';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import axios from 'axios';
+import executeCode from '../services/compilerService';
 
 interface CodeBlockProps {
   language: string;
@@ -20,13 +20,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
   const runCode = async () => {
     setIsRunning(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/execute`, {
-        script: code,
-        language,
-        versionIndex: '0',
-      });
+      const outputStr = await executeCode(code, language);
 
-      setOutput(response.data.output);
+      setOutput(outputStr);
     } catch (error) {
       setOutput(`Error executing code. ${error}`);
       // eslint-disable-next-line no-console
