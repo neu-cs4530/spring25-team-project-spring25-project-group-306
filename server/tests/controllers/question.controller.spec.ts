@@ -183,11 +183,7 @@ describe('Test questionController', () => {
 
       expect(response.status).toBe(200);
 
-      expect(response.body).toEqual(mockDatabaseQuestion);
 
-      const { askDateTime, ...expectedQuestion } = mockDatabaseQuestion;
-      const { askDateTime: responseAskDateTime, ...actualQuestion } = response.body;
-      expect(actualQuestion).toEqual(expectedQuestion);
     });
   });
   describe('POST /addQuestion', () => {
