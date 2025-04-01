@@ -22,9 +22,11 @@ const AnswerPage = () => {
     question,
     karma,
     handleNewComment,
-    handleNewAnswer,
+    handleNewAnswer, 
+    refreshQuestion,
     removeAnswer,
-  } = useAnswerPage();
+  } =
+    useAnswerPage();
   const { isModerator } = useSubforumDetails(subforumId);
   const answerUsernames = useMemo(
     () =>
@@ -32,6 +34,10 @@ const AnswerPage = () => {
     [question],
   );
   const karmaMap = useFetchKarma(answerUsernames);
+
+  const handleVoteSuccess = () => {
+    refreshQuestion();
+  };
 
   if (!question) {
     return null;
@@ -44,6 +50,7 @@ const AnswerPage = () => {
         pid={String(question._id)}
         creatorUsername={question.askedBy}
         postType={'question'}
+        onVoteSuccess={handleVoteSuccess}
       />
       {question && question.answers && (
         <AnswerHeader ansCount={question.answers.length} title={question.title} />
@@ -71,6 +78,7 @@ const AnswerPage = () => {
               pid={String(a._id)}
               creatorUsername={a.ansBy}
               postType={'answer'}
+            onVoteSuccess={handleVoteSuccess}
             />
             <div key={String(a._id)}>
               {isModerator && (
