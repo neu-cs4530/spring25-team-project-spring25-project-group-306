@@ -23,7 +23,7 @@ const NewAnswerPage = () => {
         <strong>Upload Optional Image (png, jpg, or jpeg)</strong>
       </p>
       <input type='file' accept='.png,.jpeg,.jpg' onChange={handleFileChange} />
-      <p>Image link: {image}</p>
+      <p>Image Link: {image}</p>
       <div className='btn_indicator_container'>
         <button className='form_postBtn' onClick={postAnswer}>
           Post Answer

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import { addAnswer } from '../services/answerService';
@@ -74,22 +74,18 @@ const useAnswerForm = () => {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
-      setImage('No file selected');
       return;
     }
     setImage('Uploading...');
     const file = e.target.files[0];
 
     try {
-      const imgUrl = await uploadImage(file);
-
-      setImage(imgUrl);
-    } catch (error) {
-      setImage(`Error uploading image`);
-      // eslint-disable-next-line no-console
-      console.error(error); // Log the error to the console, ignore lint error
+      const imageURL = await uploadImage(file);
+      setImage(imageURL);
+    } catch (err) {
+      setTextErr('Error uploading image');
     }
   };
 

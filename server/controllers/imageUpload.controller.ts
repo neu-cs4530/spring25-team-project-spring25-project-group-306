@@ -10,7 +10,6 @@ const imageUploadController = () => {
   const uploadImage = async (req: Request, res: Response) => {
     try {
       const { file } = req;
-
       if (!file) {
         throw new Error('No file provided for upload');
       }
