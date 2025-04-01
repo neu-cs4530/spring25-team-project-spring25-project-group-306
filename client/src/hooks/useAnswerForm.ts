@@ -1,9 +1,9 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
-import { addAnswer } from '../services/answerService';
+import { addAnswer, upvoteAnswer } from '../services/answerService';
 import useUserContext from './useUserContext';
-import { Answer } from '../types/types';
+import { Answer, Post } from '../types/types';
 import uploadImage from '../services/imageUploadService';
 
 /**
@@ -66,9 +66,11 @@ const useAnswerForm = () => {
       image: image || undefined,
     };
 
-    const res = await addAnswer(questionID, answer);
+    const resAnswer = await addAnswer(questionID, answer);
 
-    if (res && res._id) {
+    await upvoteAnswer(resAnswer as Post, String(resAnswer._id), resAnswer.ansBy, user.username);
+
+    if (resAnswer && resAnswer._id) {
       // navigate to the question that was answered
       navigate(`/question/${questionID}`);
     }
