@@ -28,9 +28,7 @@ describe('uploadImageToAWS', () => {
   });
 
   afterEach(() => {
-    if (mockFile.stream && typeof mockFile.stream.destroy === 'function') {
-      mockFile.stream.destroy();
-    }
+    mockFile.stream.destroy();
   });
 
   it('should upload the image to AWS S3 and return the image URL', async () => {
