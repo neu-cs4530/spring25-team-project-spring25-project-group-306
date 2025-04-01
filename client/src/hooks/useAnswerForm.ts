@@ -4,7 +4,6 @@ import { validateHyperlink } from '../tool';
 import { addAnswer } from '../services/answerService';
 import useUserContext from './useUserContext';
 import { Answer } from '../types/types';
-import axios from 'axios';
 import uploadImage from '../services/imageUploadService';
 
 /**
@@ -75,22 +74,17 @@ const useAnswerForm = () => {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
-      setImage('No file selected');
       return;
     }
-    setImage('Uploading...')
     const file = e.target.files[0];
 
     try {
-      const imgUrl = await uploadImage(file);
-
-      setImage(imgUrl);
-    } catch (error) {
-      setImage(`Error uploading image`);
-      // eslint-disable-next-line no-console
-      console.error(error); // Log the error to the console, ignore lint error
+      const imageURL = await uploadImage(file);
+      setImage(imageURL);
+    } catch (err) {
+      setTextErr('Error uploading image');
     }
   };
 

@@ -39,6 +39,14 @@ const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyPr
         <div className='question_karma'>{karma} karma</div>
       </div>
       <div className='answer_question_meta'>asked {meta}</div>
+      {image && (
+        <img
+          src={image}
+          alt='question'
+          className='question_image'
+          style={{ width: '300px', height: '300px' }}
+        />
+      )}
     </div>
   </div>
 );
