@@ -96,11 +96,11 @@ export interface UpdateBiographyRequest extends Request {
 /**
  * Express request for updating a user's karma.
  * - `username`: The username whose karma is being updated (body).
- * - `karmaChange`: The amount to change the karma by (positive or negative) (body).
+ * - `karma`: The amount to change the karma by (positive or negative) (body).
  */
 export interface UpdateKarmaRequest extends Request {
   body: {
     username: string;
-    karmaChange: number;
+    karma: number;
   };
 }

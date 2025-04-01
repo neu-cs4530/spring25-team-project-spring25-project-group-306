@@ -1,0 +1,32 @@
+.markdown-container {
+    display: block;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+ul, ol {
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px 0;
+}
+
+a {
+    color: blue;
+    text-decoration: underline;
+}

@@ -335,7 +335,12 @@ describe('Test questionController', () => {
     it('should upvote a question successfully', async () => {
       const validPid = new mongoose.Types.ObjectId();
       const mockReqBody = {
-        pid: validPid,
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: validPid.toString(),
+        creatorUsername: 'user',
         username: 'new-user',
       };
 
@@ -355,7 +360,12 @@ describe('Test questionController', () => {
 
     it('should cancel the upvote successfully', async () => {
       const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
         pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'some-user',
       };
 
@@ -389,8 +399,13 @@ describe('Test questionController', () => {
 
     it('should handle upvote and then downvote by the same user', async () => {
       const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
         pid: '65e9b5a995b6c7045a30d823',
-        username: 'new-user',
+        creatorUsername: 'user',
+        username: 'some-user',
       };
 
       // First upvote the question
@@ -446,7 +461,12 @@ describe('Test questionController', () => {
   describe('POST /downvoteQuestion', () => {
     it('should downvote a question successfully', async () => {
       const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
         pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'new-user',
       };
 
@@ -466,7 +486,12 @@ describe('Test questionController', () => {
 
     it('should cancel the downvote successfully', async () => {
       const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
         pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'some-user',
       };
 
@@ -502,7 +527,12 @@ describe('Test questionController', () => {
 
     it('should handle downvote and then upvote by the same user', async () => {
       const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
         pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'new-user',
       };
 

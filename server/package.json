@@ -10,6 +10,7 @@
     "npm": "^11.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "axios": "1.8.4",
     "@fake-stack-overflow/shared": "^1.0.0"
   },
   "devDependencies": {

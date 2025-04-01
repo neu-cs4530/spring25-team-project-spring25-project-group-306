@@ -7,6 +7,7 @@ import {
   OrderType,
   PopulatedDatabaseAnswer,
   PopulatedDatabaseQuestion,
+  Post,
   Question,
   QuestionResponse,
   VoteResponse,
@@ -23,7 +24,7 @@ import {
   sortQuestionsByNewest,
   sortQuestionsByUnanswered,
 } from '../utils/sort.util';
-import { updateVoteOperation } from '../utils/database.util';
+import { updateUserKarma } from './user.service';
 
 /**
  * Checks if keywords exist in a question's title or text.
@@ -186,17 +187,65 @@ export const deleteQuestionById = async (qid: string): Promise<QuestionResponse>
 
 /**
  * Adds a vote to a question.
- * @param {string} pid - The question ID
+ * @param {Post} post - The post
+ * @param {string} pid - The id of the post object
+ * @param {string} creatorUsername - The username of the creator of the post
  * @param {string} username - The username who voted
  * @param {'upvote' | 'downvote'} voteType - The vote type
  * @returns {Promise<VoteResponse>} - The updated vote result
  */
 export const addVoteToQuestion = async (
+  post: Post,
   pid: string,
+  creatorUsername: string,
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
-  const updateOperation: QueryOptions = updateVoteOperation(username, voteType);
+  let updateOperation: QueryOptions;
+
+  if (voteType === 'upvote') {
+    updateOperation = [
+      {
+        $set: {
+          upVotes: {
+            $cond: [
+              { $in: [username, '$upVotes'] },
+              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
+              { $concatArrays: ['$upVotes', [username]] },
+            ],
+          },
+          downVotes: {
+            $cond: [
+              { $in: [username, '$upVotes'] },
+              '$downVotes',
+              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
+            ],
+          },
+        },
+      },
+    ];
+  } else {
+    updateOperation = [
+      {
+        $set: {
+          downVotes: {
+            $cond: [
+              { $in: [username, '$downVotes'] },
+              { $filter: { input: '$downVotes', as: 'd', cond: { $ne: ['$$d', username] } } },
+              { $concatArrays: ['$downVotes', [username]] },
+            ],
+          },
+          upVotes: {
+            $cond: [
+              { $in: [username, '$downVotes'] },
+              '$upVotes',
+              { $filter: { input: '$upVotes', as: 'u', cond: { $ne: ['$$u', username] } } },
+            ],
+          },
+        },
+      },
+    ];
+  }
 
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(
@@ -210,15 +259,34 @@ export const addVoteToQuestion = async (
     }
 
     let msg = '';
+    let karmaChange = 0;
+    const alreadyUpvoted = post.upVotes.includes(username);
+    const alreadyDownvoted = post.downVotes.includes(username);
 
     if (voteType === 'upvote') {
-      msg = result.upVotes.includes(username)
-        ? 'Question upvoted successfully'
-        : 'Upvote cancelled successfully';
+      if (alreadyDownvoted) {
+        msg = 'Question upvoted successfully';
+        karmaChange = 2;
+      } else if (!alreadyUpvoted) {
+        msg = 'Question upvoted successfully';
+        karmaChange = 1;
+      } else {
+        msg = 'Upvote cancelled successfully';
+        karmaChange = -1;
+      }
+    } else if (alreadyUpvoted) {
+      msg = 'Question downvoted successfully';
+      karmaChange = -2;
+    } else if (!alreadyDownvoted) {
+      msg = 'Question downvoted successfully';
+      karmaChange = -1;
     } else {
-      msg = result.downVotes.includes(username)
-        ? 'Question downvoted successfully'
-        : 'Downvote cancelled successfully';
+      msg = 'Downvote cancelled successfully';
+      karmaChange = 1;
+    }
+
+    if (karmaChange !== 0) {
+      await updateUserKarma(creatorUsername, karmaChange);
     }
 
     return {
