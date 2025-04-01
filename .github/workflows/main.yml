@@ -73,5 +73,9 @@ jobs:
         if: ${{ always() }}
         env:
           REACT_APP_SERVER_URL: http://localhost:8000
+          AWS_ACCESS_KEY_ID: AKIA2OP6WA2KPVPRV3FZ
+          AWS_SECRET_ACCESS_KEY: LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
+          AWS_REGION: us-east-1
+          AWS_S3_BUCKET_NAME: fakesoimgs
         run: 
           cd server && NODE_OPTIONS="--max-old-space-size=8192" npm test --runInBand
