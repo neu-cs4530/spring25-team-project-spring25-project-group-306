@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Comment,
   VoteUpdatePayload,
@@ -30,6 +30,25 @@ const useAnswerPage = () => {
   const [karma, setKarma] = useState<number>(0);
 
   /**
+   * Function to fetch the latest question data and update state.
+   */
+  const refreshQuestion = useCallback(async () => {
+    try {
+      if (!questionID) return;
+      const res = await getQuestionById(questionID, user.username);
+      setQuestion(res || null);
+
+      if (res?.askedBy) {
+        const userKarma = await getKarmaByUsername(res.askedBy);
+        setKarma(userKarma);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error refreshing question:', error);
+    }
+  }, [questionID, user.username]);
+
+  /**
    * Function to handle navigation to the "New Answer" page.
    */
   const handleNewAnswer = () => {
@@ -44,6 +63,10 @@ const useAnswerPage = () => {
 
     setQuestionID(qid);
   }, [qid, navigate]);
+
+  useEffect(() => {
+    refreshQuestion();
+  }, [refreshQuestion]);
 
   /**
    * Function to handle the submission of a new comment to a question or answer.
@@ -63,6 +86,7 @@ const useAnswerPage = () => {
       }
 
       await addComment(targetId, targetType, comment);
+      refreshQuestion();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error adding comment:', error);
@@ -198,6 +222,7 @@ const useAnswerPage = () => {
     karma,
     handleNewComment,
     handleNewAnswer,
+    refreshQuestion,
   };
 };
 

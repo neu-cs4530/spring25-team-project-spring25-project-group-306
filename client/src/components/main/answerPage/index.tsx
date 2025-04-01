@@ -15,7 +15,8 @@ import useFetchKarma from '../../../hooks/useFetchKarma';
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage = () => {
-  const { questionID, question, karma, handleNewComment, handleNewAnswer } = useAnswerPage();
+  const { questionID, question, karma, handleNewComment, handleNewAnswer, refreshQuestion } =
+    useAnswerPage();
 
   const answerUsernames = useMemo(
     () =>
@@ -23,6 +24,10 @@ const AnswerPage = () => {
     [question],
   );
   const karmaMap = useFetchKarma(answerUsernames);
+
+  const handleVoteSuccess = () => {
+    refreshQuestion();
+  };
 
   if (!question) {
     return null;
@@ -35,6 +40,7 @@ const AnswerPage = () => {
         pid={String(question._id)}
         creatorUsername={question.askedBy}
         postType={'question'}
+        onVoteSuccess={handleVoteSuccess}
       />
       <AnswerHeader ansCount={question.answers.length} title={question.title} />
       <QuestionBody
@@ -56,6 +62,7 @@ const AnswerPage = () => {
             pid={String(a._id)}
             creatorUsername={a.ansBy}
             postType={'answer'}
+            onVoteSuccess={handleVoteSuccess}
           />
           <AnswerView
             key={String(a._id)}
