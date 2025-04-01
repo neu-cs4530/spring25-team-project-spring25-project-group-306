@@ -182,8 +182,6 @@ describe('Test questionController', () => {
       );
 
       expect(response.status).toBe(200);
-
-
     });
   });
   describe('POST /addQuestion', () => {
