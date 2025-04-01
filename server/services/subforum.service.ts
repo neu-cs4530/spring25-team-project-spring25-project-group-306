@@ -59,6 +59,18 @@ export const saveSubforum = async (
       return { error: 'You need at least 2 karma to create a subforum' };
     }
 
+    // Check if the creator (first moderator) has enough karma
+    const creatorUsername = subforum.moderators[0];
+    const creator = await getUserByUsername(creatorUsername);
+
+    if ('error' in creator) {
+      return { error: `Error finding creator: ${creator.error}` };
+    }
+
+    if ((creator.karma ?? 0) < 2) {
+      return { error: 'You need at least 2 karma to create a subforum' };
+    }
+
     const result = await SubforumModel.create({
       ...subforum,
       createdAt: new Date(),
