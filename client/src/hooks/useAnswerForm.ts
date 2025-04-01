@@ -1,10 +1,9 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import { addAnswer } from '../services/answerService';
 import useUserContext from './useUserContext';
 import { Answer } from '../types/types';
-import axios from 'axios';
 import uploadImage from '../services/imageUploadService';
 
 /**
@@ -80,7 +79,7 @@ const useAnswerForm = () => {
       setImage('No file selected');
       return;
     }
-    setImage('Uploading...')
+    setImage('Uploading...');
     const file = e.target.files[0];
 
     try {
