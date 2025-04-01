@@ -22,11 +22,10 @@ const AnswerPage = () => {
     question,
     karma,
     handleNewComment,
-    handleNewAnswer, 
+    handleNewAnswer,
     refreshQuestion,
     removeAnswer,
-  } =
-    useAnswerPage();
+  } = useAnswerPage();
   const { isModerator } = useSubforumDetails(subforumId);
   const answerUsernames = useMemo(
     () =>
@@ -78,7 +77,7 @@ const AnswerPage = () => {
               pid={String(a._id)}
               creatorUsername={a.ansBy}
               postType={'answer'}
-            onVoteSuccess={handleVoteSuccess}
+              onVoteSuccess={handleVoteSuccess}
             />
             <div key={String(a._id)}>
               {isModerator && (
