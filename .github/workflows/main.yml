@@ -74,4 +74,4 @@ jobs:
         env:
           REACT_APP_SERVER_URL: http://localhost:8000
         run: 
-          cd server && NODE_OPTIONS="--max-old-space-size=4096" npm test
+          cd server && NODE_OPTIONS="--max-old-space-size=8192" npm test

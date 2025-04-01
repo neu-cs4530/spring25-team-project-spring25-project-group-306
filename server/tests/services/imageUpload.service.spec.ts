@@ -25,7 +25,6 @@ describe('uploadImageToAWS', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -42,7 +41,7 @@ describe('uploadImageToAWS', () => {
 
     mockedS3.upload = jest.fn().mockReturnValue({
       promise: jest.fn().mockResolvedValue(mockS3Response),
-    }) as jest.MockedFunction<AWS.S3['upload']>;
+    });
 
     const result = await uploadImageToAWS(mockFile);
 
@@ -59,7 +58,7 @@ describe('uploadImageToAWS', () => {
   it('should return null if the upload fails', async () => {
     mockedS3.upload = jest.fn().mockReturnValue({
       promise: jest.fn().mockRejectedValue(new Error('AWS S3 upload failed')),
-    }) as jest.MockedFunction<AWS.S3['upload']>;
+    });
 
     const result = await uploadImageToAWS(mockFile);
 
