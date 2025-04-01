@@ -21,7 +21,7 @@ import { getKarmaByUsername } from '../services/userService';
  * @returns handleNewAnswer - Function to navigate to the "New Answer" page
  */
 const useAnswerPage = () => {
-  const { qid } = useParams();
+  const { subforumId, qid } = useParams();
   const navigate = useNavigate();
 
   const { user, socket } = useUserContext();
@@ -69,7 +69,30 @@ const useAnswerPage = () => {
     }
   };
 
-  const removeAnswer = async (aid: string) => {};
+  const removeAnswer = async (aid: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/answer/deleteAnswer/${aid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to delete answer: ${errorData}`);
+      }
+
+      const data = await response.json();
+      setQuestion(data);
+    } catch (err) {
+      setQuestion(null);
+    }
+  };
 
   useEffect(() => {
     /**
@@ -195,6 +218,7 @@ const useAnswerPage = () => {
   }, [questionID, socket]);
 
   return {
+    subforumId,
     questionID,
     question,
     karma,

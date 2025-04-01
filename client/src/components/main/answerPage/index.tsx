@@ -16,9 +16,15 @@ import useSubforumDetails from '../../../hooks/useSubforumDetails';
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage = () => {
-  const { questionID, question, karma, handleNewComment, handleNewAnswer, removeAnswer } =
-    useAnswerPage();
-  const { subforumId } = useParams<{ subforumId: string }>();
+  const {
+    subforumId,
+    questionID,
+    question,
+    karma,
+    handleNewComment,
+    handleNewAnswer,
+    removeAnswer,
+  } = useAnswerPage();
   const { isModerator } = useSubforumDetails(subforumId);
   const answerUsernames = question ? [...new Set(question.answers.map(a => a.ansBy))] : [];
   const karmaMap = useFetchKarma(answerUsernames);

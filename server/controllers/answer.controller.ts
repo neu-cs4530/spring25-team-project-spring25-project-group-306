@@ -6,8 +6,14 @@ import {
   FakeSOSocket,
   PopulatedDatabaseAnswer,
   VoteRequest,
+  DeleteAnswerRequest,
 } from '../types/types';
-import { addAnswerToQuestion, saveAnswer, addVoteToAnswer } from '../services/answer.service';
+import {
+  addAnswerToQuestion,
+  saveAnswer,
+  addVoteToAnswer,
+  deleteAnswerById,
+} from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
 
 const answerController = (socket: FakeSOSocket) => {
@@ -155,10 +161,38 @@ const answerController = (socket: FakeSOSocket) => {
     }
   };
 
+  const deleteAnswer = async (req: DeleteAnswerRequest, res: Response): Promise<void> => {
+    const { aid } = req.params;
+
+    if (!aid) {
+      res.status(400).send('Invalid request');
+      return;
+    }
+
+    try {
+      const result = deleteAnswerById(aid);
+
+      if ('error' in result) {
+        throw new Error(result.error as string);
+      }
+
+      const populatedResult = await populateDocument(aid, 'answer');
+
+      if (populatedResult && 'error' in populatedResult) {
+        throw new Error(populatedResult.error);
+      }
+
+      res.json(populatedResult);
+    } catch (err) {
+      res.status(500).send(`Error when deleting answer: ${(err as Error).message}`);
+    }
+  };
+
   // add appropriate HTTP verbs and their endpoints to the router.
   router.post('/addAnswer', addAnswer);
   router.post('/answerUpvote', upvoteAnswer);
   router.post('/answerDownvote', downvoteAnswer);
+  router.delete('/deleteAnswer/:aid', deleteAnswer);
 
   return router;
 };
