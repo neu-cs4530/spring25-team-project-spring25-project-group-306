@@ -29,7 +29,6 @@ const useNewQuestion = () => {
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
   const [tagErr, setTagErr] = useState<string>('');
-  const [imageErr, setImageErr] = useState<string>('');
 
   /**
    * Function to validate the form before submitting the question.
@@ -125,17 +124,17 @@ const useNewQuestion = () => {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
-      setImageErr('No file selected');
+      setImage('No File Selected');
       return;
     }
+    setImage('Uploading...');
     const file = e.target.files[0];
 
     try {
       const imageURL = await uploadImage(file);
       setImage(imageURL);
-      setImageErr('');
     } catch (err) {
-      setImageErr('Failed to upload image');
+      setImage('Failed to upload image');
     }
   };
 
@@ -151,7 +150,6 @@ const useNewQuestion = () => {
     titleErr,
     textErr,
     tagErr,
-    imageErr,
     postQuestion,
     handleFileChange,
   };

@@ -80,6 +80,7 @@ const useAnswerForm = () => {
     if (!e.target.files) {
       return;
     }
+    setImage('Uploading...');
     const file = e.target.files[0];
 
     try {
