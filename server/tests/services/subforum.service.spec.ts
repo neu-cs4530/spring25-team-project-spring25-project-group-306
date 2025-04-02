@@ -19,20 +19,6 @@ const getUserByUsernameMock = userService.getUserByUsername as jest.MockedFuncti
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
-interface MockSubforum {
-  _id: mongoose.Types.ObjectId;
-  title: string;
-  description: string;
-  moderators: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  isActive: boolean;
-  questionCount: number;
-  tags: string[];
-  rules: string[];
-  toObject: () => DatabaseSubforum;
-}
-
 interface MockSubforumWithToObject {
   _id: mongoose.Types.ObjectId;
   title: string;

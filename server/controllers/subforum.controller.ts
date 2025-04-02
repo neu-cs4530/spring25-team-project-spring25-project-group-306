@@ -16,6 +16,32 @@ const subforumOnlineUsers = new Map<string, Set<string>>();
 const subforumController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
+  /**
+   * Handles a user leaving a subforum
+   * @param clientId Client socket id
+   * @param subforumId Subforum id
+   */
+  const handleUserLeaveSubforum = (clientId: string, subforumId: string): void => {
+    if (subforumOnlineUsers.has(subforumId)) {
+      const users = subforumOnlineUsers.get(subforumId)!;
+      users.delete(clientId);
+
+      // Update the service with the current online users map
+      setOnlineUsersMap(subforumOnlineUsers);
+
+      // Broadcast updated online users count
+      socket.emit('subforumOnlineUsers', {
+        subforumId,
+        onlineUsers: users.size,
+      });
+
+      // Clean up if no users are online in this subforum
+      if (users.size === 0) {
+        subforumOnlineUsers.delete(subforumId);
+      }
+    }
+  };
+
   // Setup socket event handlers for tracking online users
   socket.on('connection', client => {
     // Handle user joining a subforum
@@ -56,32 +82,6 @@ const subforumController = (socket: FakeSOSocket) => {
       });
     });
   });
-
-  /**
-   * Handles a user leaving a subforum
-   * @param clientId Client socket id
-   * @param subforumId Subforum id
-   */
-  const handleUserLeaveSubforum = (clientId: string, subforumId: string): void => {
-    if (subforumOnlineUsers.has(subforumId)) {
-      const users = subforumOnlineUsers.get(subforumId)!;
-      users.delete(clientId);
-
-      // Update the service with the current online users map
-      setOnlineUsersMap(subforumOnlineUsers);
-
-      // Broadcast updated online users count
-      socket.emit('subforumOnlineUsers', {
-        subforumId,
-        onlineUsers: users.size,
-      });
-
-      // Clean up if no users are online in this subforum
-      if (users.size === 0) {
-        subforumOnlineUsers.delete(subforumId);
-      }
-    }
-  };
 
   /**
    * Validates the subforum object to ensure it contains all the necessary fields.
