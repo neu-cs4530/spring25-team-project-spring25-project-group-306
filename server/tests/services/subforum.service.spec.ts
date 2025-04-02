@@ -9,7 +9,6 @@ import {
 } from '../../services/subforum.service';
 import * as userService from '../../services/user.service';
 import { DatabaseSubforum } from '../../types/types';
-import * as userService from '../../services/user.service';
 
 // Mock the user service
 jest.mock('../../services/user.service');
@@ -86,7 +85,7 @@ describe('Subforum service', () => {
 
       const result = (await saveSubforum(mockSubforum)) as DatabaseSubforum;
 
-      expect(mockGetUserByUsername).toHaveBeenCalledWith('mod1');
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('mod1');
       expect(result._id).toBeDefined();
       expect(result.title).toEqual(mockSubforum.title);
       expect(result.description).toEqual(mockSubforum.description);
@@ -107,7 +106,7 @@ describe('Subforum service', () => {
       };
 
       // Mock user service to return a user with karma 1 (less than required 2)
-      mockGetUserByUsername.mockResolvedValueOnce({
+      getUserByUsernameMock.mockResolvedValueOnce({
         _id: new mongoose.Types.ObjectId(),
         username: 'lowKarmaUser',
         dateJoined: new Date(),
@@ -116,7 +115,7 @@ describe('Subforum service', () => {
 
       const result = await saveSubforum(mockSubforum);
 
-      expect(mockGetUserByUsername).toHaveBeenCalledWith('lowKarmaUser');
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('lowKarmaUser');
       expect(result).toEqual({ error: 'You need at least 2 karma to create a subforum' });
     });
 
@@ -130,13 +129,13 @@ describe('Subforum service', () => {
       };
 
       // Mock user service to return error for non-existent user
-      mockGetUserByUsername.mockResolvedValueOnce({
+      getUserByUsernameMock.mockResolvedValueOnce({
         error: 'User not found',
       });
 
       const result = await saveSubforum(mockSubforum);
 
-      expect(mockGetUserByUsername).toHaveBeenCalledWith('nonExistentUser');
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('nonExistentUser');
       expect(result).toEqual({ error: 'Error finding creator: User not found' });
     });
 
@@ -151,7 +150,7 @@ describe('Subforum service', () => {
 
       const result = await saveSubforum(mockSubforum);
 
-      expect(mockGetUserByUsername).not.toHaveBeenCalled();
+      expect(getUserByUsernameMock).not.toHaveBeenCalled();
       expect(result).toEqual({ error: 'At least one moderator is required' });
     });
 
@@ -177,7 +176,7 @@ describe('Subforum service', () => {
 
       const result = await saveSubforum(mockSubforum);
 
-      expect(mockGetUserByUsername).toHaveBeenCalledWith('mod1');
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('mod1');
       expect(result).toEqual({ error: 'Error when saving a subforum: Database error' });
     });
   });
