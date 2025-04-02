@@ -22,6 +22,7 @@ const NewQuestionPage = () => {
     tagErr,
     postQuestion,
     handleFileChange,
+    image,
   } = useNewQuestion();
 
   return (
@@ -59,6 +60,7 @@ const NewQuestionPage = () => {
         accept='.png,.jpeg,.jpg'
         onChange={handleFileChange}
       />
+      <p>Image Link: {image}</p>
       <div className='btn_indicator_container'>
         <button
           className='form_postBtn'
