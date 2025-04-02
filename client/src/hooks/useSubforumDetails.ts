@@ -1,17 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  DatabaseSubforum,
   SubforumOnlineUserEvent,
   SubforumWithRuntimeData,
 } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
-
-// Interface to represent the Mongoose document structure
-interface MongooseDocument<T> {
-  _doc?: T;
-  onlineUsers?: number;
-}
 
 const useSubforumDetails = (subforumId: string | undefined) => {
   const navigate = useNavigate();
