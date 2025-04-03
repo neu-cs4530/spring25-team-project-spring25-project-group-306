@@ -36,11 +36,13 @@ const UsersListPage = (props: UserListPageProps) => {
       navigate(`/user/${user.username}`);
     }
   };
+  // Sort users by karma in descending order
+  const sortedUserList = [...userList].sort((a, b) => (b.karma || 0) - (a.karma || 0));
   return (
     <div className='user-card-container'>
-      <UsersListHeader userCount={userList.length} setUserFilter={setUserFilter} />
+      <UsersListHeader userCount={sortedUserList.length} setUserFilter={setUserFilter} />
       <div id='users_list' className='users_list'>
-        {userList.map(user => (
+        {sortedUserList.map(user => (
           <UserCardView
             user={user}
             key={user.username}
@@ -48,7 +50,7 @@ const UsersListPage = (props: UserListPageProps) => {
           />
         ))}
       </div>
-      {(!userList.length || userList.length === 0) && (
+      {(!sortedUserList.length || sortedUserList.length === 0) && (
         <div className='bold_title right_padding'>No Users Found</div>
       )}
     </div>

@@ -66,12 +66,6 @@ const SideBarNav = () => {
         Games
       </NavLink>
       <NavLink
-        to='/leaderboard'
-        id='menu_leaderboard'
-        className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>
-        Leaderboard
-      </NavLink>
-      <NavLink
         to='/subforums'
         id='menu_subforums'
         className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}>

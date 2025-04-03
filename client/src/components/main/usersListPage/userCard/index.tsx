@@ -1,4 +1,3 @@
-import React from 'react';
 import './index.css';
 import { SafeDatabaseUser } from '../../../../types/types';
 
@@ -27,6 +26,9 @@ const UserCardView = (props: UserProps) => {
     <div className='user right_padding' onClick={() => handleUserCardViewClickHandler(user)}>
       <div className='user_mid'>
         <div className='userUsername'>{user.username}</div>
+      </div>
+      <div className='karma'>
+        <div>{user.karma ?? 0} karma</div>
       </div>
       <div className='userStats'>
         <div>joined {new Date(user.dateJoined).toUTCString()}</div>
