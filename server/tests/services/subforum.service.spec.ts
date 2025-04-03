@@ -24,6 +24,8 @@ interface MockSubforumWithToObject {
   title: string;
   description: string;
   moderators: string[];
+  members: string[];
+  public: boolean;
   createdAt: Date;
   updatedAt: Date;
   isActive: boolean;
@@ -46,8 +48,10 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: ['mod1', 'mod2'],
+        members: ['user1'],
         tags: ['tag1', 'tag2'],
         rules: ['rule1', 'rule2'],
+        public: true,
       };
 
       // Mock the user service to return a valid user with karma
@@ -87,8 +91,10 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: ['lowKarmaUser'],
+        members: ['user1'],
         tags: ['tag1', 'tag2'],
         rules: ['rule1', 'rule2'],
+        public: true,
       };
 
       // Mock user service to return a user with karma 1 (less than required 2)
@@ -110,8 +116,10 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: ['nonExistentUser'],
+        members: ['user1'],
         tags: ['tag1', 'tag2'],
         rules: ['rule1', 'rule2'],
+        public: true,
       };
 
       // Mock user service to return error for non-existent user
@@ -130,8 +138,10 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: [],
+        members: ['user1'],
         tags: ['tag1', 'tag2'],
         rules: ['rule1', 'rule2'],
+        public: true,
       };
 
       const result = await saveSubforum(mockSubforum);
@@ -145,8 +155,10 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: ['mod1'],
+        members: ['user1'],
         tags: ['tag1'],
         rules: ['rule1'],
+        public: true,
       };
 
       // Mock the user service to return a valid user with karma
@@ -174,6 +186,7 @@ describe('Subforum service', () => {
         title: 'Updated Title',
         description: 'Updated Description',
         moderators: ['newMod'],
+        members: ['user1'],
         tags: ['newTag'],
         rules: ['newRule'],
         isActive: false,
@@ -247,6 +260,7 @@ describe('Subforum service', () => {
         title: 'Test Subforum',
         description: 'Test Description',
         moderators: ['mod1'],
+        members: ['user1'],
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: true,
@@ -258,6 +272,7 @@ describe('Subforum service', () => {
           title: 'Test Subforum',
           description: 'Test Description',
           moderators: ['mod1'],
+          members: ['user1'],
           createdAt: mockSubforum.createdAt,
           updatedAt: mockSubforum.updatedAt,
           isActive: true,
@@ -312,23 +327,27 @@ describe('Subforum service', () => {
           title: 'Subforum 1',
           description: 'Description 1',
           moderators: ['mod1'],
+          members: ['user1'],
           createdAt: new Date(),
           updatedAt: new Date(),
           isActive: true,
           questionCount: 0,
           tags: [],
           rules: [],
+          public: true,
           toObject: (): DatabaseSubforum => ({
             _id: subforum1Id.toString(),
             title: 'Subforum 1',
             description: 'Description 1',
             moderators: ['mod1'],
+            members: ['user1'],
             createdAt: mockSubforums[0].createdAt,
             updatedAt: mockSubforums[0].updatedAt,
             isActive: true,
             questionCount: 0,
             tags: [],
             rules: [],
+            public: true,
           }),
         },
         {
@@ -336,23 +355,27 @@ describe('Subforum service', () => {
           title: 'Subforum 2',
           description: 'Description 2',
           moderators: ['mod2'],
+          members: ['user2'],
           createdAt: new Date(),
           updatedAt: new Date(),
           isActive: true,
           questionCount: 0,
           tags: [],
           rules: [],
+          public: true,
           toObject: (): DatabaseSubforum => ({
             _id: subforum2Id.toString(),
             title: 'Subforum 2',
             description: 'Description 2',
             moderators: ['mod2'],
+            members: ['user2'],
             createdAt: mockSubforums[1].createdAt,
             updatedAt: mockSubforums[1].updatedAt,
             isActive: true,
             questionCount: 0,
             tags: [],
             rules: [],
+            public: true,
           }),
         },
       ];

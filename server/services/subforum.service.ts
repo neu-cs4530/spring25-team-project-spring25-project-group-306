@@ -106,7 +106,12 @@ export const updateSubforumById = async (
 export const getSubforumById = async (id: string): Promise<SubforumWithRuntimeData | null> => {
   try {
     const subforum = await SubforumModel.findById(id);
-    return subforum ? addRuntimeData(subforum) : null;
+    if (!subforum) return null;
+
+    return {
+      ...subforum.toObject(),
+      onlineUsers: onlineUsersMap.get(id) || 0,
+    };
   } catch (error) {
     return null;
   }
