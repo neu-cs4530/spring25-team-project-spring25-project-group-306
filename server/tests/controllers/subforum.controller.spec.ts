@@ -117,8 +117,11 @@ describe('Test subforumController', () => {
 
       const response = await supertest(app).post('/subforums').send(mockSubforum);
 
-      expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to create subforum' });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        error:
+          'Invalid subforum data. Title, description, and at least one moderator username are required.',
+      });
     });
   });
 
