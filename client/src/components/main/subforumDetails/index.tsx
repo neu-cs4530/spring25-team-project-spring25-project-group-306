@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Tag } from '../../../types';
 import useSubforumDetails from '../../../hooks/useSubforumDetails';
 import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
-import AskQuestionModal from './AskQuestionModal';
+import NewQuestion from '../newQuestion';
 import './index.css';
 
 const SubforumDetailsPage: React.FC = () => {
@@ -22,7 +22,8 @@ const SubforumDetailsPage: React.FC = () => {
     error: questionsError,
     refetch: refetchQuestions,
   } = useSubforumQuestions(subforumId);
-  const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
+
+  const [isNewQuestionOpen, setIsNewQuestionOpen] = useState(false);
 
   if (subforumLoading || questionsLoading) {
     return <div className='loading'>Loading subforum details...</div>;
@@ -132,7 +133,7 @@ const SubforumDetailsPage: React.FC = () => {
         <div className='subforum-questions'>
           <div className='questions-header'>
             <h2>Questions</h2>
-            <button className='ask-question-btn' onClick={() => setIsAskQuestionModalOpen(true)}>
+            <button className='ask-question-btn' onClick={() => setIsNewQuestionOpen(true)}>
               Ask a Question
             </button>
           </div>
@@ -140,16 +141,22 @@ const SubforumDetailsPage: React.FC = () => {
         </div>
       </div>
 
-      {isAskQuestionModalOpen && (
-        <AskQuestionModal
-          isOpen={isAskQuestionModalOpen}
-          onClose={() => setIsAskQuestionModalOpen(false)}
-          subforumId={subforumId || ''}
-          onQuestionAdded={() => {
-            refetchQuestions();
-            refetchSubforum();
-          }}
-        />
+      {isNewQuestionOpen && (
+        <div className='new-question-modal'>
+          <div className='modal-content'>
+            <button className='close-button' onClick={() => setIsNewQuestionOpen(false)}>
+              ×
+            </button>
+            <NewQuestion
+              subforumId={subforumId}
+              onQuestionAdded={() => {
+                refetchQuestions();
+                refetchSubforum();
+                setIsNewQuestionOpen(false);
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
