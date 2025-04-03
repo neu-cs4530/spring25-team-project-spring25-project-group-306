@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import * as http from 'http';
+import UserModel from './models/users.model';
 
 import answerController from './controllers/answer.controller';
 import questionController from './controllers/question.controller';
@@ -75,6 +76,25 @@ app.get('/', (_: Request, res: Response) => {
   res.send('hello world');
   res.end();
 });
+
+// Function to decrement karma by 1 for all users above the 0 threshold
+const applyKarmaDecay = async () => {
+  try {
+    await UserModel.updateMany(
+      { karma: { $gt: 0 } },
+      { $inc: { karma: -1 } }
+    );
+    console.log(`Karma decay applied successfully on [${new Date().toISOString()}]`);
+  } catch (error) {
+    console.error('Error applying karma decay:', error);
+  }
+};
+
+// Every 24 hours, call the karma decay method
+setInterval(async () => {
+  console.log('Running daily karma decay job...');
+  await applyKarmaDecay();
+}, 24 * 60 * 60 * 1000);
 
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());
