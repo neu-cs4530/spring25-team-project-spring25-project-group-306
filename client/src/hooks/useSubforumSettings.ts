@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   DatabaseSubforum,
   DatabaseUpdateSubforumRequest,
-  Subforum,
 } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
 

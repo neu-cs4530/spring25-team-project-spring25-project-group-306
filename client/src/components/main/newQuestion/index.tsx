@@ -30,7 +30,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
     textErr,
     tagErr,
     postQuestion,
-    handleFileChange,
   } = useNewQuestion();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,8 +70,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
             subforumId, // Include the subforumId
           };
 
-          console.log('Submitting question data:', questionData);
-
           // Make the API request directly
           const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/question/addQuestion`, {
             method: 'POST',
@@ -89,7 +86,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
           }
 
           const data = await response.json();
-          console.log('Question created successfully:', data);
 
           // After posting, if we have a callback, call it
           if (onQuestionAdded) {
@@ -110,7 +106,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
         await postQuestion();
       }
     } catch (err) {
-      console.error('Error creating question:', err);
       setError(err instanceof Error ? err.message : 'Failed to create question');
     } finally {
       setIsSubmitting(false);
