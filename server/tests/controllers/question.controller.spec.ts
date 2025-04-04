@@ -173,6 +173,17 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  describe('DELETE /deleteQuestion/:qid', () => {
+    it('should delete a question successfully', async () => {
+      jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
+
+      const response = await supertest(app).delete(
+        `/question/deleteQuestion/${mockDatabaseQuestion._id}`,
+      );
+
+      expect(response.status).toBe(200);
+    });
+  });
   describe('POST /addQuestion', () => {
     it('should add a new question', async () => {
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);

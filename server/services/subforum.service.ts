@@ -1,4 +1,5 @@
 import SubforumModel from '../models/subforums.model';
+
 import {
   DatabaseSubforum,
   CreateSubforumRequest,

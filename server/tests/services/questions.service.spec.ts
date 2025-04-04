@@ -7,6 +7,7 @@ import {
   fetchAndIncrementQuestionViewsById,
   saveQuestion,
   addVoteToQuestion,
+  deleteQuestionById,
 } from '../../services/question.service';
 import { DatabaseQuestion, PopulatedDatabaseQuestion, Post } from '../../types/types';
 import {
@@ -28,6 +29,16 @@ describe('Question model', () => {
     mockingoose.resetAll();
   });
 
+  describe('deleteQuestionById', () => {
+    test('deleteQuestionById should return the deleted question', async () => {
+      const mockQuestion = QUESTIONS[0];
+      mockingoose(QuestionModel).toReturn(mockQuestion, 'findOneAndDelete');
+
+      const result = await deleteQuestionById(mockQuestion._id.toString());
+
+      expect(result).toEqual(mockQuestion);
+    });
+  });
   describe('filterQuestionsBySearch', () => {
     test('filter questions with empty search string should return all questions', () => {
       const result = filterQuestionsBySearch(POPULATED_QUESTIONS, '');
