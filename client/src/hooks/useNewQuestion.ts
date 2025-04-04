@@ -106,6 +106,7 @@ const useNewQuestion = () => {
       views: [],
       comments: [],
       image: image || undefined,
+      pinned: false,
     };
 
     const resQuestion = await addQuestion(question);

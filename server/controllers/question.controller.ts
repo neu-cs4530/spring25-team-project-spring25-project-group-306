@@ -8,6 +8,7 @@ import {
   FakeSOSocket,
   PopulatedDatabaseQuestion,
   VoteRequest,
+  PinUnpinRequest,
 } from '../types/types';
 import {
   addVoteToQuestion,
@@ -16,6 +17,7 @@ import {
   filterQuestionsBySearch,
   getQuestionsByOrder,
   saveQuestion,
+  updateQuestionPin,
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
@@ -236,7 +238,7 @@ const questionController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const upvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
-    voteQuestion(req, res, 'upvote');
+    await voteQuestion(req, res, 'upvote');
   };
 
   /**
@@ -249,7 +251,24 @@ const questionController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const downvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
-    voteQuestion(req, res, 'downvote');
+    await voteQuestion(req, res, 'downvote');
+  };
+
+  const pinUnpinQuestion = async (req: PinUnpinRequest, res: Response): Promise<void> => {
+    const { pid, pinned } = req.body;
+
+    if (!pid) {
+      res.status(400).send('Invalid request');
+      return;
+    }
+
+    try {
+      const updatedQuestion = await updateQuestionPin(pid, pinned);
+
+      res.status(200).send(updatedQuestion);
+    } catch (err: unknown) {
+      res.status(500).send(`Error when updating pin status`);
+    }
   };
 
   // add appropriate HTTP verbs and their endpoints to the router
@@ -258,6 +277,7 @@ const questionController = (socket: FakeSOSocket) => {
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);
   router.post('/downvoteQuestion', downvoteQuestion);
+  router.post('/pinUnpinQuestion', pinUnpinQuestion);
 
   return router;
 };

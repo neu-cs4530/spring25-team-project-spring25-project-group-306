@@ -24,6 +24,13 @@ export interface VoteRequest extends Request {
   };
 }
 
+export interface PinUnpinRequest extends Request {
+  body: {
+    pid: string;
+    pinned: boolean;
+  };
+}
+
 /**
  * Type representing an object with the vote success message, updated upVotes, updated downVotes
  */

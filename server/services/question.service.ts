@@ -289,3 +289,24 @@ export const addVoteToQuestion = async (
     };
   }
 };
+
+export const updateQuestionPin = async (
+  pid: string,
+  pinned: boolean,
+): Promise<QuestionResponse> => {
+  try {
+    const updatedQuestion = await QuestionModel.findOneAndUpdate(
+      { _id: pid },
+      { $set: { pinned: Boolean(pinned) } },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedQuestion) {
+      return { error: 'Question not found!' };
+    }
+
+    return updatedQuestion;
+  } catch (error) {
+    return { error: 'Error when updating question pin status' };
+  }
+};

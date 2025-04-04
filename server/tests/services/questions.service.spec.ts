@@ -7,6 +7,7 @@ import {
   fetchAndIncrementQuestionViewsById,
   saveQuestion,
   addVoteToQuestion,
+  updateQuestionPin,
 } from '../../services/question.service';
 import { DatabaseQuestion, PopulatedDatabaseQuestion, Post } from '../../types/types';
 import {
@@ -299,6 +300,7 @@ describe('Question model', () => {
         upVotes: [],
         downVotes: [],
         comments: [],
+        pinned: false,
       };
 
       const result = (await saveQuestion(mockQn)) as DatabaseQuestion;
@@ -329,6 +331,7 @@ describe('Question model', () => {
       downVotes: [],
       comments: [],
       image: undefined,
+      pinned: false,
     };
 
     beforeEach(() => {
@@ -523,6 +526,60 @@ describe('Question model', () => {
       );
 
       expect(result).toEqual({ error: 'Error when adding downvote to question' });
+    });
+  });
+
+  describe('updateQuestionPin', () => {
+    it('should update the pin status of a question to true', async () => {
+      const mockQuestion = {
+        _id: '65e9b716ff0e892116b2de01',
+        pinned: false,
+      };
+
+      const mockResult = {
+        ...mockQuestion,
+        pinned: true,
+      };
+
+      mockingoose(QuestionModel).toReturn(mockResult, 'findOneAndUpdate');
+
+      await updateQuestionPin(mockQuestion._id, true);
+
+      expect(true).toEqual(mockResult.pinned);
+    });
+
+    it('should update the pin status of a question to false', async () => {
+      const mockQuestion = {
+        _id: '65e9b716ff0e892116b2de01',
+        pinned: true,
+      };
+
+      const mockResult = {
+        ...mockQuestion,
+        pinned: false,
+      };
+
+      mockingoose(QuestionModel).toReturn(mockResult, 'findOneAndUpdate');
+
+      await updateQuestionPin(mockQuestion._id, false);
+
+      expect(false).toEqual(mockResult.pinned);
+    });
+
+    it('should return an error if the question is not found', async () => {
+      mockingoose(QuestionModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await updateQuestionPin('65e9b716ff0e892116b2de01', true);
+
+      expect(result).toEqual({ error: 'Question not found!' });
+    });
+
+    it('should return an error if there is an issue with updating the pin status', async () => {
+      mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
+
+      const result = await updateQuestionPin('65e9b716ff0e892116b2de01', true);
+
+      expect(result).toEqual({ error: 'Error when updating question pin status' });
     });
   });
 });
