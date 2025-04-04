@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Tag, Question } from '../../../types';
 import useSubforumDetails from '../../../hooks/useSubforumDetails';
@@ -36,6 +35,12 @@ const SubforumDetailsPage: React.FC = () => {
   if (subforumError || !subforum) {
     return <div className='error'>Error: {subforumError || 'Subforum not found'}</div>;
   }
+
+  const handleQuestionClick = (question: Question): void => {
+    if (question._id && subforumId) {
+      navigate(`/subforums/${subforumId}/question/${question._id}`);
+    }
+  };
 
   const renderQuestion = (question: Question) => {
     if (questionsError) {
