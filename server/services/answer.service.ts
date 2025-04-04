@@ -162,6 +162,21 @@ export const addVoteToAnswer = async (
   }
 };
 
+export const deleteAnswerById = async (aid: string): Promise<AnswerResponse> => {
+  if (!aid) {
+    return { error: 'Invalid answer ID' };
+  }
+  try {
+    const result: DatabaseAnswer | null = await AnswerModel.findByIdAndDelete(aid);
+    if (!result || result === null) {
+      throw new Error('Answer not found!');
+    }
+    return result;
+  } catch (error) {
+    return { error: 'Error when deleting an answer' };
+  }
+};
+
 /**
  * Adds an existing answer to a specified question in the database.
  *
