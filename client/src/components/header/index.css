@@ -13,21 +13,30 @@
 }
 
 .logout-button {
-  padding: 12px;
+  padding: 10px 15px;
   font-size: 16px;
   background-color: #007bff;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
+.logout-button:hover {
+  background-color: #0056b3;
+}
+
+.logout-button:active {
+  background-color: #003f7f;
+}
+
 .view-profile-button {
+  padding: 10px 15px;
+  font-size: 16px;
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
   margin-left: 10px; /* Add spacing from Logout button */

@@ -10,7 +10,7 @@ describe("Cypress Tests to verify asking new questions", () => {
 
   it("2.1 | Ask a Question creates and displays expected meta data", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -18,7 +18,7 @@ describe("Cypress Tests to verify asking new questions", () => {
     cy.get("#formTextInput").type("Test Question Q1 Text T1");
     cy.get("#formTagInput").type("javascript");
     cy.contains("Post Question").click();
-    cy.contains("Fake Stack Overflow");
+    cy.contains("StackUnderflow");
     cy.contains("5 questions");
     cy.contains("testuser asked 0 seconds ago");
     const answers = [
@@ -46,7 +46,7 @@ describe("Cypress Tests to verify asking new questions", () => {
 
   it("2.2 | Ask a Question with empty title shows error", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();

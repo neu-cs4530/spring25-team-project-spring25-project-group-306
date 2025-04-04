@@ -9,7 +9,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("7.1 | Adds a question with tags, checks the tags existied", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     
@@ -29,7 +29,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("7.2 | Checks if all tags exist", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all tags exist in the page
@@ -44,7 +44,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("7.3 | Checks if all questions exist inside tags", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all question no. should be in the page
@@ -56,7 +56,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("8.1 | go to question in tag react", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all question no. should be in the page
@@ -67,7 +67,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("8.2 | go to questions in tag storage", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all question no. should be in the page
@@ -78,7 +78,7 @@ describe("Cypress Tests to verify tagging", () => {
 
   it("8.3 | create a new question with a new tag and finds the question through tag", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -99,7 +99,7 @@ describe("Cypress Tests to verify tagging", () => {
     const tagNames = "javascript";
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Tags").click();
@@ -114,7 +114,7 @@ describe("Cypress Tests to verify tagging", () => {
     const tagNames = "storage";
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 

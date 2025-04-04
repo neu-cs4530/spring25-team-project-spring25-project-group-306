@@ -7,17 +7,28 @@
 }
 
 .toggle-button {
-  background: none;
-  color: #007bff;
-  border: none;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 1rem;
   cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
+  transition: all 0.2s ease-in-out;
+  color: #333;
 }
 
 .toggle-button:hover {
-  color: #0056b3;
+  background-color: #e0e0e0;
+  border-color: #aaa;
+}
+
+.toggle-button:active {
+  background-color: #d5d5d5;
+}
+
+.toggle-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #a0c4ff;
 }
 
 .comments-container {

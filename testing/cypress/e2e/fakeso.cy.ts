@@ -14,7 +14,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it('1.1 | Adds three questions and one answer, then click "Questions", then click unanswered button, verifies the sequence', () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -61,7 +61,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     const qTitles = [Q4_DESC, Q3_DESC, Q2_DESC, Q1_DESC];
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get(".postTitle").each(($el, index, $list) => {
@@ -72,7 +72,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("1.3 | successfully shows all questions in model in active order", () => {
     const qTitles = [Q1_DESC, Q2_DESC, Q4_DESC, Q3_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Active").click();
@@ -83,7 +83,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("2.1 | Adds multiple questions one by one and displays them in All Questions", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -107,7 +107,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     cy.contains("Post Question").click();
 
     // verify the presence of multiple questions in most recently added order.
-    cy.contains("Fake Stack Overflow");
+    cy.contains("StackUnderflow");
     const qTitles = [
       "Test Question 3",
       "Test Question 2",
@@ -135,7 +135,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("2.2 | Ask a Question creates and displays expected meta data", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -143,7 +143,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     cy.get("#formTextInput").type("Test Question Q1 Text T1");
     cy.get("#formTagInput").type("javascript");
     cy.contains("Post Question").click();
-    cy.contains("Fake Stack Overflow");
+    cy.contains("StackUnderflow");
     cy.contains("5 questions");
     cy.contains("testuser asked 0 seconds ago");
     const answers = [
@@ -171,7 +171,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("2.3 | Ask a Question with empty title shows error", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -185,7 +185,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     const searchText = "Web3";
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type(`${searchText}{enter}`);
@@ -196,7 +196,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("3.3 | earch string in question text", () => {
     const qTitles = [Q4_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("data remains{enter}");
@@ -208,7 +208,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("4.1 | Search a question by tag (t1)", () => {
     const qTitles = [Q1_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("[react]{enter}");
@@ -220,7 +220,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("4.2 | Search a question by tag (t2)", () => {
     const qTitles = [Q2_DESC, Q1_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("[javascript]{enter}");
@@ -232,7 +232,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("4.3 | Search a question by tag (t3)", () => {
     const qTitles = [Q4_DESC, Q2_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("[android-studio]{enter}");
@@ -244,7 +244,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("4.4 | Search a question by tag (t4)", () => {
     const qTitles = [Q4_DESC, Q2_DESC];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("[shared-preferences]{enter}");
@@ -255,7 +255,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("4.5 | Search for a question using a tag that does not exist", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get("#searchBar").type("[nonExistentTag]{enter}");
@@ -265,7 +265,7 @@ describe("Cypress Tests repeated from React assignment", () => {
   it("5.1 | Created new answer should be displayed at the top of the answers page", () => {
     const answers = ["Test Answer 1", A1_TXT, A2_TXT];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -282,7 +282,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("5.3 | Answer is mandatory when creating a new answer", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -293,7 +293,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("6.1 | Adds a question, click active button, verifies the sequence", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // add a question
@@ -345,7 +345,7 @@ describe("Cypress Tests repeated from React assignment", () => {
       "Storing content as BLOBs in databases.",
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q3_DESC).click();
@@ -356,7 +356,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("6.3 | Checks if a8 exist in q4 answers page", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q4_DESC).click();
@@ -365,7 +365,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("7.1 | Adds a question with tags, checks the tags existied", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -385,7 +385,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("7.2 | Checks if all tags exist", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all tags exist in the page
@@ -400,7 +400,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("7.3 | Checks if all questions exist inside tags", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all question no. should be in the page
@@ -412,7 +412,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("8.1 | go to question in tag react", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     // all question no. should be in the page
@@ -423,7 +423,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("8.3 | create a new question with a new tag and finds the question through tag", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -442,7 +442,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("9.1 | Adds a question with a hyperlink and verifies", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -465,7 +465,7 @@ describe("Cypress Tests repeated from React assignment", () => {
       A2_TXT,
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -506,7 +506,7 @@ describe("Cypress Tests repeated from React assignment", () => {
       "[Wikipedia](tps://www.wikipedia=com)",
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -520,7 +520,7 @@ describe("Cypress Tests repeated from React assignment", () => {
       cy.contains("Invalid hyperlink");
     });
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("How to add an invalid hyperlink in Markdown?").should(
@@ -530,7 +530,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("9.4 | Attempts to add an answer with an invalid hyperlink and verifies failure", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -541,7 +541,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     cy.contains("Post Answer").click();
     cy.contains("Invalid hyperlink");
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -550,7 +550,7 @@ describe("Cypress Tests repeated from React assignment", () => {
 
   it("9.5 | Adds multiple questions with valid hyperlinks and verify", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -597,7 +597,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     const tagNames = "javascript";
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Tags").click();
@@ -612,7 +612,7 @@ describe("Cypress Tests repeated from React assignment", () => {
     const tagNames = "storage";
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 

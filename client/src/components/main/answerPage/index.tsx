@@ -55,7 +55,7 @@ const AnswerPage = () => {
         comments={question.comments}
         handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
       />
-      {question.answers.map(a => (
+      {question.answers.map((a, i) => (
         <React.Fragment key={String(a._id)}>
           <VoteComponent
             post={a as Post}
@@ -76,10 +76,11 @@ const AnswerPage = () => {
               handleNewComment(comment, 'answer', String(a._id))
             }
           />
+          {i !== question.answers.length - 1 && <hr className='answer-divider' />}
         </React.Fragment>
       ))}
       <button
-        className='bluebtn ansButton'
+        className='bluebtn'
         onClick={() => {
           handleNewAnswer();
         }}>

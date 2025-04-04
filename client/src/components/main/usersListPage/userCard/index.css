@@ -18,21 +18,3 @@
   margin-bottom: auto;
   width: 30%;
 }
-
-.karma {
-  border-radius: 25px;
-  width: fit-content;
-  height: fit-content;
-  padding: 5px;
-  color: white;
-  background: gray;
-  display: inline-block;
-  margin-left: 2rem;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.userUsername {
-  color: cornflowerblue;
-  cursor: pointer;
-}
