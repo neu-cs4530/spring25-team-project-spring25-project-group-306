@@ -81,11 +81,14 @@ const SubforumDetailsPage: React.FC = () => {
       <div className='subforum-details-header'>
         <div className='subforum-title-section'>
           <h1>{subforum.title}</h1>
-          {isModerator && (
-            <button className='settings-button' onClick={navigateToSettings}>
-              Edit Settings
-            </button>
-          )}
+          <div className='subforum-header-actions'>
+            <span className='online-users-indicator'>{subforum.onlineUsers} online now</span>
+            {isModerator && (
+              <button className='settings-button' onClick={navigateToSettings}>
+                Edit Settings
+              </button>
+            )}
+          </div>
         </div>
         <p className='subforum-description'>{subforum.description}</p>
       </div>
@@ -100,6 +103,10 @@ const SubforumDetailsPage: React.FC = () => {
             <div className='stat-item'>
               <span className='stat-label'>Tags:</span>
               <span className='stat-value'>{subforum.tags?.length || 0}</span>
+            </div>
+            <div className='stat-item'>
+              <span className='stat-label'>Online users:</span>
+              <span className='stat-value online-count'>{subforum.onlineUsers}</span>
             </div>
           </div>
 

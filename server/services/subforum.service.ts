@@ -1,5 +1,39 @@
 import SubforumModel from '../models/subforums.model';
-import { DatabaseSubforum, CreateSubforumRequest, UpdateSubforumRequest } from '../types/types';
+
+import {
+  DatabaseSubforum,
+  CreateSubforumRequest,
+  UpdateSubforumRequest,
+  SubforumWithRuntimeData,
+} from '../types/types';
+import { getUserByUsername } from './user.service';
+
+
+// This will be set from the controller
+let onlineUsersMap = new Map<string, number>();
+
+/**
+ * Updates the online users map reference
+ * @param map The map of subforum IDs to online user counts
+ */
+export const setOnlineUsersMap = (map: Map<string, Set<string>>): void => {
+  onlineUsersMap = new Map(
+    Array.from(map.entries()).map(([subforumId, users]) => [subforumId, users.size]),
+  );
+};
+
+/**
+ * Adds runtime data (like online users count) to a subforum
+ * @param subforum The subforum to enhance
+ * @returns Subforum with runtime data
+ */
+const addRuntimeData = (subforum: DatabaseSubforum): SubforumWithRuntimeData => {
+  const id = subforum._id.toString();
+  return {
+    ...subforum,
+    onlineUsers: onlineUsersMap.get(id) || 0,
+  };
+};
 
 /**
  * Saves a new subforum to the database.
@@ -13,6 +47,18 @@ export const saveSubforum = async (
     // Validate moderator usernames
     if (!subforum.moderators || subforum.moderators.length === 0) {
       return { error: 'At least one moderator is required' };
+    }
+
+    // Check if the creator (first moderator) has enough karma
+    const creatorUsername = subforum.moderators[0];
+    const creator = await getUserByUsername(creatorUsername);
+
+    if (!creator || 'error' in creator) {
+      return { error: `Error finding creator: ${creator?.error}` };
+    }
+
+    if ((creator.karma ?? 0) < 2) {
+      return { error: 'You need at least 2 karma to create a subforum' };
     }
 
     const result = await SubforumModel.create({
@@ -57,11 +103,12 @@ export const updateSubforumById = async (
 /**
  * Retrieves a subforum by its ID.
  * @param {string} id - The subforum ID
- * @returns {Promise<DatabaseSubforum | null>} - The subforum or null if not found
+ * @returns {Promise<SubforumWithRuntimeData | null>} - The subforum with runtime data or null if not found
  */
-export const getSubforumById = async (id: string): Promise<DatabaseSubforum | null> => {
+export const getSubforumById = async (id: string): Promise<SubforumWithRuntimeData | null> => {
   try {
-    return await SubforumModel.findById(id);
+    const subforum = await SubforumModel.findById(id);
+    return subforum ? addRuntimeData(subforum) : null;
   } catch (error) {
     return null;
   }
@@ -69,11 +116,12 @@ export const getSubforumById = async (id: string): Promise<DatabaseSubforum | nu
 
 /**
  * Retrieves all subforums.
- * @returns {Promise<DatabaseSubforum[]>} - List of all subforums
+ * @returns {Promise<SubforumWithRuntimeData[]>} - List of all subforums with runtime data
  */
-export const getAllSubforums = async (): Promise<DatabaseSubforum[]> => {
+export const getAllSubforums = async (): Promise<SubforumWithRuntimeData[]> => {
   try {
-    return await SubforumModel.find();
+    const subforums = await SubforumModel.find();
+    return subforums.map(addRuntimeData);
   } catch (error) {
     return [];
   }

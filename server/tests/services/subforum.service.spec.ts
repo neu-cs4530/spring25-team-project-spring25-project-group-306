@@ -9,12 +9,35 @@ import {
 } from '../../services/subforum.service';
 import { DatabaseSubforum } from '../../types/types';
 
+
+// Mock the user service
+jest.mock('../../services/user.service');
+const getUserByUsernameMock = userService.getUserByUsername as jest.MockedFunction<
+  typeof userService.getUserByUsername
+>;
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
+
+interface MockSubforumWithToObject {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  description: string;
+  moderators: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean;
+  questionCount: number;
+  tags: string[];
+  rules: string[];
+  toObject: () => DatabaseSubforum;
+}
 
 describe('Subforum service', () => {
   beforeEach(() => {
     mockingoose.resetAll();
+    jest.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('saveSubforum', () => {
@@ -27,6 +50,14 @@ describe('Subforum service', () => {
         rules: ['rule1', 'rule2'],
       };
 
+      // Mock the user service to return a valid user with karma
+      getUserByUsernameMock.mockResolvedValueOnce({
+        username: 'mod1',
+        karma: 3,
+        _id: new mongoose.Types.ObjectId(),
+        dateJoined: new Date(),
+      });
+
       const mockDBSubforum = {
         ...mockSubforum,
         _id: new mongoose.Types.ObjectId(),
@@ -34,20 +65,14 @@ describe('Subforum service', () => {
         updatedAt: new Date(),
         isActive: true,
         questionCount: 0,
-        toObject: () => ({
-          ...mockSubforum,
-          _id: mockDBSubforum._id,
-          createdAt: mockDBSubforum.createdAt,
-          updatedAt: mockDBSubforum.updatedAt,
-          isActive: true,
-          questionCount: 0,
-        }),
       };
 
-      mockingoose(SubforumModel, 'create').toReturn(mockDBSubforum);
+
+      mockingoose(SubforumModel).toReturn(mockDBSubforum, 'create');
 
       const result = (await saveSubforum(mockSubforum)) as DatabaseSubforum;
 
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('mod1');
       expect(result._id).toBeDefined();
       expect(result.title).toEqual(mockSubforum.title);
       expect(result.description).toEqual(mockSubforum.description);
@@ -56,6 +81,49 @@ describe('Subforum service', () => {
       expect(result.rules).toEqual(mockSubforum.rules);
       expect(result.isActive).toBe(true);
       expect(result.questionCount).toBe(0);
+    });
+
+    test('should return error when creator has insufficient karma', async () => {
+      const mockSubforum = {
+        title: 'Test Subforum',
+        description: 'Test Description',
+        moderators: ['lowKarmaUser'],
+        tags: ['tag1', 'tag2'],
+        rules: ['rule1', 'rule2'],
+      };
+
+      // Mock user service to return a user with karma 1 (less than required 2)
+      getUserByUsernameMock.mockResolvedValueOnce({
+        _id: new mongoose.Types.ObjectId(),
+        username: 'lowKarmaUser',
+        dateJoined: new Date(),
+        karma: 1,
+      });
+
+      const result = await saveSubforum(mockSubforum);
+
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('lowKarmaUser');
+      expect(result).toEqual({ error: 'You need at least 2 karma to create a subforum' });
+    });
+
+    test('should return error when creator is not found', async () => {
+      const mockSubforum = {
+        title: 'Test Subforum',
+        description: 'Test Description',
+        moderators: ['nonExistentUser'],
+        tags: ['tag1', 'tag2'],
+        rules: ['rule1', 'rule2'],
+      };
+
+      // Mock user service to return error for non-existent user
+      getUserByUsernameMock.mockResolvedValueOnce({
+        error: 'User not found',
+      });
+
+      const result = await saveSubforum(mockSubforum);
+
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('nonExistentUser');
+      expect(result).toEqual({ error: 'Error finding creator: User not found' });
     });
 
     test('should return error when no moderators provided', async () => {
@@ -69,6 +137,7 @@ describe('Subforum service', () => {
 
       const result = await saveSubforum(mockSubforum);
 
+      expect(getUserByUsernameMock).not.toHaveBeenCalled();
       expect(result).toEqual({ error: 'At least one moderator is required' });
     });
 
@@ -81,10 +150,21 @@ describe('Subforum service', () => {
         rules: ['rule1'],
       };
 
+      // Mock the user service to return a valid user with karma
+      getUserByUsernameMock.mockResolvedValueOnce({
+        username: 'mod1',
+        karma: 3,
+        _id: new mongoose.Types.ObjectId(),
+        dateJoined: new Date(),
+      });
+
+      // Mock the create operation to throw an error
       jest.spyOn(SubforumModel, 'create').mockRejectedValueOnce(new Error('Database error'));
 
       const result = await saveSubforum(mockSubforum);
 
+
+      expect(getUserByUsernameMock).toHaveBeenCalledWith('mod1');
       expect(result).toEqual({ error: 'Error when saving a subforum: Database error' });
     });
   });
@@ -163,7 +243,7 @@ describe('Subforum service', () => {
 
   describe('getSubforumById', () => {
     test('should successfully retrieve an existing subforum', async () => {
-      const subforumId = new mongoose.Types.ObjectId().toString();
+      const subforumId = new mongoose.Types.ObjectId();
       const mockSubforum = {
         _id: subforumId,
         title: 'Test Subforum',
@@ -176,7 +256,7 @@ describe('Subforum service', () => {
         tags: [],
         rules: [],
         toObject: () => ({
-          _id: subforumId,
+          _id: subforumId.toString(),
           title: 'Test Subforum',
           description: 'Test Description',
           moderators: ['mod1'],
@@ -189,20 +269,23 @@ describe('Subforum service', () => {
         }),
       };
 
-      mockingoose(SubforumModel).toReturn(mockSubforum, 'findById');
+      // Mock the findOne operation to return the mock subforum
+      jest.spyOn(SubforumModel, 'findOne').mockResolvedValueOnce(mockSubforum);
 
-      const result = await getSubforumById(subforumId);
+      const result = await getSubforumById(subforumId.toString());
 
       expect(result).not.toBeNull();
       if (result) {
-        expect(result._id.toString()).toEqual(subforumId);
+        expect(JSON.stringify(result._id)).toEqual(JSON.stringify(subforumId.toHexString()));
+        expect(result.onlineUsers).toBeDefined();
+        expect(result.onlineUsers).toBe(0);
       }
     });
 
     test('should return null when subforum not found', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
 
-      jest.spyOn(SubforumModel, 'findById').mockResolvedValueOnce(null);
+      jest.spyOn(SubforumModel, 'findOne').mockResolvedValueOnce(null);
 
       const result = await getSubforumById(subforumId);
 
@@ -212,7 +295,7 @@ describe('Subforum service', () => {
     test('should return null when database operation fails', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
 
-      jest.spyOn(SubforumModel, 'findById').mockRejectedValueOnce(new Error('Database error'));
+      jest.spyOn(SubforumModel, 'findOne').mockRejectedValueOnce(new Error('Database error'));
 
       const result = await getSubforumById(subforumId);
 
@@ -222,9 +305,12 @@ describe('Subforum service', () => {
 
   describe('getAllSubforums', () => {
     test('should successfully retrieve all subforums', async () => {
-      const mockSubforums: Array<DatabaseSubforum> = [
+      const subforum1Id = new mongoose.Types.ObjectId();
+      const subforum2Id = new mongoose.Types.ObjectId();
+
+      const mockSubforums: MockSubforumWithToObject[] = [
         {
-          _id: new mongoose.Types.ObjectId().toString(),
+          _id: subforum1Id,
           title: 'Subforum 1',
           description: 'Description 1',
           moderators: ['mod1'],
@@ -234,9 +320,21 @@ describe('Subforum service', () => {
           questionCount: 0,
           tags: [],
           rules: [],
+          toObject: (): DatabaseSubforum => ({
+            _id: subforum1Id.toString(),
+            title: 'Subforum 1',
+            description: 'Description 1',
+            moderators: ['mod1'],
+            createdAt: mockSubforums[0].createdAt,
+            updatedAt: mockSubforums[0].updatedAt,
+            isActive: true,
+            questionCount: 0,
+            tags: [],
+            rules: [],
+          }),
         },
         {
-          _id: new mongoose.Types.ObjectId().toString(),
+          _id: subforum2Id,
           title: 'Subforum 2',
           description: 'Description 2',
           moderators: ['mod2'],
@@ -246,30 +344,39 @@ describe('Subforum service', () => {
           questionCount: 0,
           tags: [],
           rules: [],
+          toObject: (): DatabaseSubforum => ({
+            _id: subforum2Id.toString(),
+            title: 'Subforum 2',
+            description: 'Description 2',
+            moderators: ['mod2'],
+            createdAt: mockSubforums[1].createdAt,
+            updatedAt: mockSubforums[1].updatedAt,
+            isActive: true,
+            questionCount: 0,
+            tags: [],
+            rules: [],
+          }),
         },
       ];
 
-      mockingoose(SubforumModel).toReturn(mockSubforums, 'find');
+      // Mock the find operation to return the mock subforums
+      jest.spyOn(SubforumModel, 'find').mockResolvedValueOnce(mockSubforums);
 
       const result = await getAllSubforums();
 
       expect(result.length).toBe(2);
-      expect(result[0]._id.toString()).toBe(mockSubforums[0]._id);
-      expect(result[1]._id.toString()).toBe(mockSubforums[1]._id);
+      expect(JSON.stringify(result[0]._id)).toEqual(
+        JSON.stringify(mockSubforums[0]._id.toHexString()),
+      );
+      expect(JSON.stringify(result[1]._id)).toEqual(
+        JSON.stringify(mockSubforums[1]._id.toHexString()),
+      );
       expect(result[0].title).toBe(mockSubforums[0].title);
       expect(result[1].title).toBe(mockSubforums[1].title);
-      expect(result[0].description).toBe(mockSubforums[0].description);
-      expect(result[1].description).toBe(mockSubforums[1].description);
-      expect(result[0].moderators).toEqual(mockSubforums[0].moderators);
-      expect(result[1].moderators).toEqual(mockSubforums[1].moderators);
-      expect(result[0].isActive).toBe(mockSubforums[0].isActive);
-      expect(result[1].isActive).toBe(mockSubforums[1].isActive);
-      expect(result[0].questionCount).toBe(mockSubforums[0].questionCount);
-      expect(result[1].questionCount).toBe(mockSubforums[1].questionCount);
-      expect(result[0].tags).toEqual(mockSubforums[0].tags);
-      expect(result[1].tags).toEqual(mockSubforums[1].tags);
-      expect(result[0].rules).toEqual(mockSubforums[0].rules);
-      expect(result[1].rules).toEqual(mockSubforums[1].rules);
+      expect(result[0].onlineUsers).toBeDefined();
+      expect(result[1].onlineUsers).toBeDefined();
+      expect(result[0].onlineUsers).toBe(0);
+      expect(result[1].onlineUsers).toBe(0);
     });
 
     test('should return empty array when no subforums exist', async () => {

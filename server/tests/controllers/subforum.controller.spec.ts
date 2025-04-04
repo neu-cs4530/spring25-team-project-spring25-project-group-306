@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../app';
 import * as subforumUtil from '../../services/subforum.service';
-import { DatabaseSubforum } from '../../types/types';
+import { DatabaseSubforum, SubforumWithRuntimeData } from '../../types/types';
 
 // Spy on all the service methods
 const saveSubforumSpy = jest.spyOn(subforumUtil, 'saveSubforum');
@@ -193,10 +193,10 @@ describe('Test subforumController', () => {
   describe('GET /:id', () => {
     it('should successfully retrieve a subforum', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
-      const mockSubforum: DatabaseSubforum = {
+      const mockSubforum: SubforumWithRuntimeData = {
         _id: subforumId,
         title: 'Test Subforum',
-        description: 'Test Description',
+        description: 'This is a test subforum',
         moderators: ['mod1'],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -204,6 +204,7 @@ describe('Test subforumController', () => {
         questionCount: 0,
         tags: [],
         rules: [],
+        onlineUsers: 0,
       };
 
       getSubforumByIdSpy.mockResolvedValueOnce(mockSubforum);
@@ -248,7 +249,7 @@ describe('Test subforumController', () => {
 
   describe('GET /', () => {
     it('should successfully retrieve all subforums', async () => {
-      const mockSubforums: DatabaseSubforum[] = [
+      const mockSubforums: SubforumWithRuntimeData[] = [
         {
           _id: new mongoose.Types.ObjectId().toString(),
           title: 'Subforum 1',
@@ -260,6 +261,7 @@ describe('Test subforumController', () => {
           questionCount: 0,
           tags: [],
           rules: [],
+          onlineUsers: 0,
         },
         {
           _id: new mongoose.Types.ObjectId().toString(),
@@ -272,6 +274,7 @@ describe('Test subforumController', () => {
           questionCount: 0,
           tags: [],
           rules: [],
+          onlineUsers: 0,
         },
       ];
 
