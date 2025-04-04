@@ -21,7 +21,7 @@ import { getKarmaByUsername } from '../services/userService';
  * @returns handleNewAnswer - Function to navigate to the "New Answer" page
  */
 const useAnswerPage = () => {
-  const { qid } = useParams();
+  const { subforumId, qid } = useParams();
   const navigate = useNavigate();
 
   const { user, socket } = useUserContext();
@@ -52,7 +52,7 @@ const useAnswerPage = () => {
    * Function to handle navigation to the "New Answer" page.
    */
   const handleNewAnswer = () => {
-    navigate(`/new/answer/${questionID}`);
+    navigate(`/new/answer/${subforumId}/${questionID}`);
   };
 
   useEffect(() => {
@@ -90,6 +90,44 @@ const useAnswerPage = () => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error adding comment:', error);
+    }
+  };
+
+  /**
+   * Function to remove an answer from a question.
+   *
+   * @param aid - The ID of the answer to be removed.
+   */
+  const removeAnswer = async (aid: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/answer/deleteAnswer/${aid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to delete answer: ${errorData}`);
+      }
+
+      const data = await response.json();
+      setQuestion(prevQuestion => {
+        if (!prevQuestion) {
+          return prevQuestion;
+        }
+        return {
+          ...prevQuestion,
+          answers: prevQuestion.answers.filter(a => a._id !== data._id),
+        };
+      });
+    } catch (err) {
+      setQuestion(null);
     }
   };
 
@@ -217,12 +255,14 @@ const useAnswerPage = () => {
   }, [questionID, socket]);
 
   return {
+    subforumId,
     questionID,
     question,
     karma,
     handleNewComment,
     handleNewAnswer,
     refreshQuestion,
+    removeAnswer,
   };
 };
 

@@ -9,6 +9,7 @@ import {
   PopulatedDatabaseQuestion,
   VoteRequest,
   PinUnpinRequest,
+  FindAndDeleteQuestionByID,
 } from '../types/types';
 import {
   addVoteToQuestion,
@@ -18,6 +19,7 @@ import {
   getQuestionsByOrder,
   saveQuestion,
   updateQuestionPin,
+  deleteQuestionById,
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
@@ -271,6 +273,31 @@ const questionController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Deletes a question by its unique ID. If the ID is invalid or the question is not found,
+   * the appropriate HTTP response status and message are returned.
+   */
+  const deleteQuestion = async (req: FindAndDeleteQuestionByID, res: Response): Promise<void> => {
+    const { qid } = req.params;
+
+    if (!ObjectId.isValid(qid)) {
+      res.status(400).send('Invalid ID format');
+      return;
+    }
+
+    try {
+      const result = await deleteQuestionById(qid);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).send(`Error when deleting question: ${(err as Error).message}`);
+    }
+  };
+
   // add appropriate HTTP verbs and their endpoints to the router
   router.get('/getQuestion', getQuestionsByFilter);
   router.get('/getQuestionById/:qid', getQuestionById);
@@ -278,6 +305,7 @@ const questionController = (socket: FakeSOSocket) => {
   router.post('/upvoteQuestion', upvoteQuestion);
   router.post('/downvoteQuestion', downvoteQuestion);
   router.post('/pinUnpinQuestion', pinUnpinQuestion);
+  router.delete('/deleteQuestion/:qid', deleteQuestion);
 
   return router;
 };

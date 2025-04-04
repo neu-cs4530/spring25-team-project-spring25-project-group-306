@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Tag, Question } from '../../../types';
 import useSubforumDetails from '../../../hooks/useSubforumDetails';
 import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
@@ -7,6 +8,7 @@ import AskQuestionModal from './AskQuestionModal';
 import './index.css';
 
 const SubforumDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { subforumId } = useParams<{ subforumId: string }>();
   const {
     subforum,
@@ -23,6 +25,7 @@ const SubforumDetailsPage: React.FC = () => {
     loading: questionsLoading,
     error: questionsError,
     refetch: refetchQuestions,
+    deleteQuestion,
   } = useSubforumQuestions(subforumId);
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
 
@@ -60,7 +63,9 @@ const SubforumDetailsPage: React.FC = () => {
             </button>
           )}
         </div>
-        <h3>{question.title}</h3>
+        <h3 onClick={() => handleQuestionClick(question)} className='question-title'>
+          {question.title}
+        </h3>
         <p className='question-preview'>{question.text.substring(0, 200)}</p>
         <div className='question-meta'>
           <span>Asked by {question.askedBy}</span>
@@ -74,6 +79,11 @@ const SubforumDetailsPage: React.FC = () => {
             </span>
           ))}
         </div>
+        {isModerator && (
+          <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
+            Remove
+          </button>
+        )}
       </div>
     );
   };

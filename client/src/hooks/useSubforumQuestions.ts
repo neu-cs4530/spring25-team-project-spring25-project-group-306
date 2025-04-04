@@ -64,6 +64,33 @@ const useSubforumQuestions = (subforumId: string | undefined) => {
     }
   }, [subforumId]);
 
+  const deleteQuestion = async (qid: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/question/deleteQuestion/${qid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to delete question: ${errorData}`);
+      }
+
+      await fetchQuestions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
@@ -75,6 +102,7 @@ const useSubforumQuestions = (subforumId: string | undefined) => {
     error,
     handlePinUnpinQuestion,
     refetch: fetchQuestions,
+    deleteQuestion,
   };
 };
 

@@ -50,6 +50,12 @@ export interface AddAnswerRequest extends Request {
   };
 }
 
+export interface DeleteAnswerRequest extends Request {
+  params: {
+    aid: string;
+  };
+}
+
 /**
  * Type representing possible responses for an Answer-related operation.
  * - Either a `DatabaseAnswer` object or an error message.

@@ -7,14 +7,12 @@ import {
   getAllSubforums,
   deleteSubforumById,
 } from '../../services/subforum.service';
-import * as userService from '../../services/user.service';
 import { DatabaseSubforum } from '../../types/types';
+import { getUserByUsername } from '../../services/user.service';
 
 // Mock the user service
 jest.mock('../../services/user.service');
-const getUserByUsernameMock = userService.getUserByUsername as jest.MockedFunction<
-  typeof userService.getUserByUsername
->;
+const getUserByUsernameMock = getUserByUsername as jest.MockedFunction<typeof getUserByUsername>;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -41,7 +39,7 @@ describe('Subforum service', () => {
   });
 
   describe('saveSubforum', () => {
-    test('should successfully save a valid subforum when creator has enough karma', async () => {
+    test('should successfully save a valid subforum', async () => {
       const mockSubforum = {
         title: 'Test Subforum',
         description: 'Test Description',
