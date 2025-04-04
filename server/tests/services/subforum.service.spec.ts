@@ -8,13 +8,11 @@ import {
   deleteSubforumById,
 } from '../../services/subforum.service';
 import { DatabaseSubforum } from '../../types/types';
-
+import { getUserByUsername } from '../../services/user.service';
 
 // Mock the user service
 jest.mock('../../services/user.service');
-const getUserByUsernameMock = userService.getUserByUsername as jest.MockedFunction<
-  typeof userService.getUserByUsername
->;
+const getUserByUsernameMock = getUserByUsername as jest.MockedFunction<typeof getUserByUsername>;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -66,7 +64,6 @@ describe('Subforum service', () => {
         isActive: true,
         questionCount: 0,
       };
-
 
       mockingoose(SubforumModel).toReturn(mockDBSubforum, 'create');
 
@@ -162,7 +159,6 @@ describe('Subforum service', () => {
       jest.spyOn(SubforumModel, 'create').mockRejectedValueOnce(new Error('Database error'));
 
       const result = await saveSubforum(mockSubforum);
-
 
       expect(getUserByUsernameMock).toHaveBeenCalledWith('mod1');
       expect(result).toEqual({ error: 'Error when saving a subforum: Database error' });

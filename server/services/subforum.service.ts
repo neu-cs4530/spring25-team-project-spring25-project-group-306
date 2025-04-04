@@ -8,7 +8,6 @@ import {
 } from '../types/types';
 import { getUserByUsername } from './user.service';
 
-
 // This will be set from the controller
 let onlineUsersMap = new Map<string, number>();
 
