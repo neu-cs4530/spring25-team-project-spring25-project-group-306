@@ -44,6 +44,10 @@ const questionSchema: Schema = new Schema(
       ref: 'Subforum',
       required: false,
     },
+    pinned: {
+      type: Boolean,
+      default: false,
+    },
   },
   { collection: 'Question' },
 );

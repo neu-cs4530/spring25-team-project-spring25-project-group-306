@@ -1,4 +1,10 @@
-import { PopulatedDatabaseQuestion, Post, Question, VoteInterface } from '../types/types';
+import {
+  PopulatedDatabaseQuestion,
+  Post,
+  Question,
+  QuestionResponse,
+  VoteInterface,
+} from '../types/types';
 import api from './config';
 
 const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
@@ -103,4 +109,20 @@ const downvoteQuestion = async (
   return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion, upvoteQuestion, downvoteQuestion };
+const pinUnpinQuestion = async (pid: string, pin: boolean): Promise<QuestionResponse> => {
+  const data = { pid, pinned: pin };
+  const res = await api.post(`${QUESTION_API_URL}/pinUnpinQuestion`, data);
+  if (res.status !== 200) {
+    throw new Error('Error when fetching or filtering questions');
+  }
+  return res.data;
+};
+
+export {
+  getQuestionsByFilter,
+  getQuestionById,
+  addQuestion,
+  upvoteQuestion,
+  downvoteQuestion,
+  pinUnpinQuestion,
+};
