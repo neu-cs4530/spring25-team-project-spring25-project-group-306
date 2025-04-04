@@ -54,7 +54,7 @@ export interface DatabaseQuestion extends Omit<Question, 'tags' | 'answers' | 'c
   tags: ObjectId[];
   answers: ObjectId[];
   comments: ObjectId[];
-  pinned: boolean
+  pinned: boolean;
 }
 
 /**
