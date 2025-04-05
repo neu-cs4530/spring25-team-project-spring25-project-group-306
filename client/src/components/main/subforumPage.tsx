@@ -1,10 +1,12 @@
 import React from 'react';
 import useSubforums from '../../hooks/useSubforums';
+import useUserContext from '../../hooks/useUserContext';
 import './subforumPage.css';
 
 const SubforumPage: React.FC = () => {
   const { subforums, loading, error, navigateToSubforum, createNewSubforum, canCreateSubforum } =
     useSubforums();
+  const { user } = useUserContext();
 
   if (loading) {
     return <div className='loading'>Loading subforums...</div>;
@@ -13,6 +15,11 @@ const SubforumPage: React.FC = () => {
   if (error) {
     return <div className='error'>Error: {error}</div>;
   }
+
+  // Filter subforums to only show public ones and private ones where the user is a member
+  const filteredSubforums = subforums.filter(
+    subforum => subforum.public || (user && subforum.members.includes(user.username)),
+  );
 
   return (
     <div className='subforum-container'>
@@ -25,7 +32,7 @@ const SubforumPage: React.FC = () => {
         )}
       </div>
       <div className='subforum-list'>
-        {subforums.map(subforum => {
+        {filteredSubforums.map(subforum => {
           const tags = subforum.tags || [];
           return (
             <div key={subforum._id} className='subforum-card'>

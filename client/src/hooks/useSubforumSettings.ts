@@ -19,12 +19,14 @@ const useSubforumSettings = (subforumId: string | undefined) => {
   const [tags, setTags] = useState('');
   const [rules, setRules] = useState('');
   const [moderators, setModerators] = useState('');
-
+  const [members, setMembers] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
   const [titleErr, setTitleErr] = useState('');
   const [descriptionErr, setDescriptionErr] = useState('');
   const [tagsErr, setTagsErr] = useState('');
   const [rulesErr, setRulesErr] = useState('');
   const [moderatorsErr, setModeratorsErr] = useState('');
+  const [membersErr, setMembersErr] = useState('');
 
   useEffect(() => {
     const fetchSubforum = async () => {
@@ -50,7 +52,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
           throw new Error('Failed to fetch subforum');
         }
 
-        const data: DatabaseSubforum = await response.json();
+        const data = (await response.json()) as unknown as DatabaseSubforum;
 
         // Check if user is a moderator
         if (!data.moderators.includes(user?.username || '')) {
@@ -63,6 +65,8 @@ const useSubforumSettings = (subforumId: string | undefined) => {
         setTags(data.tags?.join(' ') || '');
         setRules(data.rules?.join('\n') || '');
         setModerators(data.moderators.join('\n'));
+        setMembers(data.members?.join('\n') || '');
+        setIsPublic(data.public);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -130,6 +134,14 @@ const useSubforumSettings = (subforumId: string | undefined) => {
       setModeratorsErr('');
     }
 
+    // Members are required for private subforums
+    if (!isPublic && !members.trim()) {
+      setMembersErr('Members are required for private subforums');
+      isValid = false;
+    } else {
+      setMembersErr('');
+    }
+
     return isValid;
   };
 
@@ -142,15 +154,29 @@ const useSubforumSettings = (subforumId: string | undefined) => {
       .split('\n')
       .map(mod => mod.trim())
       .filter(mod => mod !== '');
+    const membersList = members
+      .split('\n')
+      .map(member => member.trim())
+      .filter(member => member !== '');
+
+    // Ensure current user is included as a moderator and member
+    if (!moderatorsList.includes(user.username)) {
+      moderatorsList.push(user.username);
+    }
+    if (!membersList.includes(user.username)) {
+      membersList.push(user.username);
+    }
 
     const updateData: DatabaseUpdateSubforumRequest = {
       title,
       description,
       moderators: moderatorsList,
+      members: membersList,
       tags: tagList,
       rules: rulesList,
+      public: isPublic,
       updatedAt: new Date(),
-    };
+    } as DatabaseUpdateSubforumRequest;
 
     try {
       const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/subforums/${subforumId}`, {
@@ -205,11 +231,16 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     setRules,
     moderators,
     setModerators,
+    members,
+    setMembers,
+    isPublic,
+    setIsPublic,
     titleErr,
     descriptionErr,
     tagsErr,
     rulesErr,
     moderatorsErr,
+    membersErr,
     loading,
     error,
     updateError,

@@ -94,7 +94,13 @@ const subforumController = (socket: FakeSOSocket) => {
     !!subforum.moderators &&
     Array.isArray(subforum.moderators) &&
     subforum.moderators.length > 0 &&
-    subforum.moderators.every(moderator => typeof moderator === 'string' && moderator.length > 0);
+    subforum.moderators.every(moderator => typeof moderator === 'string' && moderator.length > 0) &&
+    // Validate members for private subforums
+    (subforum.public === true ||
+      (subforum.public === false &&
+        !!subforum.members &&
+        Array.isArray(subforum.members) &&
+        subforum.members.length > 0));
 
   /**
    * Creates a new subforum.
@@ -155,6 +161,22 @@ const subforumController = (socket: FakeSOSocket) => {
         )
       ) {
         res.status(400).json({ error: 'All moderator usernames must be non-empty strings' });
+        return;
+      }
+    }
+
+    // Validate members if the subforum is being set to private
+    if (req.body.public === false) {
+      if (!req.body.members || !Array.isArray(req.body.members) || req.body.members.length === 0) {
+        res
+          .status(400)
+          .json({ error: 'At least one member username is required for private subforums' });
+        return;
+      }
+      if (
+        !req.body.members.every((member: string) => typeof member === 'string' && member.length > 0)
+      ) {
+        res.status(400).json({ error: 'All member usernames must be non-empty strings' });
         return;
       }
     }

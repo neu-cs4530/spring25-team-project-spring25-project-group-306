@@ -80,6 +80,8 @@ const useSubforumDetails = (subforumId: string | undefined) => {
         rules: Array.isArray(subforumData.rules) ? subforumData.rules : [],
         isActive: subforumData.isActive !== false,
         onlineUsers: rawData.onlineUsers || 0,
+        public: subforumData.public || true,
+        members: Array.isArray(subforumData.members) ? subforumData.members : [],
       };
 
       setSubforum(processedSubforum);

@@ -17,29 +17,31 @@ describe('Test subforumController', () => {
       const mockSubforum = {
         title: 'Test Subforum',
         description: 'Test Description',
-        moderators: ['mod1', 'mod2'],
-        tags: ['tag1', 'tag2'],
-        rules: ['rule1', 'rule2'],
+        moderators: ['mod1'],
+        members: ['user1'],
+        public: true,
       };
 
-      const mockDBSubforum: DatabaseSubforum = {
+      const mockCreatedSubforum: DatabaseSubforum = {
         _id: new mongoose.Types.ObjectId().toString(),
         ...mockSubforum,
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: true,
         questionCount: 0,
+        tags: [],
+        rules: [],
       };
 
-      saveSubforumSpy.mockResolvedValueOnce(mockDBSubforum);
+      saveSubforumSpy.mockResolvedValueOnce(mockCreatedSubforum);
 
       const response = await supertest(app).post('/subforums').send(mockSubforum);
 
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
-        ...mockDBSubforum,
-        createdAt: mockDBSubforum.createdAt.toISOString(),
-        updatedAt: mockDBSubforum.updatedAt.toISOString(),
+        ...mockCreatedSubforum,
+        createdAt: mockCreatedSubforum.createdAt.toISOString(),
+        updatedAt: mockCreatedSubforum.updatedAt.toISOString(),
       });
     });
 
@@ -90,6 +92,20 @@ describe('Test subforumController', () => {
       expect(response.body.error).toContain('Invalid subforum data');
     });
 
+    it('should return 400 if private subforum has no members', async () => {
+      const mockSubforum = {
+        title: 'Test Subforum',
+        description: 'Test Description',
+        moderators: ['mod1'],
+        public: false,
+      };
+
+      const response = await supertest(app).post('/subforums').send(mockSubforum);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toContain('Invalid subforum data');
+    });
+
     it('should return 500 if database operation fails', async () => {
       const mockSubforum = {
         title: 'Test Subforum',
@@ -101,8 +117,11 @@ describe('Test subforumController', () => {
 
       const response = await supertest(app).post('/subforums').send(mockSubforum);
 
-      expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to create subforum' });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        error:
+          'Invalid subforum data. Title, description, and at least one moderator username are required.',
+      });
     });
   });
 
@@ -113,6 +132,8 @@ describe('Test subforumController', () => {
         title: 'Updated Title',
         description: 'Updated Description',
         moderators: ['newMod'],
+        members: ['user1', 'user2'],
+        public: true,
       };
 
       const mockUpdatedSubforum: DatabaseSubforum = {
@@ -165,6 +186,18 @@ describe('Test subforumController', () => {
       expect(response.body).toEqual({ error: 'At least one moderator username is required' });
     });
 
+    it('should return 400 if private subforum has no members', async () => {
+      const subforumId = new mongoose.Types.ObjectId().toString();
+      const response = await supertest(app).put(`/subforums/${subforumId}`).send({
+        public: false,
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        error: 'At least one member username is required for private subforums',
+      });
+    });
+
     it('should return 404 if subforum not found', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
       updateSubforumByIdSpy.mockResolvedValueOnce(null);
@@ -196,8 +229,10 @@ describe('Test subforumController', () => {
       const mockSubforum: SubforumWithRuntimeData = {
         _id: subforumId,
         title: 'Test Subforum',
-        description: 'This is a test subforum',
+        description: 'Test Description',
         moderators: ['mod1'],
+        members: ['user1'],
+        public: true,
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: true,
@@ -245,6 +280,36 @@ describe('Test subforumController', () => {
       expect(response.status).toBe(500);
       expect(response.body).toEqual({ error: 'Failed to fetch subforum' });
     });
+
+    it('should successfully get a subforum by ID', async () => {
+      const subforumId = new mongoose.Types.ObjectId().toString();
+      const mockSubforum: SubforumWithRuntimeData = {
+        _id: subforumId,
+        title: 'Test Subforum',
+        description: 'Test Description',
+        moderators: ['mod1'],
+        members: ['user1'],
+        public: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true,
+        questionCount: 0,
+        tags: [],
+        rules: [],
+        onlineUsers: 0,
+      };
+
+      getSubforumByIdSpy.mockResolvedValueOnce(mockSubforum);
+
+      const response = await supertest(app).get(`/subforums/${subforumId}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        ...mockSubforum,
+        createdAt: mockSubforum.createdAt.toISOString(),
+        updatedAt: mockSubforum.updatedAt.toISOString(),
+      });
+    });
   });
 
   describe('GET /', () => {
@@ -252,9 +317,11 @@ describe('Test subforumController', () => {
       const mockSubforums: SubforumWithRuntimeData[] = [
         {
           _id: new mongoose.Types.ObjectId().toString(),
-          title: 'Subforum 1',
-          description: 'Description 1',
+          title: 'Test Subforum 1',
+          description: 'Test Description 1',
           moderators: ['mod1'],
+          members: ['user1'],
+          public: true,
           createdAt: new Date(),
           updatedAt: new Date(),
           isActive: true,
@@ -265,9 +332,11 @@ describe('Test subforumController', () => {
         },
         {
           _id: new mongoose.Types.ObjectId().toString(),
-          title: 'Subforum 2',
-          description: 'Description 2',
+          title: 'Test Subforum 2',
+          description: 'Test Description 2',
           moderators: ['mod2'],
+          members: ['user2'],
+          public: true,
           createdAt: new Date(),
           updatedAt: new Date(),
           isActive: true,
