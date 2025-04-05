@@ -46,6 +46,7 @@ describe('POST /addAnswer', () => {
       downVotes: [],
       answers: [mockAnswer._id],
       comments: [],
+      pinned: false,
     });
 
     popDocSpy.mockResolvedValueOnce({
@@ -60,6 +61,7 @@ describe('POST /addAnswer', () => {
       downVotes: [],
       answers: [mockAnswer],
       comments: [],
+      pinned: false,
     });
 
     const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
@@ -218,6 +220,7 @@ describe('POST /addAnswer', () => {
       downVotes: [],
       answers: [mockAnswer._id],
       comments: [],
+      pinned: false,
     };
 
     saveAnswerSpy.mockResolvedValueOnce(mockAnswer);

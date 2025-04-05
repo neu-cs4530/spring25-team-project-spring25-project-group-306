@@ -171,6 +171,20 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
   }
 };
 
+export const deleteQuestionById = async (qid: string): Promise<QuestionResponse> => {
+  try {
+    const result: DatabaseQuestion | null = await QuestionModel.findByIdAndDelete(qid).lean();
+
+    if (!result) {
+      return { error: 'Question not found!' };
+    }
+
+    return result;
+  } catch (error) {
+    return { error: `Error when deleting a question : ${error}` };
+  }
+};
+
 /**
  * Adds a vote to a question.
  * @param {Post} post - The post
@@ -287,5 +301,26 @@ export const addVoteToQuestion = async (
           ? 'Error when adding upvote to question'
           : 'Error when adding downvote to question',
     };
+  }
+};
+
+export const updateQuestionPin = async (
+  pid: string,
+  pinned: boolean,
+): Promise<QuestionResponse> => {
+  try {
+    const updatedQuestion = await QuestionModel.findOneAndUpdate(
+      { _id: pid },
+      { $set: { pinned: Boolean(pinned) } },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedQuestion) {
+      return { error: 'Question not found!' };
+    }
+
+    return updatedQuestion;
+  } catch (error) {
+    return { error: 'Error when updating question pin status' };
   }
 };

@@ -1,13 +1,10 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useSubforumSettings from '../../../hooks/useSubforumSettings';
-import Form from '../baseComponents/form';
-import Input from '../baseComponents/input';
-import TextArea from '../baseComponents/textarea';
 import './index.css';
 
-const SubforumSettingsPage: React.FC = () => {
-  const { subforumId } = useParams<{ subforumId: string }>();
+const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
+  const navigate = useNavigate();
   const {
     title,
     setTitle,
@@ -19,11 +16,16 @@ const SubforumSettingsPage: React.FC = () => {
     setRules,
     moderators,
     setModerators,
+    members,
+    setMembers,
+    isPublic,
+    setIsPublic,
     titleErr,
     descriptionErr,
     tagsErr,
     rulesErr,
     moderatorsErr,
+    membersErr,
     loading,
     error,
     updateError,
@@ -33,84 +35,154 @@ const SubforumSettingsPage: React.FC = () => {
     deleteSubforum,
   } = useSubforumSettings(subforumId);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSubforum();
+  };
+
   if (loading) {
     return <div className='loading'>Loading subforum settings...</div>;
   }
 
   if (error) {
-    return <div className='error'>Error: {error}</div>;
+    return <div className='error-message'>{error}</div>;
   }
 
   return (
     <div className='subforum-settings-container'>
-      <h1>Edit Subforum Settings</h1>
-      {updateError && <div className='error update-error'>{updateError}</div>}
-      <Form>
-        <Input
-          title='Subforum Title *'
-          hint='Limit title to 100 characters or less'
-          id='formTitleInput'
-          val={title}
-          setState={setTitle}
-          err={titleErr}
-        />
-        <TextArea
-          title='Description *'
-          hint='Describe the purpose and scope of this subforum'
-          id='formDescriptionInput'
-          val={description}
-          setState={setDescription}
-          err={descriptionErr}
-        />
-        <Input
-          title='Tags'
-          hint='Add keywords separated by whitespace'
-          id='formTagInput'
-          val={tags}
-          setState={setTags}
-          err={tagsErr}
-        />
-        <TextArea
-          title='Rules'
-          hint='Add rules for the subforum (one per line)'
-          id='formRulesInput'
-          val={rules}
-          setState={setRules}
-          err={rulesErr}
-        />
-        <TextArea
-          title='Moderators *'
-          hint='Add moderator usernames (one per line)'
-          id='formModeratorsInput'
-          val={moderators}
-          setState={setModerators}
-          err={moderatorsErr}
-        />
-        <div className='settings-actions'>
-          <button className='save-button' onClick={updateSubforum}>
+      <h1>Subforum Settings</h1>
+      {updateError && <div className='error-message'>{updateError}</div>}
+      <form onSubmit={handleSubmit} className='subforum-settings-form'>
+        <div className='form-group'>
+          <label htmlFor='title'>Title</label>
+          <input
+            type='text'
+            id='title'
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder='Enter subforum title'
+            className={titleErr ? 'error' : ''}
+          />
+          {titleErr && <div className='error-message'>{titleErr}</div>}
+        </div>
+
+        <div className='form-group'>
+          <label htmlFor='description'>Description</label>
+          <textarea
+            id='description'
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder='Enter subforum description'
+            className={descriptionErr ? 'error' : ''}
+          />
+          {descriptionErr && <div className='error-message'>{descriptionErr}</div>}
+        </div>
+
+        <div className='form-group'>
+          <label htmlFor='tags'>Tags (space-separated)</label>
+          <input
+            type='text'
+            id='tags'
+            value={tags}
+            onChange={e => setTags(e.target.value)}
+            placeholder='Enter tags (space-separated)'
+            className={tagsErr ? 'error' : ''}
+          />
+          {tagsErr && <div className='error-message'>{tagsErr}</div>}
+        </div>
+
+        <div className='form-group'>
+          <label htmlFor='moderators'>Moderators (one per line)</label>
+          <textarea
+            id='moderators'
+            value={moderators}
+            onChange={e => setModerators(e.target.value)}
+            placeholder='Enter moderators (one per line)'
+            className={moderatorsErr ? 'error' : ''}
+          />
+          {moderatorsErr && <div className='error-message'>{moderatorsErr}</div>}
+        </div>
+
+        <div className='form-group'>
+          <label htmlFor='rules'>Rules (one per line)</label>
+          <textarea
+            id='rules'
+            value={rules}
+            onChange={e => setRules(e.target.value)}
+            placeholder='Enter rules (one per line)'
+            className={rulesErr ? 'error' : ''}
+          />
+          {rulesErr && <div className='error-message'>{rulesErr}</div>}
+        </div>
+
+        <div className='form-group'>
+          <label>Visibility</label>
+          <div className='radio-group'>
+            <label>
+              <input
+                type='radio'
+                name='visibility'
+                checked={isPublic}
+                onChange={() => setIsPublic(true)}
+              />
+              Public
+            </label>
+            <label>
+              <input
+                type='radio'
+                name='visibility'
+                checked={!isPublic}
+                onChange={() => setIsPublic(false)}
+              />
+              Private
+            </label>
+          </div>
+        </div>
+
+        {!isPublic && (
+          <div className='form-group'>
+            <label htmlFor='members'>Members (one per line)</label>
+            <textarea
+              id='members'
+              value={members}
+              onChange={e => setMembers(e.target.value)}
+              placeholder='Enter members (one per line)'
+              className={membersErr ? 'error' : ''}
+            />
+            {membersErr && <div className='error-message'>{membersErr}</div>}
+          </div>
+        )}
+
+        <div className='form-actions'>
+          <button
+            type='button'
+            onClick={() => navigate(`/subforums/${subforumId}`)}
+            className='cancel-button'>
+            Cancel
+          </button>
+          <button type='submit' className='submit-button'>
             Save Changes
           </button>
-          <button className='delete-button' onClick={() => setShowDeleteConfirm(true)}>
-            Delete Subforum
-          </button>
         </div>
-      </Form>
+      </form>
+
+      <div className='danger-zone'>
+        <h2>Danger Zone</h2>
+        <button className='delete-button' onClick={() => setShowDeleteConfirm(true)}>
+          Delete Subforum
+        </button>
+      </div>
 
       {showDeleteConfirm && (
-        <div className='delete-confirmation-overlay'>
-          <div className='delete-confirmation-dialog'>
-            <h2>Delete Subforum</h2>
+        <div className='delete-confirmation-modal'>
+          <div className='modal-content'>
+            <h2>Confirm Deletion</h2>
             <p>Are you sure you want to delete this subforum? This action cannot be undone.</p>
-            <div className='delete-confirmation-actions'>
-              <button className='cancel-button' onClick={() => setShowDeleteConfirm(false)}>
+            <div className='modal-actions'>
+              <button onClick={() => setShowDeleteConfirm(false)} className='cancel-button'>
                 Cancel
               </button>
-              <button
-                className='confirm-delete-button'
-                onClick={() => {
-                  deleteSubforum();
-                  setShowDeleteConfirm(false);
-                }}>
+              <button onClick={deleteSubforum} className='delete-button'>
                 Delete
               </button>
             </div>
@@ -121,4 +193,4 @@ const SubforumSettingsPage: React.FC = () => {
   );
 };
 
-export default SubforumSettingsPage;
+export default SubforumSettings;
