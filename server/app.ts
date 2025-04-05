@@ -21,6 +21,7 @@ import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
 import subforumController from './controllers/subforum.controller';
 import compilerController from './controllers/compiler.controller';
+import applyKarmaDecay from "./utils/karmaDecay.util";
 
 dotenv.config();
 
@@ -77,24 +78,18 @@ app.get('/', (_: Request, res: Response) => {
   res.end();
 });
 
-// Function to decrement karma by 1 for all users above the 0 threshold
-const applyKarmaDecay = async () => {
-  try {
-    await UserModel.updateMany(
-      { karma: { $gt: 0 } },
-      { $inc: { karma: -1 } }
-    );
-    console.log(`Karma decay applied successfully on [${new Date().toISOString()}]`);
-  } catch (error) {
-    console.error('Error applying karma decay:', error);
-  }
-};
-
 // Every 24 hours, call the karma decay method
-setInterval(async () => {
-  console.log('Running daily karma decay job...');
-  await applyKarmaDecay();
-}, 24 * 60 * 60 * 1000);
+if (process.env.NODE_ENV !== 'test') {
+  setInterval(async () => {
+    console.log('Running daily karma decay job...');
+    const res = await applyKarmaDecay();
+    if (res.success) {
+      console.log(`Successfully applied karma decay at [${new Date().toISOString()}]`);
+    } else {
+      console.log(res.error);
+    }
+  }, 24 * 60 * 60 * 1000);
+}
 
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());
