@@ -25,6 +25,8 @@ export type OrderType = 'newest' | 'unanswered' | 'active' | 'mostViewed';
  * - `upVotes`: An array of usernames who have upvoted the question.
  * - `downVotes`: An array of usernames who have downvoted the question.
  * - `comments`: An array of comments related to the question.
+ * - `image`: An optional image associated with the question.
+ * - `pinned`: A boolean indicating whether the question is pinned.
  */
 export interface Question extends Post {
   title: string;
@@ -37,6 +39,7 @@ export interface Question extends Post {
   comments: Comment[];
   image?: string;
   subforumId?: ObjectId;
+  pinned: boolean;
 }
 
 /**
@@ -51,6 +54,7 @@ export interface DatabaseQuestion extends Omit<Question, 'tags' | 'answers' | 'c
   tags: ObjectId[];
   answers: ObjectId[];
   comments: ObjectId[];
+  pinned: boolean;
 }
 
 /**
@@ -98,6 +102,12 @@ export interface FindQuestionByIdRequest extends Request {
   };
   query: {
     username: string;
+  };
+}
+
+export interface FindAndDeleteQuestionByID extends Request {
+  params: {
+    qid: string;
   };
 }
 

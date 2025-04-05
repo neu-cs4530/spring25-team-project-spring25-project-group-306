@@ -21,6 +21,7 @@ import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
 import subforumController from './controllers/subforum.controller';
 import compilerController from './controllers/compiler.controller';
+import imageUploadController from './controllers/imageUpload.controller';
 
 dotenv.config();
 
@@ -106,6 +107,7 @@ app.use('/chat', chatController(socket));
 app.use('/games', gameController(socket));
 app.use('/subforums', subforumController(socket));
 app.use('/execute', compilerController());
+app.use('/imageUpload', imageUploadController());
 
 // Export the app instance
 export { app, server, startServer };

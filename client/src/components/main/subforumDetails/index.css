@@ -20,6 +20,30 @@
   color: #333;
 }
 
+.subforum-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.online-users-indicator {
+  color: #28a745;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.online-users-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin-right: 5px;
+}
+
 .settings-button {
   padding: 8px 16px;
   background-color: #6c757d;
@@ -74,6 +98,10 @@
   font-weight: 600;
   color: #333;
   text-align: right;
+}
+
+.online-count {
+  color: #28a745;
 }
 
 .subforum-moderators,
@@ -262,4 +290,46 @@
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   font-size: 0.9rem;
+}
+
+.new-question-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.new-question-modal .modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.new-question-modal .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  line-height: 1;
+}
+
+.new-question-modal .close-button:hover {
+  color: #333;
 }

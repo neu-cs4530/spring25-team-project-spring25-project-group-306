@@ -1,10 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Question } from '../types';
+import { pinUnpinQuestion } from '../services/questionService';
 
 const useSubforumQuestions = (subforumId: string | undefined) => {
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsPinned, setQuestionsPinned] = useState<Question[]>([]);
+  const [questionsUnpinned, setQuestionsUnpinned] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handlePinUnpinQuestion = async (pid: string, pin: boolean) => {
+    if (!subforumId) {
+      setError('No subforum ID provided');
+      return;
+    }
+    try {
+      const response = await pinUnpinQuestion(pid, pin);
+      if ('error' in response) {
+        setError('Failed to pin/unpin question');
+      }
+    } catch (err) {
+      setError('Error pinning/unpinning question');
+    }
+  };
 
   const fetchQuestions = useCallback(async () => {
     if (!subforumId) {
@@ -31,25 +48,61 @@ const useSubforumQuestions = (subforumId: string | undefined) => {
       }
 
       const data = await response.json();
-      setQuestions(data);
+
+      const pinnedQuestions = data.filter((question: Question) => question.pinned);
+      const unpinnedQuestions = data.filter((question: Question) => !question.pinned);
+
+      setQuestionsPinned(pinnedQuestions);
+      setQuestionsUnpinned(unpinnedQuestions);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      setQuestions([]);
+      setQuestionsPinned([]);
+      setQuestionsUnpinned([]);
     } finally {
       setLoading(false);
     }
   }, [subforumId]);
+
+  const deleteQuestion = async (qid: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/question/deleteQuestion/${qid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to delete question: ${errorData}`);
+      }
+
+      await fetchQuestions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
 
   return {
-    questions,
+    questionsPinned,
+    questionsUnpinned,
     loading,
     error,
+    handlePinUnpinQuestion,
     refetch: fetchQuestions,
+    deleteQuestion,
   };
 };
 

@@ -71,6 +71,23 @@
   color: #666;
 }
 
+.online-users {
+  color: #28a745;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.online-users::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin-right: 5px;
+}
+
 .subforum-description {
   margin: 0;
   color: #555;

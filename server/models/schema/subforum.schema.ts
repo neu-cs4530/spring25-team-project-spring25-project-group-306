@@ -14,6 +14,8 @@ import { Schema } from 'mongoose';
  * - `tags`: Array of tag strings associated with this subforum (optional).
  * - `rules`: Array of rules specific to this subforum (optional).
  * - `isActive`: Whether the subforum is active or archived.
+ * - `public`: Whether the subforum is public or private.
+ * - `members`: Array of usernames who are members of this subforum (required for private subforums).
  */
 const subforumSchema: Schema = new Schema(
   {
@@ -52,6 +54,14 @@ const subforumSchema: Schema = new Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    public: {
+      type: Boolean,
+      default: true,
+    },
+    members: {
+      type: [String],
+      default: [],
     },
   },
   {

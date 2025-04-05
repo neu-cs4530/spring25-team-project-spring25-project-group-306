@@ -14,4 +14,5 @@ export interface Question {
   askDateTime: Date;
   answers?: ObjectId[];
   subforumId?: string;
+  pinned: boolean;
 }

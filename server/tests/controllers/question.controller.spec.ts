@@ -21,6 +21,7 @@ const filterQuestionsBySearchSpy: jest.SpyInstance = jest.spyOn(
   questionUtil,
   'filterQuestionsBySearch',
 );
+const pinUnpinQuestionSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'updateQuestionPin');
 
 const tag1: Tag = {
   name: 'tag1',
@@ -53,6 +54,7 @@ const mockQuestion: Question = {
   upVotes: [],
   downVotes: [],
   comments: [],
+  pinned: false,
 };
 
 const mockDatabaseQuestion: DatabaseQuestion = {
@@ -67,6 +69,7 @@ const mockDatabaseQuestion: DatabaseQuestion = {
   upVotes: [],
   downVotes: [],
   comments: [],
+  pinned: false,
 };
 
 const mockPopulatedQuestion: PopulatedDatabaseQuestion = {
@@ -129,6 +132,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
   },
   {
     _id: new mongoose.Types.ObjectId('65e9b5a995b6c7045a30d823'),
@@ -142,6 +146,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
   },
   {
     _id: new mongoose.Types.ObjectId('34e9b58910afe6e94fc6e99f'),
@@ -155,6 +160,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
   },
 ];
 
@@ -173,6 +179,17 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  describe('DELETE /deleteQuestion/:qid', () => {
+    it('should delete a question successfully', async () => {
+      jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
+
+      const response = await supertest(app).delete(
+        `/question/deleteQuestion/${mockDatabaseQuestion._id}`,
+      );
+
+      expect(response.status).toBe(200);
+    });
+  });
   describe('POST /addQuestion', () => {
     it('should add a new question', async () => {
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
@@ -282,6 +299,7 @@ describe('Test questionController', () => {
         upVotes: [],
         downVotes: [],
         comments: [],
+        pinned: false,
       };
 
       const result: PopulatedDatabaseQuestion = {
@@ -290,6 +308,7 @@ describe('Test questionController', () => {
         tags: [dbTag1, dbTag2], // Duplicate tags
         answers: [],
         comments: [],
+        pinned: false,
       };
 
       // Set up the mock to resolve with unique tags
@@ -769,6 +788,74 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
+    });
+  });
+
+  describe('POST /pinUnpinQuestion', () => {
+    it('should pin a question successfully', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: true,
+      };
+
+      const mockResponse = {
+        msg: 'Question pinned successfully',
+        question: {
+          pinned: true,
+        },
+      };
+
+      pinUnpinQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockResponse);
+    });
+    it('should unpin a question successfully', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: false,
+      };
+
+      const mockResponse = {
+        msg: 'Question pinned successfully',
+        question: {
+          pinned: false,
+        },
+      };
+
+      pinUnpinQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockResponse);
+    });
+    it('should return bad request error if the request had pid missing', async () => {
+      const mockReqBody = {
+        pin: true,
+      };
+
+      const response = await supertest(app).post(`/question/pinUnpinQuestion`).send(mockReqBody);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return an error if the request fails', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: true,
+      };
+
+      jest.spyOn(questionUtil, 'updateQuestionPin').mockImplementationOnce(() => {
+        throw new Error('Error updating pin status');
+      });
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when updating pin status');
     });
   });
 });

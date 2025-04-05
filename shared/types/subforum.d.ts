@@ -16,6 +16,9 @@ export interface Subforum {
   /** Array of usernames who are moderators of this subforum */
   moderators: string[];
 
+  /** Array of usernames who are members of this subforum */
+  members: string[];
+
   /** Date when the subforum was created */
   createdAt: Date;
 
@@ -33,6 +36,9 @@ export interface Subforum {
 
   /** Whether the subforum is active or archived */
   isActive: boolean;
+
+  /** Whether the subforum is public or private */
+  public: boolean;
 }
 
 /**
@@ -43,6 +49,29 @@ export interface Subforum {
 export interface DatabaseSubforum extends Subforum {
   /** MongoDB ObjectId as string */
   _id: string;
+}
+
+/**
+ * Interface representing runtime data for a subforum that doesn't need to be stored in the database
+ */
+export interface SubforumRuntimeData {
+  /** Number of users currently online in this subforum */
+  onlineUsers: number;
+}
+
+/**
+ * Interface for a Subforum payload as sent to the client, including runtime data
+ */
+export interface SubforumWithRuntimeData extends DatabaseSubforum, SubforumRuntimeData {}
+
+/**
+ * Interface for socket events related to subforum online users
+ */
+export interface SubforumOnlineUserEvent {
+  /** Subforum ID */
+  subforumId: string;
+  /** Number of users currently online in this subforum */
+  onlineUsers: number;
 }
 
 /**
@@ -61,11 +90,17 @@ export interface CreateSubforumRequest extends Request {
     /** Array of usernames who are moderators of this subforum */
     moderators: string[];
 
+    /** Array of usernames who are members of this subforum */
+    members: string[];
+
     /** Tags associated with this subforum (optional) */
     tags?: string[];
 
     /** Rules specific to this subforum (optional) */
     rules?: string[];
+
+    /** Whether the subforum is public or private (optional) */
+    public?: boolean;
   };
 }
 
@@ -88,6 +123,9 @@ export interface UpdateSubforumRequest extends Request {
     /** Array of usernames who are moderators of this subforum (optional) */
     moderators?: string[];
 
+    /** Array of usernames who are members of this subforum (optional) */
+    members?: string[];
+
     /** Tags associated with this subforum (optional) */
     tags?: string[];
 
@@ -96,6 +134,9 @@ export interface UpdateSubforumRequest extends Request {
 
     /** Whether the subforum is active or archived (optional) */
     isActive?: boolean;
+
+    /** Whether the subforum is public or private (optional) */
+    public?: boolean;
   };
 }
 
@@ -114,6 +155,9 @@ export interface DatabaseUpdateSubforumRequest {
   /** Array of usernames who are moderators of this subforum (optional) */
   moderators?: string[];
 
+  /** Array of usernames who are members of this subforum (optional) */
+  members?: string[];
+
   /** Tags associated with this subforum (optional) */
   tags?: string[];
 
@@ -122,6 +166,9 @@ export interface DatabaseUpdateSubforumRequest {
 
   /** Whether the subforum is active or archived (optional) */
   isActive?: boolean;
+
+  /** Whether the subforum is public or private (optional) */
+  public?: boolean;
 
   /** Date when the subforum was last updated */
   updatedAt: Date;

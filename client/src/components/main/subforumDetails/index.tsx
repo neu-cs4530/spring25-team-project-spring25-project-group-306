@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Tag } from '../../../types';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Tag, Question } from '../../../types';
 import useSubforumDetails from '../../../hooks/useSubforumDetails';
 import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
-import AskQuestionModal from './AskQuestionModal';
+import NewQuestion from '../newQuestion';
 import './index.css';
 
 const SubforumDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { subforumId } = useParams<{ subforumId: string }>();
   const {
     subforum,
@@ -17,12 +18,16 @@ const SubforumDetailsPage: React.FC = () => {
     refetch: refetchSubforum,
   } = useSubforumDetails(subforumId);
   const {
-    questions,
+    questionsPinned,
+    questionsUnpinned,
+    handlePinUnpinQuestion,
     loading: questionsLoading,
     error: questionsError,
     refetch: refetchQuestions,
+    deleteQuestion,
   } = useSubforumQuestions(subforumId);
-  const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
+
+  const [isNewQuestionOpen, setIsNewQuestionOpen] = useState(false);
 
   if (subforumLoading || questionsLoading) {
     return <div className='loading'>Loading subforum details...</div>;
@@ -32,18 +37,41 @@ const SubforumDetailsPage: React.FC = () => {
     return <div className='error'>Error: {subforumError || 'Subforum not found'}</div>;
   }
 
-  const renderQuestionsList = () => {
+  const handleQuestionClick = (question: Question): void => {
+    if (question._id && subforumId) {
+      navigate(`/subforums/${subforumId}/question/${question._id}`);
+    }
+  };
+
+  const renderQuestion = (question: Question) => {
     if (questionsError) {
-      return <div className='error'>Error loading questions: {questionsError}</div>;
+      return <div className='error'>Error loading question: {questionsError}</div>;
     }
-
-    if (questions.length === 0) {
-      return <p>No questions yet. Be the first to ask a question!</p>;
-    }
-
-    return questions.map(question => (
+    return (
       <div key={question._id} className='question-card'>
-        <h3>{question.title}</h3>
+        <div className='question-actions'>
+          {isModerator && (
+            <button
+              className='pin-button'
+              onClick={() => {
+                handlePinUnpinQuestion(question._id, !question.pinned)
+                  .then(() => {
+                    // Optionally refetch data to ensure consistency
+                    refetchQuestions();
+                    refetchSubforum();
+                  })
+                  .catch(() => {
+                    // Revert the optimistic update if the API call fails
+                    question.pinned = !question.pinned;
+                  });
+              }}>
+              {question.pinned ? 'Unpin' : 'Pin'}
+            </button>
+          )}
+        </div>
+        <h3 onClick={() => handleQuestionClick(question)} className='question-title'>
+          {question.title}
+        </h3>
         <p className='question-preview'>{question.text.substring(0, 200)}</p>
         <div className='question-meta'>
           <span>Asked by {question.askedBy}</span>
@@ -57,8 +85,32 @@ const SubforumDetailsPage: React.FC = () => {
             </span>
           ))}
         </div>
+        {isModerator && (
+          <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
+            Remove
+          </button>
+        )}
       </div>
-    ));
+    );
+  };
+
+  const renderQuestionsPinnedList = () => {
+    if (questionsError) {
+      return <div className='error'>Error loading pinned questions: {questionsError}</div>;
+    }
+    return questionsPinned
+      .filter(question => question.pinned)
+      .map(question => renderQuestion(question));
+  };
+
+  const renderQuestionsUnpinnedList = () => {
+    if (questionsError) {
+      return <div className='error'>Error loading unpinned questions: {questionsError}</div>;
+    }
+    if (questionsUnpinned.length === 0) {
+      return <div className='no-questions'>No questions available</div>;
+    }
+    return questionsUnpinned.map(question => renderQuestion(question));
   };
 
   return (
@@ -66,11 +118,14 @@ const SubforumDetailsPage: React.FC = () => {
       <div className='subforum-details-header'>
         <div className='subforum-title-section'>
           <h1>{subforum.title}</h1>
-          {isModerator && (
-            <button className='settings-button' onClick={navigateToSettings}>
-              Edit Settings
-            </button>
-          )}
+          <div className='subforum-header-actions'>
+            <span className='online-users-indicator'>{subforum.onlineUsers} online now</span>
+            {isModerator && (
+              <button className='settings-button' onClick={navigateToSettings}>
+                Edit Settings
+              </button>
+            )}
+          </div>
         </div>
         <p className='subforum-description'>{subforum.description}</p>
       </div>
@@ -85,6 +140,10 @@ const SubforumDetailsPage: React.FC = () => {
             <div className='stat-item'>
               <span className='stat-label'>Tags:</span>
               <span className='stat-value'>{subforum.tags?.length || 0}</span>
+            </div>
+            <div className='stat-item'>
+              <span className='stat-label'>Online users:</span>
+              <span className='stat-value online-count'>{subforum.onlineUsers}</span>
             </div>
           </div>
 
@@ -125,24 +184,37 @@ const SubforumDetailsPage: React.FC = () => {
         <div className='subforum-questions'>
           <div className='questions-header'>
             <h2>Questions</h2>
-            <button className='ask-question-btn' onClick={() => setIsAskQuestionModalOpen(true)}>
+            <button className='ask-question-btn' onClick={() => setIsNewQuestionOpen(true)}>
               Ask a Question
             </button>
           </div>
-          <div className='questions-list'>{renderQuestionsList()}</div>
+          {questionsPinned.length > 0 && (
+            <div className='pinned-questions-section'>
+              <h3>Pinned Questions</h3>
+              <div className='questions-list'>{renderQuestionsPinnedList()}</div>
+              <p>----</p>
+            </div>
+          )}
+          <div className='questions-list'>{renderQuestionsUnpinnedList()}</div>
         </div>
       </div>
 
-      {isAskQuestionModalOpen && (
-        <AskQuestionModal
-          isOpen={isAskQuestionModalOpen}
-          onClose={() => setIsAskQuestionModalOpen(false)}
-          subforumId={subforumId || ''}
-          onQuestionAdded={() => {
-            refetchQuestions();
-            refetchSubforum();
-          }}
-        />
+      {isNewQuestionOpen && (
+        <div className='new-question-modal'>
+          <div className='modal-content'>
+            <button className='close-button' onClick={() => setIsNewQuestionOpen(false)}>
+              ×
+            </button>
+            <NewQuestion
+              subforumId={subforumId}
+              onQuestionAdded={() => {
+                refetchQuestions();
+                refetchSubforum();
+                setIsNewQuestionOpen(false);
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
