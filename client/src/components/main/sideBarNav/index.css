@@ -10,6 +10,8 @@
   top: 0;
   box-shadow: 1px 0 2px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
+  border-right: 1px solid #e1e1e1;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .menu_button {
@@ -18,11 +20,12 @@
   height: 44px;
   width: 100%;
   padding: 0 1rem;
-  font-size: 16px;
+  font-size: 22px;
   color: #2c3e50;
   text-decoration: none;
   border-left: 3px solid transparent;
   transition: all 0.2s ease;
+  margin-bottom: 10px;
 }
 
 .menu_button:hover {
@@ -44,7 +47,7 @@
 
 .message-options {
   padding-left: 1.5rem;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .message-option-selected {
