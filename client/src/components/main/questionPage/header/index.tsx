@@ -28,14 +28,14 @@ interface QuestionHeaderProps {
  * @param setQuestionOrder - Function to set the order of questions based on input message.
  */
 const QuestionHeader = ({ titleText, qcnt, setQuestionOrder }: QuestionHeaderProps) => (
-  <div>
-    <div className='space_between right_padding'>
+  <div className='question-header'>
+    <div className='space_between'>
       <div className='bold_title'>{titleText}</div>
       <AskQuestionButton />
     </div>
-    <div className='space_between right_padding'>
+    <div className='space_between'>
       <div id='question_count'>{qcnt} questions</div>
-      <div>
+      <div className='filter-buttons'>
         {Object.keys(orderTypeDisplayName).map(order => (
           <OrderButton
             key={order}

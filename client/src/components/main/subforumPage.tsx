@@ -22,11 +22,11 @@ const SubforumPage: React.FC = () => {
   );
 
   return (
-    <div className='subforum-container'>
-      <div className='subforum-header'>
-        <h1>Subforums</h1>
+    <div className='right_main'>
+      <div className='page-header'>
+        <h1 className='page-title'>Subforums</h1>
         {canCreateSubforum() && (
-          <button className='create-subforum-btn' onClick={createNewSubforum}>
+          <button className='bluebtn' onClick={createNewSubforum}>
             Create New Subforum
           </button>
         )}

@@ -16,7 +16,7 @@ const Header = () => {
   return (
     <div id='header' className='header'>
       <div></div>
-      <div className='title'>StackUnderflow</div>
+      <div className='title'>💻 StackUnderflow</div>
       <input
         id='searchBar'
         placeholder='Search ...'
@@ -25,14 +25,16 @@ const Header = () => {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
       />
-      <button onClick={handleSignOut} className='logout-button'>
-        Log out
-      </button>
-      <button
-        className='view-profile-button'
-        onClick={() => navigate(`/user/${currentUser.username}`)}>
-        View Profile
-      </button>
+      <div className='header-buttons'>
+        <button
+          className='view-profile-button'
+          onClick={() => navigate(`/user/${currentUser.username}`)}>
+          View Profile
+        </button>
+        <button onClick={handleSignOut} className='logout-button'>
+          Log out
+        </button>
+      </div>
     </div>
   );
 };

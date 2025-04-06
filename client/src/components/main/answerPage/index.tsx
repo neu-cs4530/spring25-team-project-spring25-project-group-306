@@ -43,7 +43,7 @@ const AnswerPage = () => {
   }
 
   return (
-    <>
+    <div className='right_main'>
       <VoteComponent
         post={question as Post}
         pid={String(question._id)}
@@ -107,7 +107,7 @@ const AnswerPage = () => {
         }}>
         Answer Question
       </button>
-    </>
+    </div>
   );
 };
 
