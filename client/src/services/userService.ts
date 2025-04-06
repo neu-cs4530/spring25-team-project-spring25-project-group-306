@@ -137,26 +137,6 @@ const getKarmaByUsername = async (username: string): Promise<number> => {
   return karma;
 };
 
-/**
- * Changes the user's karma by some value.
- * @param username The unique username of the user
- * @param changeKarma The karma change
- * @returns A promise resolving to the updated user
- * @throws Error if the request fails
- */
-const changeKarmaBy = async (username: string, changeKarma: number): Promise<SafeDatabaseUser> => {
-  const karma = (await getKarmaByUsername(username)) + changeKarma;
-
-  const res = await api.patch(`${USER_API_URL}/updateKarma`, {
-    username,
-    karma,
-  });
-  if (res.status !== 200) {
-    throw new Error('Error when updating karma');
-  }
-  return res.data;
-};
-
 export {
   getUsers,
   getUserByUsername,
@@ -165,6 +145,5 @@ export {
   deleteUser,
   resetPassword,
   updateBiography,
-  changeKarmaBy,
   getKarmaByUsername,
 };

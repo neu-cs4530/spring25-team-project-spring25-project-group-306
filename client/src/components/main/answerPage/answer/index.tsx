@@ -1,6 +1,7 @@
 import MarkdownRenderer from '../../../../markdown';
 import CommentSection from '../../commentSection';
 import './index.css';
+import '../../karma.css';
 import { Comment, DatabaseComment } from '../../../../types/types';
 
 /**
@@ -41,26 +42,38 @@ const AnswerView = ({
   image,
   comments,
   handleAddComment,
-}: AnswerProps) => (
-  <div className='answer right_padding'>
-    <MarkdownRenderer text={text} />
-    <div className='answerAuthor'>
-      <div>
-        <div className='answer_author'>{ansBy}</div>
-        <div className='answer_karma'>{karma} karma</div>
+}: AnswerProps) => {
+  let karmaClass = 'karma-grey';
+  if (karma && karma < 0) {
+    karmaClass = 'karma-red';
+  } else if (karma && karma > 0) {
+    karmaClass = 'karma-green';
+  }
+
+  return (
+    <div className='answer right_padding'>
+      <div className='answer_top'>
+        <div className='answer_text'>
+          <MarkdownRenderer text={text} />
+        </div>
+        <div className='answerAuthor'>
+          <div className='answer_author'>{ansBy}</div>
+          <div className={karmaClass}>{karma} karma</div>
+          <div className='answer_question_meta'>{meta}</div>
+          {image && (
+            <img
+              src={image}
+              alt='answer'
+              className='answer_image'
+              style={{ width: '100%', maxWidth: '300px', height: 'auto' }}
+            />
+          )}
+        </div>
       </div>
-      <div className='answer_question_meta'>{meta}</div>
-      {image && (
-        <img
-          src={image}
-          alt='answer'
-          className='answer_image'
-          style={{ width: '300px', height: '300px' }}
-        />
-      )}
+
+      <CommentSection comments={comments} handleAddComment={handleAddComment} />
     </div>
-    <CommentSection comments={comments} handleAddComment={handleAddComment} />
-  </div>
-);
+  );
+};
 
 export default AnswerView;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ThumbUp, ThumbDown } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
 import { downvoteAnswer, upvoteAnswer } from '../../../services/answerService';
 import './index.css';
@@ -95,17 +97,21 @@ const VoteComponent = ({
 
   return (
     <div className='vote-container'>
-      <button
-        className={`vote-button ${voted === 1 ? 'vote-button-upvoted' : ''}`}
-        onClick={() => handleVote('upvote')}>
-        Upvote
-      </button>
-      <button
-        className={`vote-button ${voted === -1 ? 'vote-button-downvoted' : ''}`}
-        onClick={() => handleVote('downvote')}>
-        Downvote
-      </button>
+      <IconButton
+        onClick={() => handleVote('upvote')}
+        color={voted === 1 ? 'success' : 'default'}
+        aria-label='Upvote'>
+        <ThumbUp />
+      </IconButton>
+
       <span className='vote-count'>{count}</span>
+
+      <IconButton
+        onClick={() => handleVote('downvote')}
+        color={voted === -1 ? 'error' : 'default'}
+        aria-label='Downvote'>
+        <ThumbDown />
+      </IconButton>
     </div>
   );
 };

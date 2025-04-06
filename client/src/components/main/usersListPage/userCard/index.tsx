@@ -1,5 +1,5 @@
-import React from 'react';
 import './index.css';
+import '../../karma.css';
 import { SafeDatabaseUser } from '../../../../types/types';
 
 /**
@@ -23,10 +23,20 @@ interface UserProps {
 const UserCardView = (props: UserProps) => {
   const { user, handleUserCardViewClickHandler } = props;
 
+  let karmaClass = 'karma-grey';
+  if (user.karma && user.karma < 0) {
+    karmaClass = 'karma-red';
+  } else if (user.karma && user.karma > 0) {
+    karmaClass = 'karma-green';
+  }
+
   return (
     <div className='user right_padding' onClick={() => handleUserCardViewClickHandler(user)}>
       <div className='user_mid'>
         <div className='userUsername'>{user.username}</div>
+      </div>
+      <div className={karmaClass}>
+        <div>{user.karma ?? 0} karma</div>
       </div>
       <div className='userStats'>
         <div>joined {new Date(user.dateJoined).toUTCString()}</div>

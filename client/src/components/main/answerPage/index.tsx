@@ -101,7 +101,7 @@ const AnswerPage = () => {
           </React.Fragment>
         ))}
       <button
-        className='bluebtn ansButton'
+        className='bluebtn'
         onClick={() => {
           handleNewAnswer();
         }}>

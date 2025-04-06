@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import * as http from 'http';
+import UserModel from './models/users.model';
 
 import answerController from './controllers/answer.controller';
 import questionController from './controllers/question.controller';
@@ -20,6 +21,7 @@ import chatController from './controllers/chat.controller';
 import gameController from './controllers/game.controller';
 import subforumController from './controllers/subforum.controller';
 import compilerController from './controllers/compiler.controller';
+import applyKarmaDecay from "./utils/karmaDecay.util";
 import imageUploadController from './controllers/imageUpload.controller';
 
 dotenv.config();
@@ -76,6 +78,19 @@ app.get('/', (_: Request, res: Response) => {
   res.send('hello world');
   res.end();
 });
+
+// Every 24 hours, call the karma decay method
+if (process.env.NODE_ENV !== 'test') {
+  setInterval(async () => {
+    console.log('Running daily karma decay job...');
+    const res = await applyKarmaDecay();
+    if (res.success) {
+      console.log(`Successfully applied karma decay at [${new Date().toISOString()}]`);
+    } else {
+      console.log(res.error);
+    }
+  }, 24 * 60 * 60 * 1000);
+}
 
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());

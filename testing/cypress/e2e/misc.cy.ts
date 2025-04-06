@@ -10,7 +10,7 @@ describe("Cypress Tests for verifying active order and initial test data", () =>
 
   it("6.1 | Adds a question, click active button, verifies the sequence", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -72,7 +72,7 @@ describe("Cypress Tests for verifying active order and initial test data", () =>
       "Storing content as BLOBs in databases.",
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -84,7 +84,7 @@ describe("Cypress Tests for verifying active order and initial test data", () =>
 
   it("6.3 | Checks if a8 exist in q4 answers page", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q4_DESC).click();

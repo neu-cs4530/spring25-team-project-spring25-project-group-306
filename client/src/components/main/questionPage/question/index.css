@@ -46,17 +46,6 @@
   display: inline-block;
 }
 
-.question_karma {
-  border-radius: 25px;
-  width: fit-content;
-  height: fit-content;
-  padding: 5px;
-  color: white;
-  background: gray;
-  display: inline-block;
-  margin-left: 5px;
-}
-
 .question_meta {
   color: #bbbbbb;
 }

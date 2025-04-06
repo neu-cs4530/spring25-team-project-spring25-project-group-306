@@ -1,8 +1,16 @@
 .btn {
-  background: #ffffff;
-  border: #000000 1px solid;
+  padding: 5px 10px;
+  background: #dddddd;
+  border: #aaaaaa 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .btn:hover {
-  background-color: #007bff;
+  background: #cccccc;
+}
+
+.btn:active {
+  background-color: #bbbbbb;
 }

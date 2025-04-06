@@ -10,7 +10,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
 
   it("9.1 | Adds a question with a hyperlink and verifies", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -33,7 +33,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
       A2_TXT,
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -74,7 +74,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
       "[Wikipedia](tps://www.wikipedia=com)",
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Ask a Question").click();
@@ -88,7 +88,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
       cy.contains("Invalid hyperlink");
     });
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("How to add an invalid hyperlink in Markdown?").should(
@@ -98,7 +98,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
 
   it("9.4 | Attempts to add an answer with an invalid hyperlink and verifies failure", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -109,7 +109,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
     cy.contains("Post Answer").click();
     cy.contains("Invalid hyperlink");
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains(Q1_DESC).click();
@@ -118,7 +118,7 @@ describe("Cypress Tests repeated to verify adding hyperlinks to text", () => {
 
   it("9.5 | Adds multiple questions with valid hyperlinks and verify", () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
