@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './index.css';
 
 /**
  * AskQuestionButton component that renders a button for navigating to the
@@ -18,7 +19,7 @@ const AskQuestionButton = () => {
 
   return (
     <button
-      className='bluebtn'
+      className='ask-question-button'
       onClick={() => {
         handleNewQuestion();
       }}>

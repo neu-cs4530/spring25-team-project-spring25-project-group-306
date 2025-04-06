@@ -60,9 +60,13 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
 
 const MarkdownRenderer: React.FC<{ text: string }> = ({ text }) => (
   <ReactMarkdown
-    className='markdown-container'
     remarkPlugins={[remarkBreaks, remarkGfm] as PluggableList}
     components={{
+      div: ({ children, ...props }) => (
+        <div className='markdown-container' {...props}>
+          {children}
+        </div>
+      ),
       a: ({ href, children, ...props }) => {
         const isValidURL = /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/.test(href || '');
         return isValidURL ? (
