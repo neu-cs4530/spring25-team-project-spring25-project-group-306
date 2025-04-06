@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import '../../karma.css';
 import MarkdownRenderer from '../../../../markdown';
 
 /**
@@ -29,26 +30,33 @@ interface QuestionBodyProps {
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
  */
-const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyProps) => (
-  <div id='questionBody' className='questionBody right_padding'>
-    <div className='bold_title answer_question_view'>{views} views</div>
-    <MarkdownRenderer text={text} />
-    <div className='answer_question_right'>
-      <div>
+const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyProps) => {
+  let karmaClass = 'karma-grey';
+  if (karma && karma < 0) {
+    karmaClass = 'karma-red';
+  } else if (karma && karma > 0) {
+    karmaClass = 'karma-green';
+  }
+
+  return (
+    <div id='questionBody' className='questionBody right_padding'>
+      <div className='bold_title answer_question_view'>{views} views</div>
+      <MarkdownRenderer text={text} />
+      <div className='answer_question_right'>
         <div className='question_author'>{askby}</div>
-        <div className='question_karma'>{karma} karma</div>
+        <div className={karmaClass}>{karma} karma</div>
+        <div className='answer_question_meta'>asked {meta}</div>
+        {image && (
+          <img
+            src={image}
+            alt='question'
+            className='question_image'
+            style={{ width: '300px', height: '300px' }}
+          />
+        )}
       </div>
-      <div className='answer_question_meta'>asked {meta}</div>
-      {image && (
-        <img
-          src={image}
-          alt='question'
-          className='question_image'
-          style={{ width: '300px', height: '300px' }}
-        />
-      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default QuestionBody;

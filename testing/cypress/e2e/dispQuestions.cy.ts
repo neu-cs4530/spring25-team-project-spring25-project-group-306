@@ -9,7 +9,7 @@ describe("Cypress Tests to verify order of questions displayed", () => {
 
   it('1.1 | Adds three questions and one answer, then click "Questions", then click unanswered button, verifies the sequence', () => {
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
 
@@ -60,7 +60,7 @@ describe("Cypress Tests to verify order of questions displayed", () => {
     ];
 
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.get(".postTitle").each(($el, index, $list) => {
@@ -76,7 +76,7 @@ describe("Cypress Tests to verify order of questions displayed", () => {
       Q3_DESC,
     ];
     cy.visit("http://localhost:3000");
-    cy.contains('Welcome to FakeStackOverflow!');
+    cy.contains('Welcome to StackUnderflow!');
     cy.get("#usernameInput").type("testuser")
     cy.contains("Submit").click();
     cy.contains("Active").click();

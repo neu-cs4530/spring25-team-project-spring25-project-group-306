@@ -1,5 +1,5 @@
-import React from 'react';
 import './index.css';
+import '../../karma.css';
 import { SafeDatabaseUser } from '../../../../types/types';
 
 /**

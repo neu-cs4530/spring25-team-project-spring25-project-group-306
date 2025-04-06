@@ -17,7 +17,6 @@ import UsersListPage from './main/usersListPage';
 import ProfileSettings from './profileSettings';
 import AllGamesPage from './main/games/allGamesPage';
 import GamePage from './main/games/gamePage';
-import LeaderboardPage from './main/leaderboardPage';
 import SubforumPage from './main/subforumPage';
 import NewSubforumPage from './main/newSubforum';
 import SubforumDetailsPage from './main/subforumDetails';
@@ -69,7 +68,6 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/home' element={<QuestionPage />} />
             <Route path='tags' element={<TagPage />} />
             <Route path='/messaging' element={<MessagingPage />} />
-            <Route path='/leaderboard' element={<LeaderboardPage />} />
             <Route path='/messaging/direct-message' element={<DirectMessage />} />
             <Route path='/subforums/:subforumId/question/:qid' element={<AnswerPage />} />
             <Route path='/new/question' element={<NewQuestionPage />} />

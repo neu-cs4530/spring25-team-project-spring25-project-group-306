@@ -1,0 +1,26 @@
+.karma-red {
+    border-radius: 25px;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px;
+    color: white;
+    background: indianred;
+  }
+  
+  .karma-grey {
+    border-radius: 25px;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px;
+    color: white;
+    background: gray;
+  }
+  
+  .karma-green {
+    border-radius: 25px;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px;
+    color: white;
+    background: seagreen;
+  }
