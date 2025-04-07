@@ -17,7 +17,7 @@ const GameCard = ({
 }) => (
   <div className='game-item'>
     <p>
-      <strong>Game ID:</strong> {game.gameID} | <strong>Status:</strong> {game.state.status}
+      <strong>Status:</strong> {game.state.status}
     </p>
     <ul className='game-players'>
       {game.players.map((player: string) => (
