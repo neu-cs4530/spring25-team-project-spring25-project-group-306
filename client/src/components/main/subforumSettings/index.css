@@ -14,6 +14,13 @@
   color: #333;
 }
 
+.subforum-settings-form {
+  display: block;
+  gap: 20px;
+  width: 100%;
+  margin-right: 0px;
+}
+
 .settings-actions {
   display: flex;
   justify-content: space-between;

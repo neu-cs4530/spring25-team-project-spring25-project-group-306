@@ -65,7 +65,7 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     <div className='subforum-settings-container'>
       <h1>Subforum Settings</h1>
       {updateError && <div className='error-message'>{updateError}</div>}
-      <form onSubmit={handleSubmit} className='subforum-settings-form'>
+      <div onSubmit={handleSubmit} className='subforum-settings-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title</label>
           <input
@@ -184,8 +184,7 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
             Save Changes
           </button>
         </div>
-      </form>
-
+      </div>
       <div className='danger-zone'>
         <h2>Danger Zone</h2>
         <button className='delete-button' onClick={() => setShowDeleteConfirm(true)}>
