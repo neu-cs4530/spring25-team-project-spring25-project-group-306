@@ -66,7 +66,7 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     <div className='subforum-settings-container'>
       <h1>Subforum Settings</h1>
       {updateError && <div className='error-message'>{updateError}</div>}
-      <div onSubmit={handleSubmit} className='subforum-settings-form'>
+      <div className='subforum-settings-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title</label>
           <input
