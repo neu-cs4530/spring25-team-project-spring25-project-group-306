@@ -28,7 +28,7 @@
   color: #2c3e50;
 }
 
-#question_count {
+.question_count {
   color: #6c757d;
   font-size: 14px;
 }
@@ -63,7 +63,6 @@
 .question-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
 }
 
 .question-item {

@@ -165,10 +165,10 @@ const NewSubforum: React.FC = () => {
         )}
 
         <div className='form-actions'>
-          <button type='button' onClick={() => navigate('/subforums')} className='cancel-button'>
+          <button type='button' onClick={() => navigate('/subforums')} className='cancel-button-1'>
             Cancel
           </button>
-          <button type='submit' className='submit-button'>
+          <button type='submit' className='submit-button-1'>
             Create Subforum
           </button>
         </div>
