@@ -41,11 +41,16 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     setShowDeleteConfirm,
     updateSubforum,
     deleteSubforum,
+    userList,
   } = useSubforumSettings(subforumId);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateSubforum();
+  };
+
+  const handleModeratorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setModerators(e.target.value);
   };
 
   if (loading) {
@@ -101,13 +106,20 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
 
         <div className='form-group'>
           <label htmlFor='moderators'>Moderators (one per line)</label>
-          <textarea
+          <select
             id='moderators'
             value={moderators}
-            onChange={e => setModerators(e.target.value)}
-            placeholder='Enter moderators (one per line)'
-            className={moderatorsErr ? 'error' : ''}
-          />
+            onChange={handleModeratorChange}
+            className={moderatorsErr ? 'error' : ''}>
+            {userList.map(user => (
+              <option
+                key={user.username}
+                value={user.username}
+                className={moderators.includes(user.username) ? 'selected' : ''}>
+                {user.username}
+              </option>
+            ))}
+          </select>
           {moderatorsErr && <div className='error-message'>{moderatorsErr}</div>}
         </div>
 

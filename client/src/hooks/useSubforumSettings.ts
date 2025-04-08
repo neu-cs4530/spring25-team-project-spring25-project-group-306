@@ -5,6 +5,8 @@ import {
   DatabaseUpdateSubforumRequest,
 } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
+import { getUsers } from '../services/userService';
+import { SafeDatabaseUser } from '../types/types';
 
 /**
  * Custom hook to manage subforum settings and updates.
@@ -33,8 +35,21 @@ const useSubforumSettings = (subforumId: string | undefined) => {
   const [rulesErr, setRulesErr] = useState('');
   const [moderatorsErr, setModeratorsErr] = useState('');
   const [membersErr, setMembersErr] = useState('');
+  const [userList, setUserList] = useState<SafeDatabaseUser[]>([]);
 
   useEffect(() => {
+    /**
+     * Function to fetch users based and update the user list
+     */
+    const fetchData = async () => {
+      try {
+        const res = await getUsers();
+        setUserList(res || []);
+      } catch (err) {
+        setError('Failed to fetch users');
+      }
+    };
+
     const fetchSubforum = async () => {
       if (!subforumId) {
         setError('No subforum ID provided');
@@ -82,6 +97,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     };
 
     fetchSubforum();
+    fetchData();
   }, [subforumId, user?.username, navigate]);
 
   // Validate form inputs
@@ -171,10 +187,6 @@ const useSubforumSettings = (subforumId: string | undefined) => {
       .map(member => member.trim())
       .filter(member => member !== '');
 
-    // Ensure current user is included as a moderator and member
-    if (!moderatorsList.includes(user.username)) {
-      moderatorsList.push(user.username);
-    }
     if (!membersList.includes(user.username)) {
       membersList.push(user.username);
     }
@@ -260,6 +272,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     setShowDeleteConfirm,
     updateSubforum,
     deleteSubforum,
+    userList,
   };
 };
 
