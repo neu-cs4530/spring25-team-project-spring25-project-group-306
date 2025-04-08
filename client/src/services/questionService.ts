@@ -109,6 +109,13 @@ const downvoteQuestion = async (
   return res.data;
 };
 
+/**
+ * Function to pin or unpin a question.
+ *
+ * @param pid - The id of the question to pin or unpin.
+ * @param pin - A boolean indicating whether to pin (true) or unpin (false) the question.
+ * @throws Error if there is an issue pinning or unpinning the question.
+ */
 const pinUnpinQuestion = async (pid: string, pin: boolean): Promise<QuestionResponse> => {
   const data = { pid, pinned: pin };
   const res = await api.post(`${QUESTION_API_URL}/pinUnpinQuestion`, data);

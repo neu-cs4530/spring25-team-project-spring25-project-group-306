@@ -9,6 +9,14 @@ const SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || '';
 const REGION = process.env.AWS_REGION || '';
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || '';
 
+/**
+ * Uploads an image file to an AWS S3 bucket and returns the public URL of the uploaded file.
+ *
+ * @param file - The file object provided by Multer middleware, containing the image to be uploaded.
+ * @returns A promise that resolves to the public URL of the uploaded image, or `null` if the upload fails.
+ *
+ * @throws Will log an error to the console if the upload process encounters an issue.
+ */
 const uploadImageToAWS = async (file: Express.Multer.File): Promise<string | null> => {
   const s3 = new AWS.S3({
     accessKeyId: ACCESS_KEY_ID,

@@ -6,6 +6,16 @@ import {
 } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
 
+/**
+ *  Custom hook to fetch and manage subforum details.
+ *  It handles loading and error states, and provides a function to navigate to subforum settings.
+ *  It also listens for online users updates via a WebSocket connection.
+ *  The hook returns the subforum data, loading state, error message, and a function to refetch the data.
+ *  It also provides a boolean indicating if the current user is a moderator of the subforum.
+ *  @param subforumId - The ID of the subforum to fetch.
+ *  @returns An object containing the subforum data, loading state, error message, isModerator flag,
+ *           navigateToSettings function, and refetch function.
+ */
 const useSubforumDetails = (subforumId: string | undefined) => {
   const navigate = useNavigate();
   const { user, socket } = useUserContext();
@@ -105,6 +115,12 @@ const useSubforumDetails = (subforumId: string | undefined) => {
     Array.isArray(subforum.moderators) &&
     subforum.moderators.includes(user.username);
 
+  /**
+   * Navigate to the subforum settings page.
+   * This function is called when the user clicks on the settings button.
+   * It checks if the subforumId is available and then navigates to the settings page.
+   * @returns {void}
+   */
   const navigateToSettings = () => {
     if (subforumId) {
       navigate(`/subforums/${subforumId}/settings`);

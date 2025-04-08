@@ -10,6 +10,7 @@ import { Schema } from 'mongoose';
  * - `comments`: Comments that have been added to the answer by users.
  * - 'upvotes': The usernames of the users who have upvoted the answer.
  * - 'downvotes': The usernames of the users who have downvoted the answer.
+ * - `image`: An optional field for storing an image associated with the answer.
  */
 const answerSchema: Schema = new Schema(
   {

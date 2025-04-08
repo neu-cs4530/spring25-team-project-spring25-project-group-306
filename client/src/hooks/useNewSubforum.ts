@@ -40,6 +40,12 @@ const useNewSubforum = () => {
   const [rulesErr, setRulesErr] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   *  Function to validate the form before creating a subforum.
+   *  It checks for empty fields, character limits, and valid input formats.
+   *  Sets error messages for invalid fields.
+   * @returns boolean - True if the form is valid, false otherwise.
+   */
   const validateForm = (): boolean => {
     let isValid = true;
 
@@ -100,6 +106,11 @@ const useNewSubforum = () => {
     return isValid;
   };
 
+  /**
+   * Function to create a new subforum.
+   * It validates the form, constructs the subforum data object,
+   * and sends a POST request to the server.
+   */
   const createSubforum = async () => {
     if (!validateForm()) return;
 

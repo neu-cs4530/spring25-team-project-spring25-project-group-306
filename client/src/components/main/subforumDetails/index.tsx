@@ -6,6 +6,12 @@ import useSubforumQuestions from '../../../hooks/useSubforumQuestions';
 import NewQuestion from '../newQuestion';
 import './index.css';
 
+/**
+ * SubforumDetailsPage component displays the details of a specific subforum,
+ * including its title, description, rules, moderators, and a list of questions.
+ * It allows moderators to pin/unpin questions and add new questions.
+ * It also provides a button to navigate to the subforum settings.
+ */
 const SubforumDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const { subforumId } = useParams<{ subforumId: string }>();
@@ -37,12 +43,29 @@ const SubforumDetailsPage: React.FC = () => {
     return <div className='error'>Error: {subforumError || 'Subforum not found'}</div>;
   }
 
+  /**
+   * This function is used to handle the click event on a question title.
+   * It navigates the user to the question details page.
+   * It checks if the question ID and subforum ID are available before navigating.
+   * If either ID is missing, it throws an error.
+   * This ensures that the navigation only occurs when valid IDs are provided.
+   * @param question The question object to navigate to.
+   *
+   * @returns {void}
+   * @throws {Error} If the question ID or subforum ID is not available.
+   */
   const handleQuestionClick = (question: Question): void => {
     if (question._id && subforumId) {
       navigate(`/subforums/${subforumId}/question/${question._id}`);
     }
   };
 
+  /**
+   * This function is used to handle the click event on the "Ask a Question" button.
+   * It opens the modal for asking a new question.
+   *
+   * @returns {void}
+   */
   const renderQuestion = (question: Question) => {
     if (questionsError) {
       return <div className='error'>Error loading question: {questionsError}</div>;

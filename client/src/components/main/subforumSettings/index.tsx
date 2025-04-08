@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import useSubforumSettings from '../../../hooks/useSubforumSettings';
 import './index.css';
 
+/**
+ * SubforumSettings component for managing subforum settings.
+ * It includes fields for title, description, tags, moderators, members, rules, and visibility.
+ * The component handles form submission, error handling, and deletion confirmation.
+ *
+ * @param {string} subforumId - The ID of the subforum being managed.
+ * @returns {JSX.Element} The rendered SubforumSettings component.
+ */
 const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
   const navigate = useNavigate();
   const {

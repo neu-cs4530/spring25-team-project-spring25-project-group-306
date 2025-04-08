@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import useNewSubforum from '../../../hooks/useNewSubforum';
 import './index.css';
 
+/**
+ * NewSubforum component for creating a new subforum.
+ * It includes fields for title, description, tags, moderators, members, rules, and visibility.
+ * The component handles form submission and error handling.
+ *
+ * @returns {JSX.Element} The rendered NewSubforum component.
+ */
 const NewSubforum: React.FC = () => {
   const navigate = useNavigate();
   const {

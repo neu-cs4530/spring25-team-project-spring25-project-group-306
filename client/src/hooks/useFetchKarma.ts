@@ -13,6 +13,9 @@ const useFetchKarma = (usernames: string[]) => {
   useEffect(() => {
     if (stableUsernames.length === 0) return;
 
+    /**
+     * Fetch karma for each username and update the state.
+     */
     const fetchKarma = async () => {
       const karmaResults = await Promise.allSettled(
         stableUsernames.map(async username => ({

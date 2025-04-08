@@ -4,11 +4,24 @@ import useUserContext from '../../../hooks/useUserContext';
 import useNewQuestion from '../../../hooks/useNewQuestion';
 import './index.css';
 
+/**
+ * NewQuestion component for creating a new question.
+ * It includes fields for title, text, tags, and an optional image upload.
+ * The component handles form submission, image upload, and error handling.
+ */
 interface NewQuestionProps {
   subforumId?: string;
   onQuestionAdded?: () => void;
 }
 
+/**
+ * NewQuestion component that allows users to ask a new question.
+ * It includes fields for title, text, tags, and an optional image upload.
+ * The component handles form submission, image upload, and error handling.
+ *
+ * @param subforumId Optional ID of the subforum where the question is being asked.
+ * @param onQuestionAdded Optional callback function to be called after a question is successfully added.
+ */
 const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }) => {
   const navigate = useNavigate();
   const { user } = useUserContext();
