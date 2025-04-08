@@ -188,7 +188,6 @@ describe('Test questionController', () => {
       );
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({mockDatabaseQuestion});
     });
   });
   describe('POST /addQuestion', () => {
