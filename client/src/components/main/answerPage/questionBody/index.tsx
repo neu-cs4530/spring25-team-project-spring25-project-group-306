@@ -41,7 +41,9 @@ const QuestionBody = ({ views, text, image, askby, karma, meta }: QuestionBodyPr
   return (
     <div id='questionBody' className='questionBody right_padding'>
       <div className='bold_title answer_question_view'>{views} views</div>
-      <MarkdownRenderer text={text} />
+      <div className='markdown-container'>
+        <MarkdownRenderer text={text} />
+      </div>
       <div className='answer_question_right'>
         <div className='question_author'>{askby}</div>
         <div className={karmaClass}>{karma} karma</div>
