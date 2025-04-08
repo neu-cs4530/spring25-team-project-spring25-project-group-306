@@ -24,7 +24,7 @@ const useNewQuestion = () => {
   const [title, setTitle] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [tagNames, setTagNames] = useState<string>('');
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>('No Image Uploaded');
 
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
