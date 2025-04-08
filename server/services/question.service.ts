@@ -201,9 +201,11 @@ export const addVoteToQuestion = async (
   username: string,
   voteType: 'upvote' | 'downvote',
 ): Promise<VoteResponse> => {
+  // Define the update operation based on the vote type (upvote or downvote)
   let updateOperation: QueryOptions;
 
   if (voteType === 'upvote') {
+    // Handle the upvote logic: add/remove the username from upVotes and adjust downVotes accordingly
     updateOperation = [
       {
         $set: {
@@ -225,6 +227,7 @@ export const addVoteToQuestion = async (
       },
     ];
   } else {
+    // Handle the downvote logic: add/remove the username from downVotes and adjust upVotes accordingly
     updateOperation = [
       {
         $set: {
@@ -248,53 +251,62 @@ export const addVoteToQuestion = async (
   }
 
   try {
+    // Update the question document in the database with the new vote operation
     const result: DatabaseQuestion | null = await QuestionModel.findOneAndUpdate(
       { _id: pid },
       updateOperation,
       { new: true },
     );
 
+    // If the question is not found, return an error
     if (!result) {
       return { error: 'Question not found!' };
     }
 
+    // Initialize variables for the response message and karma change
     let msg = '';
     let karmaChange = 0;
+
+    // Check if the user has already upvoted or downvoted the post
     const alreadyUpvoted = post.upVotes.includes(username);
     const alreadyDownvoted = post.downVotes.includes(username);
 
+    // Determine the message and karma change based on the vote type and current state
     if (voteType === 'upvote') {
       if (alreadyDownvoted) {
         msg = 'Question upvoted successfully';
-        karmaChange = 2;
+        karmaChange = 2; // Switching from downvote to upvote
       } else if (!alreadyUpvoted) {
         msg = 'Question upvoted successfully';
-        karmaChange = 1;
+        karmaChange = 1; // Adding a new upvote
       } else {
         msg = 'Upvote cancelled successfully';
-        karmaChange = -1;
+        karmaChange = -1; // Removing an existing upvote
       }
     } else if (alreadyUpvoted) {
       msg = 'Question downvoted successfully';
-      karmaChange = -2;
+      karmaChange = -2; // Switching from upvote to downvote
     } else if (!alreadyDownvoted) {
       msg = 'Question downvoted successfully';
-      karmaChange = -1;
+      karmaChange = -1; // Adding a new downvote
     } else {
       msg = 'Downvote cancelled successfully';
-      karmaChange = 1;
+      karmaChange = 1; // Removing an existing downvote
     }
 
+    // Update the creator's karma if there is a change
     if (karmaChange !== 0) {
       await updateUserKarma(creatorUsername, karmaChange);
     }
 
+    // Return the updated vote result and message
     return {
       msg,
       upVotes: result.upVotes || [],
       downVotes: result.downVotes || [],
     };
   } catch (err) {
+    // Handle any errors that occur during the update operation
     return {
       error:
         voteType === 'upvote'
@@ -304,6 +316,12 @@ export const addVoteToQuestion = async (
   }
 };
 
+/**
+ * Updates the pin status of a question.
+ * @param {string} pid - The ID of the question to update.
+ * @param {boolean} pinned - The new pin status to set for the question.
+ * @returns {Promise<QuestionResponse>} - The updated question or an error message if the operation fails.
+ */
 export const updateQuestionPin = async (
   pid: string,
   pinned: boolean,

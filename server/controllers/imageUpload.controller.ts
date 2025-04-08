@@ -4,9 +4,20 @@ import uploadImageToAWS from '../services/imageUpload.service';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+/**
+ * Image upload controller for handling image uploads to AWS S3.
+ *
+ * @returns {Router} The router for handling image upload requests.
+ */
 const imageUploadController = () => {
   const router: Router = express.Router();
 
+  /**
+   * Handles image upload requests.
+   *
+   * @param {Request} req - The request object containing the image file.
+   * @param {Response} res - The response object to send the result.
+   */
   const uploadImage = async (req: Request, res: Response) => {
     try {
       const { file } = req;

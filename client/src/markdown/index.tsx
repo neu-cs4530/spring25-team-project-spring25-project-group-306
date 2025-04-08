@@ -7,11 +7,21 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import executeCode from '../services/compilerService';
 
+/**
+ * CodeBlock component that renders a code block
+ */
 interface CodeBlockProps {
   language: string;
   code: string;
 }
 
+/**
+ * CodeBlock component that renders a code block with execution.
+ * It allows users to run the code and copy it to the clipboard.
+ *
+ * @param language The programming language of the code block.
+ * @param code The code to be executed and displayed.
+ */
 const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -31,6 +41,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
     setIsRunning(false);
   };
 
+  // Function to copy code to clipboard
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(code);
     setCopySuccess(true);
@@ -58,6 +69,12 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, code }) => {
   );
 };
 
+/**
+ * MarkdownRenderer component that renders markdown text with custom components.
+ * It supports code blocks and hyperlinks.
+ *
+ * @param text The markdown text to be rendered.
+ */
 const MarkdownRenderer: React.FC<{ text: string }> = ({ text }) => (
   <ReactMarkdown
     remarkPlugins={[remarkBreaks, remarkGfm] as PluggableList}

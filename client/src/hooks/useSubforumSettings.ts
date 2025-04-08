@@ -6,6 +6,12 @@ import {
 } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
 
+/**
+ * Custom hook to manage subforum settings and updates.
+ *
+ * @param subforumId - The ID of the subforum to manage.
+ * @returns An object containing state variables and functions for managing subforum settings.
+ */
 const useSubforumSettings = (subforumId: string | undefined) => {
   const navigate = useNavigate();
   const { user } = useUserContext();
@@ -78,6 +84,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     fetchSubforum();
   }, [subforumId, user?.username, navigate]);
 
+  // Validate form inputs
   const validateForm = (): boolean => {
     let isValid = true;
 
@@ -145,6 +152,11 @@ const useSubforumSettings = (subforumId: string | undefined) => {
     return isValid;
   };
 
+  /**
+   * Function to update the subforum settings.
+   *
+   * @returns {void}
+   */
   const updateSubforum = async () => {
     if (!validateForm() || !subforumId) return;
 

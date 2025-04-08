@@ -86,6 +86,9 @@ const useSubforums = () => {
     };
   }, [socket]);
 
+  /**
+   * Function to fetch subforums from the server.
+   */
   const fetchSubforums = async () => {
     try {
       setLoading(true);
@@ -134,19 +137,23 @@ const useSubforums = () => {
     fetchSubforums();
   }, []);
 
+  // Function to navigate to a specific subforum
   const navigateToSubforum = (subforumId: string) => {
     // The join logic is handled in the location effect
     navigate(`/subforums/${subforumId}`);
   };
 
+  // Function to create a new subforum
   const createNewSubforum = () => {
     navigate('/new/subforum');
   };
 
+  // Function to refresh the subforums list
   const refreshSubforums = () => {
     fetchSubforums();
   };
 
+  // Function to check if the user can create a subforum
   const canCreateSubforum = () => !!user;
 
   return {

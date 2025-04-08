@@ -14,6 +14,9 @@ import { Schema } from 'mongoose';
  * - `upVotes`: An array of usernames that have upvoted the question.
  * - `downVotes`: An array of usernames that have downvoted the question.
  * - `comments`: Comments that have been added to the question by users.
+ * - `image`: An optional field for storing an image associated with the question.
+ * - `subforumId`: An optional reference to the `Subforum` document where the question was asked.
+ * - `pinned`: A boolean indicating whether the question is pinned or not.
  */
 const questionSchema: Schema = new Schema(
   {

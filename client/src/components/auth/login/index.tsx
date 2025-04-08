@@ -6,6 +6,7 @@ import useAuth from '../../../hooks/useAuth';
 /**
  * Renders a login form with username and password inputs, password visibility toggle,
  * error handling, and a link to the signup page.
+ *
  */
 const Login = () => {
   const {
