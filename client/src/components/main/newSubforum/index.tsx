@@ -37,8 +37,7 @@ const NewSubforum: React.FC = () => {
     createSubforum,
   } = useNewSubforum();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     createSubforum();
   };
 
@@ -46,7 +45,7 @@ const NewSubforum: React.FC = () => {
     <div className='new-subforum-container'>
       <h1>Create a New Subforum</h1>
       {error && <div className='error-message'>{error}</div>}
-      <div onSubmit={handleSubmit} className='new-subforum-form'>
+      <div className='new-subforum-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title *</label>
           <input
@@ -168,7 +167,7 @@ const NewSubforum: React.FC = () => {
           <button type='button' onClick={() => navigate('/subforums')} className='cancel-button-1'>
             Cancel
           </button>
-          <button type='submit' className='submit-button-1'>
+          <button type='button' onClick={() => handleSubmit()} className='submit-button-1'>
             Create Subforum
           </button>
         </div>
