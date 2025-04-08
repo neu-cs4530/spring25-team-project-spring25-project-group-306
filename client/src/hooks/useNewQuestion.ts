@@ -123,6 +123,11 @@ const useNewQuestion = () => {
     }
   };
 
+  /**
+   * Function to handle file input change and upload the image.
+   *
+   * @param e - The event object from the file input change.
+   */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
       setImage('No File Selected');

@@ -256,6 +256,15 @@ const questionController = (socket: FakeSOSocket) => {
     await voteQuestion(req, res, 'downvote');
   };
 
+  /**
+   * Pins or unpins a question based on the provided request body. If the request is invalid,
+   * the HTTP response status is updated.
+   *
+   * @param req The PinUnpinRequest object containing the question ID and the pin status.
+   * @param res The HTTP response object used to send back the result of the operation.
+   *
+   * @returns A Promise that resolves to void.
+   */
   const pinUnpinQuestion = async (req: PinUnpinRequest, res: Response): Promise<void> => {
     const { pid, pinned } = req.body;
 
@@ -276,6 +285,11 @@ const questionController = (socket: FakeSOSocket) => {
   /**
    * Deletes a question by its unique ID. If the ID is invalid or the question is not found,
    * the appropriate HTTP response status and message are returned.
+   *
+   * @param req The FindAndDeleteQuestionByID object containing the question ID as a parameter.
+   * @param res The HTTP response object used to send back the result of the operation.
+   *
+   * @returns A Promise that resolves to void.
    */
   const deleteQuestion = async (req: FindAndDeleteQuestionByID, res: Response): Promise<void> => {
     const { qid } = req.params;

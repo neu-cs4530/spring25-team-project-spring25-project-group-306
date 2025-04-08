@@ -4,6 +4,12 @@ import useSubforums from '../../hooks/useSubforums';
 import useUserContext from '../../hooks/useUserContext';
 import './subforumPage.css';
 
+/**
+ * SubforumPage component that displays a list of subforums.
+ * It allows users to navigate to subforum details and create new subforums.
+ * It handles loading and error states, and displays a message for private subforums.
+ * @returns {JSX.Element} The rendered SubforumPage component.
+ */
 const SubforumPage: React.FC = () => {
   const { subforums, loading, error, navigateToSubforum, createNewSubforum, canCreateSubforum } =
     useSubforums();

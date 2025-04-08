@@ -16,6 +16,14 @@ import {
 } from '../services/answer.service';
 import { populateDocument } from '../utils/database.util';
 
+/**
+ * The `answerController` function creates an Express router for handling answer-related operations.
+ * It includes routes for adding, upvoting, downvoting, and deleting answers.
+ *
+ * @param socket - An instance of the FakeSOSocket used for emitting events to connected clients.
+ *
+ * @returns An Express router with the defined routes and their corresponding handlers.
+ */
 const answerController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
@@ -166,6 +174,16 @@ const answerController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Deletes an answer from the database. The answer ID is extracted from the request parameters.
+   * If the answer is successfully deleted, the updated answer list is populated and sent back.
+   * If there is an error, the HTTP response's status is updated.
+   *
+   * @param req The DeleteAnswerRequest object containing the answer ID to be deleted.
+   * @param res The HTTP response object used to send back the result of the operation.
+   *
+   * @returns A Promise that resolves to void.
+   */
   const deleteAnswer = async (req: DeleteAnswerRequest, res: Response): Promise<void> => {
     const { aid } = req.params;
 

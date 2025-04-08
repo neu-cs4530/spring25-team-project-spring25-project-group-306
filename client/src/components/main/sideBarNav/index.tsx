@@ -11,10 +11,20 @@ const SideBarNav = () => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const location = useLocation();
 
+  /**
+   * Toggles the visibility of the additional messaging options.
+   */
   const toggleOptions = () => {
     setShowOptions(!showOptions);
   };
 
+  /**
+   * Determines if the current path matches the provided path.
+   * If it does, it returns a class name to indicate that the option is selected.
+   *
+   * @param path The path to check against the current location pathname.
+   * @returns A string representing the class name for the selected option.
+   */
   const isActiveOption = (path: string) =>
     location.pathname === path ? 'message-option-selected ' : '';
 

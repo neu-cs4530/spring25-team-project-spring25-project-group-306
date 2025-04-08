@@ -76,6 +76,12 @@ const useAnswerForm = () => {
     }
   };
 
+  /**
+   * Function to handle file input changes and upload the selected image.
+   * It sets the image state to the uploaded image URL or an error message.
+   *
+   * @param e - The change event from the file input.
+   */
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
       return;
