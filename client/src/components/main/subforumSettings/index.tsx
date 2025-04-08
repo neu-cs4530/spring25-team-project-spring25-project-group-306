@@ -44,13 +44,14 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     userList,
   } = useSubforumSettings(subforumId);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     updateSubforum();
   };
 
   const handleModeratorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setModerators(e.target.value);
+    const newModerators = e.target.value.split(',').map(mod => mod.trim());
+    const updatedModerators = Array.from(new Set([...moderators, ...newModerators]));
+    setModerators(updatedModerators);
   };
 
   if (loading) {
@@ -65,7 +66,7 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     <div className='subforum-settings-container'>
       <h1>Subforum Settings</h1>
       {updateError && <div className='error-message'>{updateError}</div>}
-      <div onSubmit={handleSubmit} className='subforum-settings-form'>
+      <div className='subforum-settings-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title</label>
           <input
@@ -105,10 +106,10 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
         </div>
 
         <div className='form-group'>
-          <label htmlFor='moderators'>Moderators (one per line)</label>
+          <label htmlFor='moderators'>Add Moderators (one per line)</label>
           <select
             id='moderators'
-            value={moderators}
+            value={moderators[-1]}
             onChange={handleModeratorChange}
             className={moderatorsErr ? 'error' : ''}>
             {userList.map(user => (
@@ -120,6 +121,14 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
               </option>
             ))}
           </select>
+          <div className='moderator-list'>
+            <h3>Current Moderators</h3>
+            <ul>
+              {moderators.map(moderator => (
+                <li key={moderator}>{moderator}</li>
+              ))}
+            </ul>
+          </div>
           {moderatorsErr && <div className='error-message'>{moderatorsErr}</div>}
         </div>
 
@@ -180,7 +189,7 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
             className='cancel-button'>
             Cancel
           </button>
-          <button type='submit' className='submit-button'>
+          <button type='button' onClick={() => handleSubmit()} className='submit-button'>
             Save Changes
           </button>
         </div>
@@ -191,7 +200,6 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
           Delete Subforum
         </button>
       </div>
-
       {showDeleteConfirm && (
         <div className='delete-confirmation-modal'>
           <div className='modal-content'>

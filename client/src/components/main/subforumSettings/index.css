@@ -176,3 +176,8 @@
   color: #666;
   margin-top: 4px;
 }
+
+.selected {
+  background-color: #d3d3d3; /* Highlight color */
+  color: #000; /* Text color */
+}
