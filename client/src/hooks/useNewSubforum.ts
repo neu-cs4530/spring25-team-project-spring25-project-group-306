@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateSubforumRequest } from '@fake-stack-overflow/shared/types/subforum';
 import useUserContext from './useUserContext';
-
+import { getUsers } from '../services/userService';
+import { SafeDatabaseUser } from '../types/types';
 /**
  * Custom hook to handle subforum creation and form validation
  *
@@ -28,8 +29,8 @@ const useNewSubforum = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
-  const [moderators, setModerators] = useState('');
-  const [members, setMembers] = useState('');
+  const [moderators, setModerators] = useState(['']);
+  const [members, setMembers] = useState(['']);
   const [rules, setRules] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [titleErr, setTitleErr] = useState('');
@@ -39,6 +40,24 @@ const useNewSubforum = () => {
   const [membersErr, setMembersErr] = useState('');
   const [rulesErr, setRulesErr] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [userList, setUserList] = useState<SafeDatabaseUser[]>([]);
+
+  useEffect(() => {
+    setModerators([user?.username || '']);
+
+    /**
+     * Function to fetch users based and update the user list
+     */
+    const fetchData = async () => {
+      try {
+        const res = await getUsers();
+        setUserList(res || []);
+      } catch (err) {
+        setError('Failed to fetch users');
+      }
+    };
+    fetchData();
+  }, [navigate, user?.username]);
 
   /**
    *  Function to validate the form before creating a subforum.
@@ -96,7 +115,11 @@ const useNewSubforum = () => {
     setModeratorsErr('');
 
     // Members are required for private subforums
-    if (!isPublic && !members.trim()) {
+    if (
+      !isPublic &&
+      (!members ||
+        members.map(member => member.trim()).filter(member => member !== '').length === 0)
+    ) {
       setMembersErr('Members are required for private subforums');
       isValid = false;
     } else {
@@ -116,14 +139,8 @@ const useNewSubforum = () => {
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     const rulesList = rules.split('\n').filter(rule => rule.trim() !== '');
-    const moderatorsList = moderators
-      .split('\n')
-      .map(mod => mod.trim())
-      .filter(mod => mod !== '');
-    const membersList = members
-      .split('\n')
-      .map(member => member.trim())
-      .filter(member => member !== '');
+    const moderatorsList = moderators.map(mod => mod.trim()).filter(mod => mod !== '');
+    const membersList = members.map(member => member.trim()).filter(member => member !== '');
 
     // Ensure current user is included as a moderator and member
     if (!moderatorsList.includes(user.username)) {
@@ -188,6 +205,7 @@ const useNewSubforum = () => {
     rulesErr,
     error,
     createSubforum,
+    userList,
   };
 };
 
