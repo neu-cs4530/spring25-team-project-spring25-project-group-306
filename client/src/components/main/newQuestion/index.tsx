@@ -43,6 +43,7 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
     textErr,
     tagErr,
     postQuestion,
+    handleFileChange,
   } = useNewQuestion();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,6 +129,7 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
   // Handle image upload completely on the client side
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    handleFileChange(e);
     if (!file) return;
 
     // Check file type
@@ -243,6 +245,7 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
               </button>
             </div>
           )}
+          <p>Link: {image}</p>
         </div>
 
         <button type='submit' className='submit-button' disabled={isSubmitting}>

@@ -105,7 +105,6 @@ const useNewQuestion = () => {
       downVotes: [],
       views: [],
       comments: [],
-      image: image || undefined,
       pinned: false,
     };
 
