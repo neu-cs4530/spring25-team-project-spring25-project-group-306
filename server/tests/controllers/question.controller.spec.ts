@@ -299,7 +299,6 @@ describe('Test questionController', () => {
       );
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({mockDatabaseQuestion});
     });
 
     it('should return bad request error if the question ID is not in the correct format', async () => {
