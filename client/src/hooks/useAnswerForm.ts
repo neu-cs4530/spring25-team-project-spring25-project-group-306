@@ -63,7 +63,6 @@ const useAnswerForm = () => {
       comments: [],
       upVotes: [],
       downVotes: [],
-      image: image || undefined,
     };
 
     const resAnswer = await addAnswer(questionID, answer);
