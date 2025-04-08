@@ -15,7 +15,7 @@ import uploadImage from '../services/imageUploadService';
  * @returns postAnswer - the function to submit the answer after validation.
  */
 const useAnswerForm = () => {
-  const { subforumId, qid } = useParams();
+  const { qid } = useParams();
   const navigate = useNavigate();
 
   const { user } = useUserContext();
@@ -71,7 +71,7 @@ const useAnswerForm = () => {
 
     if (resAnswer && resAnswer._id) {
       // navigate to the question that was answered
-      navigate(`/subforums/${subforumId}/question/${questionID}`);
+      navigate(`/question/${questionID}`);
     }
   };
 
