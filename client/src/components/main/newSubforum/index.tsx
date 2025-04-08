@@ -46,7 +46,7 @@ const NewSubforum: React.FC = () => {
     <div className='new-subforum-container'>
       <h1>Create a New Subforum</h1>
       {error && <div className='error-message'>{error}</div>}
-      <form onSubmit={handleSubmit} className='new-subforum-form'>
+      <div onSubmit={handleSubmit} className='new-subforum-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title *</label>
           <input
@@ -172,7 +172,7 @@ const NewSubforum: React.FC = () => {
             Create Subforum
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
