@@ -184,7 +184,9 @@ describe('Answer Controller', () => {
       };
 
       saveAnswerSpy.mockResolvedValueOnce(mockAnswer);
-      addAnswerToQuestionSpy.mockResolvedValueOnce({ error: 'Error when adding answer to question' });
+      addAnswerToQuestionSpy.mockResolvedValueOnce({
+        error: 'Error when adding answer to question',
+      });
 
       const response = await supertest(app).post('/answer/addAnswer').send(mockReqBody);
 
