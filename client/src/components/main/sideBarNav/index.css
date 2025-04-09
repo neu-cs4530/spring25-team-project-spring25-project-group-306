@@ -1,43 +1,57 @@
 .sideBarNav {
   display: flex;
   flex-direction: column;
-  width: 15%;
-  border-right: dashed;
-  padding: 4% 0 4% 0;
-  align-items: center;
-}
-
-.menu_button:first-child {
-  margin-top: 0;
+  width: 240px;
+  background: #ffffff;
+  padding: 90px 0 2rem 0;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+  border-right: 1px solid #e1e1e1;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .menu_button {
-  height: 40px;
-  width: 80%;
-  margin-top: 20px;
-  border-radius: 5px;
-  text-align: center;
-  line-height: 40px;
-  color: cornflowerblue;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  width: 100%;
+  padding: 0 1rem;
+  font-size: 22px;
+  color: #2c3e50;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.menu_button:hover {
+  color: #0095ff;
+  background-color: #f8f9fa;
 }
 
 .menu_selected {
-  background: #cccccc;
+  color: #0095ff;
+  background-color: #f1f8ff;
+  border-left: 3px solid #0095ff;
+  font-weight: 500;
 }
 
 .additional-options {
-  display: flex;
-  flex-direction: column;
-  padding: 4% 0 4% 0;
-  align-items: center;
+  margin-left: 1rem;
+  border-left: 1px solid #e1e1e1;
 }
 
 .message-options {
-  width: max-content;
+  padding-left: 1.5rem;
+  font-size: 16px;
 }
 
 .message-option-selected {
-  background: #3090e2;
-  color: white;
-  width: 110%;
+  color: #0095ff;
+  background-color: #f1f8ff;
+  border-left: 3px solid #0095ff;
 }

@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { Answer, PopulatedDatabaseAnswer } from './answer';
 import { DatabaseTag, Tag } from './tag';
 import { Comment, DatabaseComment } from './comment';
-
+import { Post } from './post';
 /**
  * Type representing the possible ordering options for questions.
  * - `newest`: Sort by the most recently asked questions.
@@ -25,8 +25,10 @@ export type OrderType = 'newest' | 'unanswered' | 'active' | 'mostViewed';
  * - `upVotes`: An array of usernames who have upvoted the question.
  * - `downVotes`: An array of usernames who have downvoted the question.
  * - `comments`: An array of comments related to the question.
+ * - `image`: An optional image associated with the question.
+ * - `pinned`: A boolean indicating whether the question is pinned.
  */
-export interface Question {
+export interface Question extends Post {
   title: string;
   text: string;
   tags: Tag[];
@@ -34,9 +36,10 @@ export interface Question {
   askDateTime: Date;
   answers: Answer[];
   views: string[];
-  upVotes: string[];
-  downVotes: string[];
   comments: Comment[];
+  image?: string;
+  subforumId?: ObjectId;
+  pinned: boolean;
 }
 
 /**
@@ -51,6 +54,7 @@ export interface DatabaseQuestion extends Omit<Question, 'tags' | 'answers' | 'c
   tags: ObjectId[];
   answers: ObjectId[];
   comments: ObjectId[];
+  pinned: boolean;
 }
 
 /**
@@ -73,18 +77,6 @@ export interface PopulatedDatabaseQuestion
 export type QuestionResponse = DatabaseQuestion | { error: string };
 
 /**
- * Type representing an object with the vote success message, updated upVotes,
- */
-export type VoteInterface = { msg: string; upVotes: string[]; downVotes: string[] };
-
-/**
- * Type representing possible responses for a vote-related operation.
- * - Either an object with the vote success message, updated upVotes,
- *   and updated downVotes, or an error message.
- */
-export type VoteResponse = VoteInterface | { error: string };
-
-/**
  * Interface for the request query to find questions using a search string.
  * - `order`: The order in which to sort the questions.
  * - `search`: The search string used to find questions.
@@ -95,6 +87,7 @@ export interface FindQuestionRequest extends Request {
     order: OrderType;
     search: string;
     askedBy: string;
+    subforumId: string;
   };
 }
 
@@ -112,22 +105,16 @@ export interface FindQuestionByIdRequest extends Request {
   };
 }
 
+export interface FindAndDeleteQuestionByID extends Request {
+  params: {
+    qid: string;
+  };
+}
+
 /**
  * Interface for the request body when adding a new question.
  * - `body`: The question being added.
  */
 export interface AddQuestionRequest extends Request {
   body: Question;
-}
-
-/**
- * Interface for the request body when upvoting or downvoting a question.
- * - `qid`: The unique identifier of the question being voted on (body).
- * - `username`: The username of the user casting the vote (body).
- */
-export interface VoteRequest extends Request {
-  body: {
-    qid: string;
-    username: string;
-  };
 }

@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Comment,
   VoteUpdatePayload,
@@ -10,6 +10,7 @@ import {
 import useUserContext from './useUserContext';
 import addComment from '../services/commentService';
 import { getQuestionById } from '../services/questionService';
+import { getKarmaByUsername } from '../services/userService';
 
 /**
  * Custom hook for managing the answer page's state, navigation, and real-time updates.
@@ -20,18 +21,38 @@ import { getQuestionById } from '../services/questionService';
  * @returns handleNewAnswer - Function to navigate to the "New Answer" page
  */
 const useAnswerPage = () => {
-  const { qid } = useParams();
+  const { subforumId, qid } = useParams();
   const navigate = useNavigate();
 
   const { user, socket } = useUserContext();
   const [questionID, setQuestionID] = useState<string>(qid || '');
   const [question, setQuestion] = useState<PopulatedDatabaseQuestion | null>(null);
+  const [karma, setKarma] = useState<number>(0);
+
+  /**
+   * Function to fetch the latest question data and update state.
+   */
+  const refreshQuestion = useCallback(async () => {
+    try {
+      if (!questionID) return;
+      const res = await getQuestionById(questionID, user.username);
+      setQuestion(res || null);
+
+      if (res?.askedBy) {
+        const userKarma = await getKarmaByUsername(res.askedBy);
+        setKarma(userKarma);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error refreshing question:', error);
+    }
+  }, [questionID, user.username]);
 
   /**
    * Function to handle navigation to the "New Answer" page.
    */
   const handleNewAnswer = () => {
-    navigate(`/new/answer/${questionID}`);
+    navigate(`/new/answer/${subforumId}/${questionID}`);
   };
 
   useEffect(() => {
@@ -42,6 +63,10 @@ const useAnswerPage = () => {
 
     setQuestionID(qid);
   }, [qid, navigate]);
+
+  useEffect(() => {
+    refreshQuestion();
+  }, [refreshQuestion]);
 
   /**
    * Function to handle the submission of a new comment to a question or answer.
@@ -61,9 +86,48 @@ const useAnswerPage = () => {
       }
 
       await addComment(targetId, targetType, comment);
+      refreshQuestion();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error adding comment:', error);
+    }
+  };
+
+  /**
+   * Function to remove an answer from a question.
+   *
+   * @param aid - The ID of the answer to be removed.
+   */
+  const removeAnswer = async (aid: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/answer/deleteAnswer/${aid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to delete answer: ${errorData}`);
+      }
+
+      const data = await response.json();
+      setQuestion(prevQuestion => {
+        if (!prevQuestion) {
+          return prevQuestion;
+        }
+        return {
+          ...prevQuestion,
+          answers: prevQuestion.answers.filter(a => a._id !== data._id),
+        };
+      });
+    } catch (err) {
+      setQuestion(null);
     }
   };
 
@@ -75,6 +139,11 @@ const useAnswerPage = () => {
       try {
         const res = await getQuestionById(questionID, user.username);
         setQuestion(res || null);
+
+        if (res?.askedBy) {
+          const userKarma = await getKarmaByUsername(res.askedBy);
+          setKarma(userKarma);
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching question:', error);
@@ -159,7 +228,7 @@ const useAnswerPage = () => {
      * @param voteData - The updated vote data for a question
      */
     const handleVoteUpdate = (voteData: VoteUpdatePayload) => {
-      if (voteData.qid === questionID) {
+      if (voteData.pid === questionID) {
         setQuestion(prevQuestion =>
           prevQuestion
             ? {
@@ -186,10 +255,14 @@ const useAnswerPage = () => {
   }, [questionID, socket]);
 
   return {
+    subforumId,
     questionID,
     question,
+    karma,
     handleNewComment,
     handleNewAnswer,
+    refreshQuestion,
+    removeAnswer,
   };
 };
 

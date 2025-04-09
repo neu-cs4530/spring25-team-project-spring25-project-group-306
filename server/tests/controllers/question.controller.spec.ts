@@ -14,6 +14,7 @@ import {
   Tag,
   VoteResponse,
 } from '../../types/types';
+import SubforumModel from '../../models/subforums.model';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -21,6 +22,7 @@ const filterQuestionsBySearchSpy: jest.SpyInstance = jest.spyOn(
   questionUtil,
   'filterQuestionsBySearch',
 );
+const pinUnpinQuestionSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'updateQuestionPin');
 
 const tag1: Tag = {
   name: 'tag1',
@@ -53,6 +55,7 @@ const mockQuestion: Question = {
   upVotes: [],
   downVotes: [],
   comments: [],
+  pinned: false,
 };
 
 const mockDatabaseQuestion: DatabaseQuestion = {
@@ -67,6 +70,7 @@ const mockDatabaseQuestion: DatabaseQuestion = {
   upVotes: [],
   downVotes: [],
   comments: [],
+  pinned: false,
 };
 
 const mockPopulatedQuestion: PopulatedDatabaseQuestion = {
@@ -82,6 +86,8 @@ const ans1: PopulatedDatabaseAnswer = {
   ansBy: 'answer1_user',
   ansDateTime: new Date('2024-06-09'), // The mock date is string type but in the actual implementation it is a Date type
   comments: [],
+  upVotes: [],
+  downVotes: [],
 };
 
 const ans2: PopulatedDatabaseAnswer = {
@@ -90,6 +96,8 @@ const ans2: PopulatedDatabaseAnswer = {
   ansBy: 'answer2_user',
   ansDateTime: new Date('2024-06-10'),
   comments: [],
+  upVotes: [],
+  downVotes: [],
 };
 
 const ans3: PopulatedDatabaseAnswer = {
@@ -98,6 +106,8 @@ const ans3: PopulatedDatabaseAnswer = {
   ansBy: 'answer3_user',
   ansDateTime: new Date('2024-06-11'),
   comments: [],
+  upVotes: [],
+  downVotes: [],
 };
 
 const ans4: PopulatedDatabaseAnswer = {
@@ -106,6 +116,8 @@ const ans4: PopulatedDatabaseAnswer = {
   ansBy: 'answer4_user',
   ansDateTime: new Date('2024-06-14'),
   comments: [],
+  upVotes: [],
+  downVotes: [],
 };
 
 const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
@@ -121,6 +133,8 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
+    subforumId: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
   },
   {
     _id: new mongoose.Types.ObjectId('65e9b5a995b6c7045a30d823'),
@@ -134,6 +148,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
   },
   {
     _id: new mongoose.Types.ObjectId('34e9b58910afe6e94fc6e99f'),
@@ -147,6 +162,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     upVotes: [],
     downVotes: [],
     comments: [],
+    pinned: false,
   },
 ];
 
@@ -160,11 +176,166 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
     ansDateTime: (answer as Answer).ansDateTime.toISOString(),
   })), // Converting answer ObjectId
   askDateTime: question.askDateTime.toISOString(),
+  subforumId: question.subforumId?.toString(), // Converting subforumId ObjectId
 });
 
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  describe('GET /getQuestion', () => {
+    it('should return all questions when no filters are applied', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(EXPECTED_QUESTIONS);
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, undefined);
+    });
+
+    it('should filter questions by subforumId', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
+        q => q.subforumId?.toString() === subforumId,
+      );
+
+      const response = await supertest(app).get('/question/getQuestion').query({ subforumId });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter questions by askedBy', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[1];
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(q => q.askedBy === askedBy);
+
+      const response = await supertest(app).get('/question/getQuestion').query({ askedBy });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter questions by search term', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[0]]);
+
+      const search = 'Question 1';
+
+      const response = await supertest(app).get('/question/getQuestion').query({ search });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([simplifyQuestion(MOCK_POPULATED_QUESTIONS[0])]);
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, search);
+    });
+
+    it('should filter questions by multiple criteria', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[0];
+      const search = 'Question 1';
+
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
+        q =>
+          q.subforumId?.toString() === subforumId &&
+          q.askedBy === askedBy &&
+          q.title.includes(search),
+      );
+
+      filterQuestionsBySearchSpy.mockReturnValueOnce(filteredQuestions);
+
+      const response = await supertest(app)
+        .get('/question/getQuestion')
+        .query({ subforumId, askedBy, search });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(
+        MOCK_POPULATED_QUESTIONS.filter(
+          q => q.subforumId?.toString() === subforumId && q.askedBy === askedBy,
+        ),
+        search,
+      );
+    });
+
+    it('should return 500 if getQuestionsByOrder throws an error', async () => {
+      getQuestionsByOrderSpy.mockRejectedValueOnce(new Error('Error fetching questions'));
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when fetching questions by filter');
+    });
+
+    it('should return 500 if filterQuestionsBySearch throws an error', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockImplementationOnce(() => {
+        throw new Error('Error filtering questions');
+      });
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when fetching questions by filter');
+    });
+  });
+
+  describe('DELETE /deleteQuestion/:qid', () => {
+    it('should delete a question successfully', async () => {
+      jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
+
+      const response = await supertest(app).delete(
+        `/question/deleteQuestion/${mockDatabaseQuestion._id}`,
+      );
+
+      expect(response.status).toBe(200);
+    });
+
+    it('should return bad request error if the question ID is not in the correct format', async () => {
+      const invalidQid = 'invalid-id';
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${invalidQid}`);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toBe('Invalid ID format');
+    });
+
+    it('should return server error if deleteQuestionById throws an error', async () => {
+      const validQid = new mongoose.Types.ObjectId().toString();
+
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockRejectedValueOnce(new Error('Deletion failed'));
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting question: Deletion failed');
+    });
+
+    it('should return server error if deleteQuestionById returns an error object', async () => {
+      const validQid = new mongoose.Types.ObjectId().toString();
+
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockResolvedValueOnce({ error: 'Question not found' });
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting question: Question not found');
+    });
+  });
   describe('POST /addQuestion', () => {
     it('should add a new question', async () => {
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
@@ -274,6 +445,7 @@ describe('Test questionController', () => {
         upVotes: [],
         downVotes: [],
         comments: [],
+        pinned: false,
       };
 
       const result: PopulatedDatabaseQuestion = {
@@ -282,6 +454,7 @@ describe('Test questionController', () => {
         tags: [dbTag1, dbTag2], // Duplicate tags
         answers: [],
         comments: [],
+        pinned: false,
       };
 
       // Set up the mock to resolve with unique tags
@@ -304,12 +477,50 @@ describe('Test questionController', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
     });
+
+    it('should update the question count of the subforum the question belonged to', async () => {
+      const mockSubforumId = new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe');
+      const mockUpdatedSubforum = {
+        _id: mockSubforumId,
+        questionCount: 5,
+      };
+
+      const mockQuestionWithSubforum = {
+        ...mockQuestion,
+        subforumId: mockSubforumId,
+      };
+
+      jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
+      jest.spyOn(questionUtil, 'saveQuestion').mockResolvedValueOnce(mockDatabaseQuestion);
+      jest.spyOn(databaseUtil, 'populateDocument').mockResolvedValueOnce(mockPopulatedQuestion);
+      jest.spyOn(SubforumModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedSubforum);
+
+      // Making the request
+      const response = await supertest(app)
+        .post('/question/addQuestion')
+        .send(mockQuestionWithSubforum);
+
+      // Asserting the response
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(simplifyQuestion(mockPopulatedQuestion));
+      expect(SubforumModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        mockSubforumId,
+        { $inc: { questionCount: 1 } },
+        { new: true },
+      );
+    });
   });
 
   describe('POST /upvoteQuestion', () => {
     it('should upvote a question successfully', async () => {
+      const validPid = new mongoose.Types.ObjectId();
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: validPid.toString(),
+        creatorUsername: 'user',
         username: 'new-user',
       };
 
@@ -323,13 +534,18 @@ describe('Test questionController', () => {
 
       const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
-      expect(response.status).toBe(200);
       expect(response.body).toEqual(mockResponse);
+      expect(response.status).toBe(200);
     });
 
     it('should cancel the upvote successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'some-user',
       };
 
@@ -363,8 +579,13 @@ describe('Test questionController', () => {
 
     it('should handle upvote and then downvote by the same user', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
-        username: 'new-user',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
+        username: 'some-user',
       };
 
       // First upvote the question
@@ -408,19 +629,110 @@ describe('Test questionController', () => {
 
     it('should return bad request error if the request had username missing', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        pid: '65e9b5a995b6c7045a30d823',
       };
 
       const response = await supertest(app).post(`/question/upvoteQuestion`).send(mockReqBody);
 
       expect(response.status).toBe(400);
     });
+
+    describe('POST /voteQuestion (Helper Function)', () => {
+      it('should return bad request error if post is missing in the request body', async () => {
+        const mockReqBody = {
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return bad request error if pid is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return bad request error if creatorUsername is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          username: 'some-user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return bad request error if username is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return server error if addVoteToQuestion throws an error', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        addVoteToQuestionSpy.mockRejectedValueOnce(new Error('Error while voting'));
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(500);
+        expect(response.text).toBe('upvote failed: Error while voting');
+      });
+
+      it('should return server error if addVoteToQuestion returns an error object', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'Vote operation failed' });
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(500);
+        expect(response.text).toBe('upvote failed: Vote operation failed');
+      });
+    });
   });
 
   describe('POST /downvoteQuestion', () => {
     it('should downvote a question successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'new-user',
       };
 
@@ -440,7 +752,12 @@ describe('Test questionController', () => {
 
     it('should cancel the downvote successfully', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'some-user',
       };
 
@@ -476,7 +793,12 @@ describe('Test questionController', () => {
 
     it('should handle downvote and then upvote by the same user', async () => {
       const mockReqBody = {
-        qid: '65e9b5a995b6c7045a30d823',
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: '65e9b5a995b6c7045a30d823',
+        creatorUsername: 'user',
         username: 'new-user',
       };
 
@@ -527,6 +849,25 @@ describe('Test questionController', () => {
       const response = await supertest(app).post(`/question/downvoteQuestion`).send(mockReqBody);
 
       expect(response.status).toBe(400);
+    });
+
+    it('should return bad request error if addVoteToAnswer errors', async () => {
+      const validPid = new mongoose.Types.ObjectId();
+      const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: validPid.toString(),
+        creatorUsername: 'user',
+        username: 'new-user',
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'Error when downvoting' });
+
+      const response = await supertest(app).post('/question/downvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
     });
   });
 
@@ -640,9 +981,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id: Error while fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
 
     it('should return bad request error if an error occurs when fetching and updating the question', async () => {
@@ -665,9 +1004,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id: Error while fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
   });
 
@@ -730,6 +1067,74 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
+    });
+  });
+
+  describe('POST /pinUnpinQuestion', () => {
+    it('should pin a question successfully', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: true,
+      };
+
+      const mockResponse = {
+        msg: 'Question pinned successfully',
+        question: {
+          pinned: true,
+        },
+      };
+
+      pinUnpinQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockResponse);
+    });
+    it('should unpin a question successfully', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: false,
+      };
+
+      const mockResponse = {
+        msg: 'Question pinned successfully',
+        question: {
+          pinned: false,
+        },
+      };
+
+      pinUnpinQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockResponse);
+    });
+    it('should return bad request error if the request had pid missing', async () => {
+      const mockReqBody = {
+        pin: true,
+      };
+
+      const response = await supertest(app).post(`/question/pinUnpinQuestion`).send(mockReqBody);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return an error if the request fails', async () => {
+      const mockReqBody = {
+        pid: '65e9b5a995b6c7045a30d823',
+        pin: true,
+      };
+
+      jest.spyOn(questionUtil, 'updateQuestionPin').mockImplementationOnce(() => {
+        throw new Error('Error updating pin status');
+      });
+
+      const response = await supertest(app).post('/question/pinUnpinQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when updating pin status');
     });
   });
 });

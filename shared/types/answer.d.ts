@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 import { Comment, DatabaseComment } from './comment';
+import { Post } from './post';
 
 /**
  * Represents an answer to a question.
@@ -8,12 +9,15 @@ import { Comment, DatabaseComment } from './comment';
  * - `ansBy`: The author of the answer.
  * - `ansDateTime`: The timestamp of when the answer was given.
  * - `comments`: A list of comments associated with the answer.
+ * - `upvotes`: A list of usernames that have upvoted the answer.
+ * - 'downvotes': A list of usernames that have downvoted the answer.
  */
-export interface Answer {
+export interface Answer extends Post {
   text: string;
   ansBy: string;
   ansDateTime: Date;
   comments: Comment[];
+  image?: string;
 }
 
 /**
@@ -43,6 +47,12 @@ export interface AddAnswerRequest extends Request {
   body: {
     qid: string;
     ans: Answer;
+  };
+}
+
+export interface DeleteAnswerRequest extends Request {
+  params: {
+    aid: string;
   };
 }
 

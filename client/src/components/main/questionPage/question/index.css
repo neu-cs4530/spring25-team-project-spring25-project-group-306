@@ -1,7 +1,8 @@
 .question {
   display: flex;
   flex-direction: row;
-  border-top: #000000 1px dashed;
+  padding: 1rem;
+  border-top: #AAAAAA 1px solid;
 }
 
 .postStats {
@@ -43,6 +44,7 @@
 
 .question_author {
   color: red;
+  display: inline-block;
 }
 
 .question_meta {

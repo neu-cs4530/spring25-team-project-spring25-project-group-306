@@ -4,6 +4,7 @@ import { DatabaseMessage } from './message';
 import { PopulatedDatabaseQuestion } from './question';
 import { SafeDatabaseUser } from './user';
 import { BaseMove, GameInstance, GameInstanceID, GameMove, GameState } from './game';
+import { SubforumOnlineUserEvent } from './subforum';
 
 /**
  * Payload for an answer update event.
@@ -35,12 +36,12 @@ export interface GameErrorPayload {
 
 /**
  * Payload for a vote update event.
- * - `qid`: The unique identifier of the question.
+ * - `pid`: The unique identifier of the post.
  * - `upVotes`: An array of usernames who upvoted the question.
  * - `downVotes`: An array of usernames who downvoted the question.
  */
 export interface VoteUpdatePayload {
-  qid: string;
+  pid: string;
   upVotes: string[];
   downVotes: string[];
 }
@@ -100,6 +101,8 @@ export interface GameMovePayload {
  * - `leaveGame`: Client can leave a game.
  * - `joinChat`: Client can join a chat.
  * - `leaveChat`: Client can leave a chat.
+ * - `joinSubforum`: Client can join a subforum.
+ * - `leaveSubforum`: Client can leave a subforum.
  */
 export interface ClientToServerEvents {
   makeMove: (move: GameMovePayload) => void;
@@ -107,6 +110,8 @@ export interface ClientToServerEvents {
   leaveGame: (gameID: string) => void;
   joinChat: (chatID: string) => void;
   leaveChat: (chatID: string | undefined) => void;
+  joinSubforum: (subforumId: string) => void;
+  leaveSubforum: (subforumId: string) => void;
 }
 
 /**
@@ -121,6 +126,7 @@ export interface ClientToServerEvents {
  * - `gameUpdate`: Server sends updated game state.
  * - `gameError`: Server sends error message related to game operation.
  * - `chatUpdate`: Server sends updated chat.
+ * - `subforumOnlineUsers`: Server sends updated count of online users in a subforum.
  */
 export interface ServerToClientEvents {
   questionUpdate: (question: PopulatedDatabaseQuestion) => void;
@@ -133,4 +139,5 @@ export interface ServerToClientEvents {
   gameUpdate: (game: GameUpdatePayload) => void;
   gameError: (error: GameErrorPayload) => void;
   chatUpdate: (chat: ChatUpdatePayload) => void;
+  subforumOnlineUsers: (data: SubforumOnlineUserEvent) => void;
 }

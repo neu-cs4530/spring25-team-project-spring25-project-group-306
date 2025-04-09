@@ -2,6 +2,12 @@ import React from 'react';
 import './index.css';
 import useProfileSettings from '../../hooks/useProfileSettings';
 
+/**
+ *  ProfileSettings component for managing user profile settings.
+ *  It includes fields for biography, password reset, and user deletion.
+ *  The component handles form submission, error handling, and deletion confirmation.
+ * @returns {JSX.Element} The rendered ProfileSettings component.
+ */
 const ProfileSettings: React.FC = () => {
   const {
     userData,
@@ -50,6 +56,10 @@ const ProfileSettings: React.FC = () => {
             <h4>General Information</h4>
             <p>
               <strong>Username:</strong> {userData.username}
+            </p>
+
+            <p>
+              <strong>Karma:</strong> {userData.karma ?? 0}
             </p>
 
             {/* ---- Biography Section ---- */}

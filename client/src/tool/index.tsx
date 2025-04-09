@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.css';
 
 /**
  * List of all the months of the year.

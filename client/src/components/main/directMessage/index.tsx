@@ -26,7 +26,7 @@ const DirectMessage = () => {
   } = useDirectMessage();
 
   return (
-    <>
+    <div className='right_main'>
       <div className='create-panel'>
         <button
           className='custom-button'
@@ -77,7 +77,7 @@ const DirectMessage = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

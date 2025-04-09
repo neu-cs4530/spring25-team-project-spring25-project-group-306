@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import QuestionModel from '../../models/questions.model';
 import {
   filterQuestionsBySearch,
@@ -6,8 +7,10 @@ import {
   fetchAndIncrementQuestionViewsById,
   saveQuestion,
   addVoteToQuestion,
+  updateQuestionPin,
+  deleteQuestionById,
 } from '../../services/question.service';
-import { DatabaseQuestion, PopulatedDatabaseQuestion } from '../../types/types';
+import { DatabaseQuestion, PopulatedDatabaseQuestion, Post } from '../../types/types';
 import {
   QUESTIONS,
   tag1,
@@ -27,6 +30,16 @@ describe('Question model', () => {
     mockingoose.resetAll();
   });
 
+  describe('deleteQuestionById', () => {
+    test('deleteQuestionById should return the deleted question', async () => {
+      const mockQuestion = QUESTIONS[0];
+      mockingoose(QuestionModel).toReturn(mockQuestion, 'findOneAndDelete');
+
+      const result = await deleteQuestionById(mockQuestion._id.toString());
+
+      expect(result).toEqual(mockQuestion);
+    });
+  });
   describe('filterQuestionsBySearch', () => {
     test('filter questions with empty search string should return all questions', () => {
       const result = filterQuestionsBySearch(POPULATED_QUESTIONS, '');
@@ -298,6 +311,7 @@ describe('Question model', () => {
         upVotes: [],
         downVotes: [],
         comments: [],
+        pinned: false,
       };
 
       const result = (await saveQuestion(mockQn)) as DatabaseQuestion;
@@ -315,19 +329,39 @@ describe('Question model', () => {
   });
 
   describe('addVoteToQuestion', () => {
-    test('addVoteToQuestion should upvote a question', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: [],
-      };
+    const mockQuestion: PopulatedDatabaseQuestion = {
+      _id: new ObjectId(),
+      title: 'title',
+      text: 'text',
+      tags: [],
+      askedBy: 'user1',
+      askDateTime: new Date(),
+      answers: [],
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      comments: [],
+      image: undefined,
+      pinned: false,
+    };
 
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test('addVoteToQuestion should upvote a question', async () => {
       mockingoose(QuestionModel).toReturn(
         { ...mockQuestion, upVotes: ['testUser'], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -337,18 +371,20 @@ describe('Question model', () => {
     });
 
     test('If a downvoter upvotes, add them to upvotes and remove them from downvotes', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: ['testUser'],
-      };
+      const updatedQuestion = { ...mockQuestion, downVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: ['testUser'], downVotes: [] },
+        { ...updatedQuestion, upVotes: ['testUser'], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question upvoted successfully',
@@ -358,18 +394,20 @@ describe('Question model', () => {
     });
 
     test('should cancel the upvote if already upvoted', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: ['testUser'],
-        downVotes: [],
-      };
+      const updatedQuestion = { ...mockQuestion, upVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: [] },
+        { ...updatedQuestion, upVotes: [], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({
         msg: 'Upvote cancelled successfully',
@@ -381,7 +419,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion('nonExistentId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -389,24 +433,30 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding an upvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'upvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'upvote',
+      );
 
       expect(result).toEqual({ error: 'Error when adding upvote to question' });
     });
 
     test('addVoteToQuestion should downvote a question', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: [],
-      };
-
       mockingoose(QuestionModel).toReturn(
         { ...mockQuestion, upVotes: [], downVotes: ['testUser'] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -416,18 +466,20 @@ describe('Question model', () => {
     });
 
     test('If an upvoter downvotes, add them to downvotes and remove them from upvotes', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: ['testUser'],
-        downVotes: [],
-      };
+      const updatedQuestion = { ...mockQuestion, upVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: ['testUser'] },
+        { ...updatedQuestion, upVotes: [], downVotes: ['testUser'] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Question downvoted successfully',
@@ -437,18 +489,20 @@ describe('Question model', () => {
     });
 
     test('should cancel the downvote if already downvoted', async () => {
-      const mockQuestion = {
-        _id: 'someQuestionId',
-        upVotes: [],
-        downVotes: ['testUser'],
-      };
+      const updatedQuestion = { ...mockQuestion, downVotes: ['testUser'] };
 
       mockingoose(QuestionModel).toReturn(
-        { ...mockQuestion, upVotes: [], downVotes: [] },
+        { ...updatedQuestion, upVotes: [], downVotes: [] },
         'findOneAndUpdate',
       );
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        updatedQuestion as Post,
+        String(updatedQuestion._id),
+        updatedQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({
         msg: 'Downvote cancelled successfully',
@@ -460,7 +514,13 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error if the question is not found', async () => {
       mockingoose(QuestionModel).toReturn(null, 'findById');
 
-      const result = await addVoteToQuestion('nonExistentId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({ error: 'Question not found!' });
     });
@@ -468,9 +528,69 @@ describe('Question model', () => {
     test('addVoteToQuestion should return an error when there is an issue with adding a downvote', async () => {
       mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
 
-      const result = await addVoteToQuestion('someQuestionId', 'testUser', 'downvote');
+      const result = await addVoteToQuestion(
+        mockQuestion as Post,
+        String(mockQuestion._id),
+        mockQuestion.askedBy,
+        'testUser',
+        'downvote',
+      );
 
       expect(result).toEqual({ error: 'Error when adding downvote to question' });
+    });
+  });
+
+  describe('updateQuestionPin', () => {
+    it('should update the pin status of a question to true', async () => {
+      const mockQuestion = {
+        _id: '65e9b716ff0e892116b2de01',
+        pinned: false,
+      };
+
+      const mockResult = {
+        ...mockQuestion,
+        pinned: true,
+      };
+
+      mockingoose(QuestionModel).toReturn(mockResult, 'findOneAndUpdate');
+
+      await updateQuestionPin(mockQuestion._id, true);
+
+      expect(true).toEqual(mockResult.pinned);
+    });
+
+    it('should update the pin status of a question to false', async () => {
+      const mockQuestion = {
+        _id: '65e9b716ff0e892116b2de01',
+        pinned: true,
+      };
+
+      const mockResult = {
+        ...mockQuestion,
+        pinned: false,
+      };
+
+      mockingoose(QuestionModel).toReturn(mockResult, 'findOneAndUpdate');
+
+      await updateQuestionPin(mockQuestion._id, false);
+
+      expect(false).toEqual(mockResult.pinned);
+    });
+
+    it('should return an error if the question is not found', async () => {
+      mockingoose(QuestionModel).toReturn(null, 'findOneAndUpdate');
+
+      const result = await updateQuestionPin('65e9b716ff0e892116b2de01', true);
+
+      expect(result).toEqual({ error: 'Question not found!' });
+    });
+
+    it('should return an error if there is an issue with updating the pin status', async () => {
+      mockingoose(QuestionModel).toReturn(new Error('Database error'), 'findOneAndUpdate');
+
+      const result = await updateQuestionPin('65e9b716ff0e892116b2de01', true);
+
+      expect(result).toEqual({ error: 'Error when updating question pin status' });
     });
   });
 });

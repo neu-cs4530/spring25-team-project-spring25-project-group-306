@@ -149,3 +149,28 @@ export const updateUser = async (
     return { error: `Error occurred when updating user: ${error}` };
   }
 };
+
+/**
+ * Increases or decreases a user's karma by a given amount.
+ *
+ * @param {string} username - The username of the user to update.
+ * @param {number} amount - The amount to change the karma.
+ * @returns {Promise<UserResponse>} - Resolves with the updated user object (without the password) or an error message.
+ */
+export const updateUserKarma = async (username: string, amount: number): Promise<UserResponse> => {
+  try {
+    const updatedUser: SafeDatabaseUser | null = await UserModel.findOneAndUpdate(
+      { username },
+      { $inc: { karma: amount } },
+      { new: true },
+    ).select('-password');
+
+    if (!updatedUser) {
+      throw Error('Error updating user karma');
+    }
+
+    return updatedUser;
+  } catch (error) {
+    return { error: `Error occurred when updating user karma: ${error}` };
+  }
+};

@@ -6,6 +6,12 @@
   border-bottom: #000000 1px dashed;
 }
 
+.markdown-container {
+  flex: 1;
+  display: block;
+  margin-right: 20px;
+}
+
 .answer_question_view {
   width: 15%;
 }

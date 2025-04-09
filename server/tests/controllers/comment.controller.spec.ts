@@ -42,6 +42,7 @@ describe('POST /addComment', () => {
       downVotes: [],
       answers: [],
       comments: [mockComment._id],
+      pinned: false,
     });
 
     popDocSpy.mockResolvedValueOnce({
@@ -56,6 +57,7 @@ describe('POST /addComment', () => {
       downVotes: [],
       answers: [],
       comments: [mockComment],
+      pinned: false,
     });
 
     const response = await supertest(app).post('/comment/addComment').send(mockReqBody);
@@ -97,6 +99,8 @@ describe('POST /addComment', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [mockComment._id],
+      upVotes: [],
+      downVotes: [],
     });
 
     popDocSpy.mockResolvedValueOnce({
@@ -105,6 +109,8 @@ describe('POST /addComment', () => {
       ansBy: 'dummyUserId',
       ansDateTime: new Date('2024-06-03'),
       comments: [mockComment],
+      upVotes: [],
+      downVotes: [],
     });
 
     const response = await supertest(app).post('/comment/addComment').send(mockReqBody);
@@ -341,6 +347,7 @@ describe('POST /addComment', () => {
       downVotes: [],
       answers: [],
       comments: [mockComment._id],
+      pinned: false,
     };
 
     saveCommentSpy.mockResolvedValueOnce(mockComment);

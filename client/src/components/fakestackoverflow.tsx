@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import Layout from './layout';
 import Login from './auth/login';
 import { FakeSOSocket, SafeDatabaseUser } from '../types/types';
@@ -17,6 +17,16 @@ import UsersListPage from './main/usersListPage';
 import ProfileSettings from './profileSettings';
 import AllGamesPage from './main/games/allGamesPage';
 import GamePage from './main/games/gamePage';
+import SubforumPage from './main/subforumPage';
+import NewSubforumPage from './main/newSubforum';
+import SubforumDetailsPage from './main/subforumDetails';
+import SubforumSettingsPage from './main/subforumSettings';
+
+// Wrapper component to extract subforumId from URL params
+const SubforumSettingsWrapper = () => {
+  const { subforumId } = useParams();
+  return <SubforumSettingsPage subforumId={subforumId || ''} />;
+};
 
 const ProtectedRoute = ({
   user,
@@ -61,11 +71,15 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/messaging/direct-message' element={<DirectMessage />} />
             <Route path='/question/:qid' element={<AnswerPage />} />
             <Route path='/new/question' element={<NewQuestionPage />} />
-            <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+            <Route path='/new/answer/:subforumId/:qid' element={<NewAnswerPage />} />
             <Route path='/users' element={<UsersListPage />} />
             <Route path='/user/:username' element={<ProfileSettings />} />
             <Route path='/games' element={<AllGamesPage />} />
             <Route path='/games/:gameID' element={<GamePage />} />
+            <Route path='/subforums' element={<SubforumPage />} />
+            <Route path='/new/subforum' element={<NewSubforumPage />} />
+            <Route path='/subforums/:subforumId' element={<SubforumDetailsPage />} />
+            <Route path='/subforums/:subforumId/settings' element={<SubforumSettingsWrapper />} />
           </Route>
         }
       </Routes>

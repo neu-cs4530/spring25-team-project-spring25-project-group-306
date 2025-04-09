@@ -5,9 +5,11 @@ import {
   FindQuestionRequest,
   FindQuestionByIdRequest,
   AddQuestionRequest,
-  VoteRequest,
   FakeSOSocket,
   PopulatedDatabaseQuestion,
+  VoteRequest,
+  PinUnpinRequest,
+  FindAndDeleteQuestionByID,
 } from '../types/types';
 import {
   addVoteToQuestion,
@@ -16,9 +18,12 @@ import {
   filterQuestionsBySearch,
   getQuestionsByOrder,
   saveQuestion,
+  updateQuestionPin,
+  deleteQuestionById,
 } from '../services/question.service';
 import { processTags } from '../services/tag.service';
 import { populateDocument } from '../utils/database.util';
+import SubforumModel from '../models/subforums.model';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -36,9 +41,15 @@ const questionController = (socket: FakeSOSocket) => {
     const { order } = req.query;
     const { search } = req.query;
     const { askedBy } = req.query;
+    const { subforumId } = req.query;
 
     try {
       let qlist: PopulatedDatabaseQuestion[] = await getQuestionsByOrder(order);
+
+      // Filter by subforumId if provided
+      if (subforumId) {
+        qlist = qlist.filter(q => q.subforumId?.toString() === subforumId);
+      }
 
       // Filter by askedBy if provided
       if (askedBy) {
@@ -49,11 +60,7 @@ const questionController = (socket: FakeSOSocket) => {
       const resqlist: PopulatedDatabaseQuestion[] = filterQuestionsBySearch(qlist, search);
       res.json(resqlist);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when fetching questions by filter`);
-      }
+      res.status(500).send(`Error when fetching questions by filter`);
     }
   };
 
@@ -90,11 +97,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('viewsUpdate', q);
       res.json(q);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when fetching question by id: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when fetching question by id`);
-      }
+      res.status(500).send(`Error when fetching question by id`);
     }
   };
 
@@ -150,6 +153,15 @@ const questionController = (socket: FakeSOSocket) => {
         throw new Error(result.error);
       }
 
+      // If the question is associated with a subforum, update the subforum's questionCount
+      if (question.subforumId) {
+        await SubforumModel.findByIdAndUpdate(
+          new ObjectId(question.subforumId),
+          { $inc: { questionCount: 1 } },
+          { new: true },
+        );
+      }
+
       // Populates the fields of the question that was added, and emits the new object
       const populatedQuestion = await populateDocument(result._id.toString(), 'question');
 
@@ -160,11 +172,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('questionUpdate', populatedQuestion as PopulatedDatabaseQuestion);
       res.json(populatedQuestion);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when saving question: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when saving question`);
-      }
+      res.status(500).send(`Error when saving question`);
     }
   };
 
@@ -173,29 +181,29 @@ const questionController = (socket: FakeSOSocket) => {
    *
    * @param req The VoteRequest object containing the question ID and the username.
    * @param res The HTTP response object used to send back the result of the operation.
-   * @param type The type of vote to perform (upvote or downvote).
+   * @param voteType The type of vote to perform (upvote or downvote).
    *
    * @returns A Promise that resolves to void.
    */
   const voteQuestion = async (
     req: VoteRequest,
     res: Response,
-    type: 'upvote' | 'downvote',
+    voteType: 'upvote' | 'downvote',
   ): Promise<void> => {
-    if (!req.body.qid || !req.body.username) {
+    if (!req.body.post || !req.body.pid || !req.body.creatorUsername || !req.body.username) {
       res.status(400).send('Invalid request');
       return;
     }
 
-    const { qid, username } = req.body;
+    const { post, pid, creatorUsername, username } = req.body;
 
     try {
       let status;
 
-      if (type === 'upvote') {
-        status = await addVoteToQuestion(qid, username, type);
+      if (voteType === 'upvote') {
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, voteType);
       } else {
-        status = await addVoteToQuestion(qid, username, type);
+        status = await addVoteToQuestion(post, pid, creatorUsername, username, voteType);
       }
 
       if (status && 'error' in status) {
@@ -203,10 +211,10 @@ const questionController = (socket: FakeSOSocket) => {
       }
 
       // Emit the updated vote counts to all connected clients
-      socket.emit('voteUpdate', { qid, upVotes: status.upVotes, downVotes: status.downVotes });
+      socket.emit('voteUpdate', { pid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json(status);
     } catch (err) {
-      res.status(500).send(`Error when ${type}ing: ${(err as Error).message}`);
+      res.status(500).send(`${voteType} failed: ${(err as Error).message}`);
     }
   };
 
@@ -220,7 +228,7 @@ const questionController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const upvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
-    voteQuestion(req, res, 'upvote');
+    await voteQuestion(req, res, 'upvote');
   };
 
   /**
@@ -233,7 +241,63 @@ const questionController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const downvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
-    voteQuestion(req, res, 'downvote');
+    await voteQuestion(req, res, 'downvote');
+  };
+
+  /**
+   * Pins or unpins a question based on the provided request body. If the request is invalid,
+   * the HTTP response status is updated.
+   *
+   * @param req The PinUnpinRequest object containing the question ID and the pin status.
+   * @param res The HTTP response object used to send back the result of the operation.
+   *
+   * @returns A Promise that resolves to void.
+   */
+  const pinUnpinQuestion = async (req: PinUnpinRequest, res: Response): Promise<void> => {
+    const { pid, pinned } = req.body;
+
+    if (!pid) {
+      res.status(400).send('Invalid request');
+      return;
+    }
+
+    try {
+      const updatedQuestion = await updateQuestionPin(pid, pinned);
+
+      res.status(200).send(updatedQuestion);
+    } catch (err: unknown) {
+      res.status(500).send(`Error when updating pin status`);
+    }
+  };
+
+  /**
+   * Deletes a question by its unique ID. If the ID is invalid or the question is not found,
+   * the appropriate HTTP response status and message are returned.
+   *
+   * @param req The FindAndDeleteQuestionByID object containing the question ID as a parameter.
+   * @param res The HTTP response object used to send back the result of the operation.
+   *
+   * @returns A Promise that resolves to void.
+   */
+  const deleteQuestion = async (req: FindAndDeleteQuestionByID, res: Response): Promise<void> => {
+    const { qid } = req.params;
+
+    if (!ObjectId.isValid(qid)) {
+      res.status(400).send('Invalid ID format');
+      return;
+    }
+
+    try {
+      const result = await deleteQuestionById(qid);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).send(`Error when deleting question: ${(err as Error).message}`);
+    }
   };
 
   // add appropriate HTTP verbs and their endpoints to the router
@@ -242,6 +306,8 @@ const questionController = (socket: FakeSOSocket) => {
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);
   router.post('/downvoteQuestion', downvoteQuestion);
+  router.post('/pinUnpinQuestion', pinUnpinQuestion);
+  router.delete('/deleteQuestion/:qid', deleteQuestion);
 
   return router;
 };

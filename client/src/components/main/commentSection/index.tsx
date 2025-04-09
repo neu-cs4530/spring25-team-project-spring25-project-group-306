@@ -3,6 +3,7 @@ import { getMetaData } from '../../../tool';
 import { Comment, DatabaseComment } from '../../../types/types';
 import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
+import useFetchKarma from '../../../hooks/useFetchKarma';
 
 /**
  * Interface representing the props for the Comment Section component.
@@ -26,6 +27,9 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
   const [text, setText] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
   const [showComments, setShowComments] = useState<boolean>(false);
+
+  const commentUsernames = [...new Set(comments.map(comment => comment.commentBy))];
+  const karmaMap = useFetchKarma(commentUsernames);
 
   /**
    * Function to handle the addition of a new comment.
@@ -61,7 +65,8 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
                 <li key={String(comment._id)} className='comment-item'>
                   <p className='comment-text'>{comment.text}</p>
                   <small className='comment-meta'>
-                    {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
+                    {comment.commentBy} ({karmaMap[comment.commentBy] ?? 0} karma),{' '}
+                    {getMetaData(new Date(comment.commentDateTime))}
                   </small>
                 </li>
               ))

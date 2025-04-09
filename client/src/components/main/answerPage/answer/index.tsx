@@ -1,7 +1,7 @@
-import React from 'react';
-import { handleHyperlink } from '../../../../tool';
+import MarkdownRenderer from '../../../../markdown';
 import CommentSection from '../../commentSection';
 import './index.css';
+import '../../karma.css';
 import { Comment, DatabaseComment } from '../../../../types/types';
 
 /**
@@ -16,7 +16,9 @@ import { Comment, DatabaseComment } from '../../../../types/types';
 interface AnswerProps {
   text: string;
   ansBy: string;
+  karma: number;
   meta: string;
+  image?: string;
   comments: DatabaseComment[];
   handleAddComment: (comment: Comment) => void;
 }
@@ -31,17 +33,47 @@ interface AnswerProps {
  * @param comments An array of comments associated with the answer.
  * @param handleAddComment Function to handle adding a new comment.
  */
-const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => (
-  <div className='answer right_padding'>
-    <div id='answerText' className='answerText'>
-      {handleHyperlink(text)}
+
+const AnswerView = ({
+  text,
+  ansBy,
+  meta,
+  karma,
+  image,
+  comments,
+  handleAddComment,
+}: AnswerProps) => {
+  let karmaClass = 'karma-grey';
+  if (karma && karma < 0) {
+    karmaClass = 'karma-red';
+  } else if (karma && karma > 0) {
+    karmaClass = 'karma-green';
+  }
+
+  return (
+    <div className='answer right_padding'>
+      <div className='answer_top'>
+        <div className='answer_text'>
+          <MarkdownRenderer text={text} />
+        </div>
+        <div className='answerAuthor'>
+          <div className='answer_author'>{ansBy}</div>
+          <div className={karmaClass}>{karma} karma</div>
+          <div className='answer_question_meta'>{meta}</div>
+          {image && (
+            <img
+              src={image}
+              alt='answer'
+              className='answer_image'
+              style={{ width: '100%', maxWidth: '300px', height: 'auto' }}
+            />
+          )}
+        </div>
+      </div>
+
+      <CommentSection comments={comments} handleAddComment={handleAddComment} />
     </div>
-    <div className='answerAuthor'>
-      <div className='answer_author'>{ansBy}</div>
-      <div className='answer_question_meta'>{meta}</div>
-    </div>
-    <CommentSection comments={comments} handleAddComment={handleAddComment} />
-  </div>
-);
+  );
+};
 
 export default AnswerView;

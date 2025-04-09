@@ -1,3 +1,4 @@
+import React from 'react';
 import './index.css';
 import useMessagingPage from '../../../hooks/useMessagingPage';
 import MessageCard from '../messageCard';
@@ -10,11 +11,11 @@ const MessagingPage = () => {
   const { messages, newMessage, setNewMessage, handleSendMessage, error } = useMessagingPage();
 
   return (
-    <div className='chat-room'>
-      <div className='chat-header'>
-        <h2>Chat Room</h2>
+    <div className='right_main'>
+      <div className='page-header'>
+        <h1 className='page-title'>Global Messages</h1>
       </div>
-      <div className='chat-messages'>
+      <div className='messages-container'>
         {messages.map(message => (
           <MessageCard key={String(message._id)} message={message} />
         ))}

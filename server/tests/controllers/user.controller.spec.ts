@@ -10,9 +10,22 @@ const mockUser: User = {
   dateJoined: new Date('2024-12-03'),
 };
 
+const mockUserKarma: User = {
+  username: 'user2',
+  password: 'password',
+  dateJoined: new Date('2024-12-03'),
+  karma: 0,
+};
+
 const mockSafeUser: SafeDatabaseUser = {
   _id: new mongoose.Types.ObjectId(),
   username: 'user1',
+  dateJoined: new Date('2024-12-03'),
+};
+
+const mockSafeUserKarma: SafeDatabaseUser = {
+  _id: new mongoose.Types.ObjectId(),
+  username: 'user2',
   dateJoined: new Date('2024-12-03'),
 };
 
@@ -22,12 +35,19 @@ const mockUserJSONResponse = {
   dateJoined: new Date('2024-12-03').toISOString(),
 };
 
+const mockUserKarmaJSONResponse = {
+  _id: mockSafeUserKarma._id.toString(),
+  username: 'user2',
+  dateJoined: new Date('2024-12-03').toISOString(),
+};
+
 const saveUserSpy = jest.spyOn(util, 'saveUser');
 const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const getUsersListSpy = jest.spyOn(util, 'getUsersList');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
+const updateUserKarmaSpy = jest.spyOn(util, 'updateUserKarma');
 
 describe('Test userController', () => {
   describe('POST /signup', () => {
@@ -405,6 +425,64 @@ describe('Test userController', () => {
       expect(response.status).toBe(500);
       expect(response.text).toContain(
         'Error when updating user biography: Error: Error updating user',
+      );
+    });
+  });
+
+  describe('PATCH /updateKarma', () => {
+    it('should update karma for a valid user and amount', async () => {
+      const mockReqBody = {
+        username: mockUserKarma.username,
+        karma: 1,
+      };
+
+      updateUserKarmaSpy.mockResolvedValueOnce(mockSafeUserKarma);
+
+      const response = await supertest(app).patch('/user/updateKarma').send(mockReqBody);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockUserKarmaJSONResponse);
+      expect(updateUserKarmaSpy).toHaveBeenCalledWith(mockUserKarma.username, 1);
+    });
+
+    it('should return 500 if updateUserKarma returns an error', async () => {
+      updateUserKarmaSpy.mockResolvedValueOnce({
+        error: 'Error occurred when updating user karma: DB failure',
+      });
+
+      const mockReqBody = {
+        username: mockUserKarma.username,
+        karma: 1,
+      };
+
+      const response = await supertest(app).patch('/user/updateKarma').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain('Error occurred when updating user karma');
+    });
+
+    it('should return 400 if username or amount is missing', async () => {
+      const mockReqBody = {
+        username: mockUserKarma.username,
+      };
+
+      const response = await supertest(app).patch('/user/updateKarma').send(mockReqBody);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toContain('Invalid user body');
+    });
+
+    it('should return 400 if amount is not a number', async () => {
+      const mockReqBody = {
+        username: mockUserKarma.username,
+        karma: 'string',
+      };
+
+      const response = await supertest(app).patch('/user/updateKarma').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toContain(
+        'Error when updating user karma: Error: Invalid karma value.',
       );
     });
   });

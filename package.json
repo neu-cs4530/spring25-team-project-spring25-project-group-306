@@ -6,5 +6,19 @@
     "client",
     "server",
     "shared"
-  ]
+  ],
+  "devDependencies": {
+    "aws-sdk": "^2.1692.0",
+    "react-markdown": "^10.1.0",
+    "remark-breaks": "^4.0.0",
+    "unified": "^11.0.5"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.1",
+    "@mui/material": "^7.0.1",
+    "react-syntax-highlighter": "^15.6.1",
+    "remark-gfm": "^4.0.1"
+  }
 }

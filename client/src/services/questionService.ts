@@ -1,5 +1,10 @@
-import { ObjectId } from 'mongodb';
-import { PopulatedDatabaseQuestion, Question, VoteInterface } from '../types/types';
+import {
+  PopulatedDatabaseQuestion,
+  Post,
+  Question,
+  QuestionResponse,
+  VoteInterface,
+} from '../types/types';
 import api from './config';
 
 const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
@@ -59,12 +64,20 @@ const addQuestion = async (q: Question): Promise<PopulatedDatabaseQuestion> => {
 /**
  * Function to upvote a question.
  *
- * @param qid - The ID of the question to upvote.
+ * @param post - The post object containing voting information.
+ * @param pid - The id of the post object (PopulatedDatabaseQuestion or PopulatedDatabaseAnswer).
+ * @param creatorUsername - The username of the creator of the post.
+ * @param postType - If the post is a 'question' or 'answer'.
  * @param username - The username of the person upvoting the question.
  * @throws Error if there is an issue upvoting the question.
  */
-const upvoteQuestion = async (qid: ObjectId, username: string): Promise<VoteInterface> => {
-  const data = { qid, username };
+const upvoteQuestion = async (
+  post: Post,
+  pid: string,
+  creatorUsername: string,
+  username: string,
+): Promise<VoteInterface> => {
+  const data = { post, pid, creatorUsername, username };
   const res = await api.post(`${QUESTION_API_URL}/upvoteQuestion`, data);
   if (res.status !== 200) {
     throw new Error('Error while upvoting the question');
@@ -75,12 +88,20 @@ const upvoteQuestion = async (qid: ObjectId, username: string): Promise<VoteInte
 /**
  * Function to downvote a question.
  *
- * @param qid - The ID of the question to downvote.
+ * @param post - The post object containing voting information.
+ * @param pid - The id of the post object (PopulatedDatabaseQuestion or PopulatedDatabaseAnswer).
+ * @param creatorUsername - The username of the creator of the post.
+ * @param postType - If the post is a 'question' or 'answer'.
  * @param username - The username of the person downvoting the question.
  * @throws Error if there is an issue downvoting the question.
  */
-const downvoteQuestion = async (qid: ObjectId, username: string): Promise<VoteInterface> => {
-  const data = { qid, username };
+const downvoteQuestion = async (
+  post: Post,
+  pid: string,
+  creatorUsername: string,
+  username: string,
+): Promise<VoteInterface> => {
+  const data = { post, pid, creatorUsername, username };
   const res = await api.post(`${QUESTION_API_URL}/downvoteQuestion`, data);
   if (res.status !== 200) {
     throw new Error('Error while downvoting the question');
@@ -88,4 +109,27 @@ const downvoteQuestion = async (qid: ObjectId, username: string): Promise<VoteIn
   return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion, upvoteQuestion, downvoteQuestion };
+/**
+ * Function to pin or unpin a question.
+ *
+ * @param pid - The id of the question to pin or unpin.
+ * @param pin - A boolean indicating whether to pin (true) or unpin (false) the question.
+ * @throws Error if there is an issue pinning or unpinning the question.
+ */
+const pinUnpinQuestion = async (pid: string, pin: boolean): Promise<QuestionResponse> => {
+  const data = { pid, pinned: pin };
+  const res = await api.post(`${QUESTION_API_URL}/pinUnpinQuestion`, data);
+  if (res.status !== 200) {
+    throw new Error('Error when fetching or filtering questions');
+  }
+  return res.data;
+};
+
+export {
+  getQuestionsByFilter,
+  getQuestionById,
+  addQuestion,
+  upvoteQuestion,
+  downvoteQuestion,
+  pinUnpinQuestion,
+};
