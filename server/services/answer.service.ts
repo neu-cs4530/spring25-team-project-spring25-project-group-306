@@ -127,20 +127,20 @@ export const addVoteToAnswer = async (
 
     if (voteType === 'upvote') {
       if (alreadyDownvoted) {
-        msg = 'Question upvoted successfully';
+        msg = 'Answer upvoted successfully';
         karmaChange = 2;
       } else if (!alreadyUpvoted) {
-        msg = 'Question upvoted successfully';
+        msg = 'Answer upvoted successfully';
         karmaChange = 1;
       } else {
         msg = 'Upvote cancelled successfully';
         karmaChange = -1;
       }
     } else if (alreadyUpvoted) {
-      msg = 'Question downvoted successfully';
+      msg = 'Answer downvoted successfully';
       karmaChange = -2;
     } else if (!alreadyDownvoted) {
-      msg = 'Question downvoted successfully';
+      msg = 'Answer downvoted successfully';
       karmaChange = -1;
     } else {
       msg = 'Downvote cancelled successfully';
@@ -200,10 +200,10 @@ export const addAnswerToQuestion = async (
     );
 
     if (result === null) {
-      throw new Error('Error when adding answer to question');
+      throw new Error('Error when adding answer to answer');
     }
     return result;
   } catch (error) {
-    return { error: 'Error when adding answer to question' };
+    return { error: 'Error when adding answer to answer' };
   }
 };
