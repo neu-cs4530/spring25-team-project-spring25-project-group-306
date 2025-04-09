@@ -4,13 +4,11 @@ import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as answerUtil from '../../services/answer.service';
 import * as databaseUtil from '../../utils/database.util';
-import { DatabaseAnswer } from '../../types/types';
 
 const saveAnswerSpy = jest.spyOn(answerUtil, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
 const voteAnswerSpy = jest.spyOn(answerUtil, 'addVoteToAnswer');
-const deleteAnswerByIdSpy = jest.spyOn(answerUtil, 'deleteAnswerById');
 
 describe('Answer Controller', () => {
   beforeEach(() => {
