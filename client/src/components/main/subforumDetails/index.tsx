@@ -74,22 +74,27 @@ const SubforumDetailsPage: React.FC = () => {
       <div key={question._id} className='question-card'>
         <div className='question-actions'>
           {isModerator && (
-            <button
-              className='pin-button'
-              onClick={() => {
-                handlePinUnpinQuestion(question._id, !question.pinned)
-                  .then(() => {
-                    // Optionally refetch data to ensure consistency
-                    refetchQuestions();
-                    refetchSubforum();
-                  })
-                  .catch(() => {
-                    // Revert the optimistic update if the API call fails
-                    question.pinned = !question.pinned;
-                  });
-              }}>
-              {question.pinned ? 'Unpin' : 'Pin'}
-            </button>
+            <div className='mod-buttons'>
+              <button
+                className='pin-button'
+                onClick={() => {
+                  handlePinUnpinQuestion(question._id, !question.pinned)
+                    .then(() => {
+                      // Optionally refetch data to ensure consistency
+                      refetchQuestions();
+                      refetchSubforum();
+                    })
+                    .catch(() => {
+                      // Revert the optimistic update if the API call fails
+                      question.pinned = !question.pinned;
+                    });
+                }}>
+                {question.pinned ? 'Unpin' : 'Pin'}
+              </button>
+              <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
+                Remove
+              </button>
+            </div>
           )}
         </div>
         <h3 onClick={() => handleQuestionClick(question)} className='question-title'>
@@ -108,11 +113,6 @@ const SubforumDetailsPage: React.FC = () => {
             </span>
           ))}
         </div>
-        {isModerator && (
-          <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
-            Remove
-          </button>
-        )}
       </div>
     );
   };

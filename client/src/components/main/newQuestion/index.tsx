@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import useUserContext from '../../../hooks/useUserContext';
 import useNewQuestion from '../../../hooks/useNewQuestion';
 import './index.css';
+import { upvoteQuestion } from '../../../services/questionService';
+import { Post } from '../../../types/types';
 
 /**
  * NewQuestion component for creating a new question.
@@ -99,13 +101,20 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
             throw new Error(errorData);
           }
 
-          const data = await response.json();
+          const resQuestion = await response.json();
+
+          await upvoteQuestion(
+            resQuestion as Post,
+            String(resQuestion._id),
+            resQuestion.askedBy,
+            user.username,
+          );
 
           // After posting, if we have a callback, call it
           if (onQuestionAdded) {
             onQuestionAdded();
           } else {
-            navigate(`/questions/${data._id}`);
+            navigate(`/questions/${resQuestion._id}`);
           }
         };
 
