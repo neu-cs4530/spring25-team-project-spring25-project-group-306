@@ -26,7 +26,7 @@ const uploadImageToAWS = async (file: Express.Multer.File): Promise<string | nul
 
   const params = {
     Bucket: BUCKET_NAME,
-    Key: new ObjectId().toString() + file.originalname,
+    Key: new ObjectId().toString(),
     Body: file.buffer,
     ContentType: file.mimetype,
   };
