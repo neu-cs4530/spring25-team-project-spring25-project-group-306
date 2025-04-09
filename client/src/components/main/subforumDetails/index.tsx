@@ -56,7 +56,7 @@ const SubforumDetailsPage: React.FC = () => {
    */
   const handleQuestionClick = (question: Question): void => {
     if (question._id && subforumId) {
-      navigate(`/subforums/${subforumId}/question/${question._id}`);
+      navigate(`/question/${question._id}`);
     }
   };
 
@@ -72,31 +72,6 @@ const SubforumDetailsPage: React.FC = () => {
     }
     return (
       <div key={question._id} className='question-card'>
-        <div className='question-actions'>
-          {isModerator && (
-            <div className='mod-buttons'>
-              <button
-                className='pin-button'
-                onClick={() => {
-                  handlePinUnpinQuestion(question._id, !question.pinned)
-                    .then(() => {
-                      // Optionally refetch data to ensure consistency
-                      refetchQuestions();
-                      refetchSubforum();
-                    })
-                    .catch(() => {
-                      // Revert the optimistic update if the API call fails
-                      question.pinned = !question.pinned;
-                    });
-                }}>
-                {question.pinned ? 'Unpin' : 'Pin'}
-              </button>
-              <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
-                Remove
-              </button>
-            </div>
-          )}
-        </div>
         <h3 onClick={() => handleQuestionClick(question)} className='question-title'>
           {question.title}
         </h3>
@@ -112,6 +87,30 @@ const SubforumDetailsPage: React.FC = () => {
               {tag.name}
             </span>
           ))}
+        </div>
+        <div className='question-actions'>
+          {isModerator && (
+            <div className='mod-buttons'>
+              <button
+                className='pin-button'
+                onClick={() => {
+                  handlePinUnpinQuestion(question._id, !question.pinned)
+                    .then(() => {
+                      // Optionally refetch data to ensure consistency
+                      refetchQuestions();
+                    })
+                    .catch(() => {
+                      // Revert the optimistic update if the API call fails
+                      question.pinned = !question.pinned;
+                    });
+                }}>
+                {question.pinned ? 'Unpin' : 'Pin'}
+              </button>
+              <button className='remove-button' onClick={() => deleteQuestion(question._id)}>
+                Remove
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

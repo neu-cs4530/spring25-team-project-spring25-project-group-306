@@ -14,6 +14,7 @@ import {
   Tag,
   VoteResponse,
 } from '../../types/types';
+import SubforumModel from '../../models/subforums.model';
 
 const addVoteToQuestionSpy = jest.spyOn(questionUtil, 'addVoteToQuestion');
 const getQuestionsByOrderSpy: jest.SpyInstance = jest.spyOn(questionUtil, 'getQuestionsByOrder');
@@ -133,6 +134,7 @@ const MOCK_POPULATED_QUESTIONS: PopulatedDatabaseQuestion[] = [
     downVotes: [],
     comments: [],
     pinned: false,
+    subforumId: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
   },
   {
     _id: new mongoose.Types.ObjectId('65e9b5a995b6c7045a30d823'),
@@ -174,11 +176,120 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
     ansDateTime: (answer as Answer).ansDateTime.toISOString(),
   })), // Converting answer ObjectId
   askDateTime: question.askDateTime.toISOString(),
+  subforumId: question.subforumId?.toString(), // Converting subforumId ObjectId
 });
 
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
 describe('Test questionController', () => {
+  describe('GET /getQuestion', () => {
+    it('should return all questions when no filters are applied', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(EXPECTED_QUESTIONS);
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, undefined);
+    });
+
+    it('should filter questions by subforumId', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
+        q => q.subforumId?.toString() === subforumId,
+      );
+
+      const response = await supertest(app).get('/question/getQuestion').query({ subforumId });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter questions by askedBy', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[1];
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(q => q.askedBy === askedBy);
+
+      const response = await supertest(app).get('/question/getQuestion').query({ askedBy });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter questions by search term', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[0]]);
+
+      const search = 'Question 1';
+
+      const response = await supertest(app).get('/question/getQuestion').query({ search });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([simplifyQuestion(MOCK_POPULATED_QUESTIONS[0])]);
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, search);
+    });
+
+    it('should filter questions by multiple criteria', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+
+      const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[0];
+      const search = 'Question 1';
+
+      const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
+        q =>
+          q.subforumId?.toString() === subforumId &&
+          q.askedBy === askedBy &&
+          q.title.includes(search),
+      );
+
+      filterQuestionsBySearchSpy.mockReturnValueOnce(filteredQuestions);
+
+      const response = await supertest(app)
+        .get('/question/getQuestion')
+        .query({ subforumId, askedBy, search });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
+      expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
+      expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(
+        MOCK_POPULATED_QUESTIONS.filter(
+          q => q.subforumId?.toString() === subforumId && q.askedBy === askedBy,
+        ),
+        search,
+      );
+    });
+
+    it('should return 500 if getQuestionsByOrder throws an error', async () => {
+      getQuestionsByOrderSpy.mockRejectedValueOnce(new Error('Error fetching questions'));
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when fetching questions by filter');
+    });
+
+    it('should return 500 if filterQuestionsBySearch throws an error', async () => {
+      getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
+      filterQuestionsBySearchSpy.mockImplementationOnce(() => {
+        throw new Error('Error filtering questions');
+      });
+
+      const response = await supertest(app).get('/question/getQuestion');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when fetching questions by filter');
+    });
+  });
+
   describe('DELETE /deleteQuestion/:qid', () => {
     it('should delete a question successfully', async () => {
       jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce(mockDatabaseQuestion);
@@ -188,6 +299,41 @@ describe('Test questionController', () => {
       );
 
       expect(response.status).toBe(200);
+    });
+
+    it('should return bad request error if the question ID is not in the correct format', async () => {
+      const invalidQid = 'invalid-id';
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${invalidQid}`);
+
+      expect(response.status).toBe(400);
+      expect(response.text).toBe('Invalid ID format');
+    });
+
+    it('should return server error if deleteQuestionById throws an error', async () => {
+      const validQid = new mongoose.Types.ObjectId().toString();
+
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockRejectedValueOnce(new Error('Deletion failed'));
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting question: Deletion failed');
+    });
+
+    it('should return server error if deleteQuestionById returns an error object', async () => {
+      const validQid = new mongoose.Types.ObjectId().toString();
+
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockResolvedValueOnce({ error: 'Question not found' });
+
+      const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting question: Question not found');
     });
   });
   describe('POST /addQuestion', () => {
@@ -331,6 +477,38 @@ describe('Test questionController', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
     });
+
+    it('should update the question count of the subforum the question belonged to', async () => {
+      const mockSubforumId = new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe');
+      const mockUpdatedSubforum = {
+        _id: mockSubforumId,
+        questionCount: 5,
+      };
+
+      const mockQuestionWithSubforum = {
+        ...mockQuestion,
+        subforumId: mockSubforumId,
+      };
+
+      jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
+      jest.spyOn(questionUtil, 'saveQuestion').mockResolvedValueOnce(mockDatabaseQuestion);
+      jest.spyOn(databaseUtil, 'populateDocument').mockResolvedValueOnce(mockPopulatedQuestion);
+      jest.spyOn(SubforumModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedSubforum);
+
+      // Making the request
+      const response = await supertest(app)
+        .post('/question/addQuestion')
+        .send(mockQuestionWithSubforum);
+
+      // Asserting the response
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(simplifyQuestion(mockPopulatedQuestion));
+      expect(SubforumModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        mockSubforumId,
+        { $inc: { questionCount: 1 } },
+        { new: true },
+      );
+    });
   });
 
   describe('POST /upvoteQuestion', () => {
@@ -459,23 +637,90 @@ describe('Test questionController', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return bad request error if addVoteToAnswer errors', async () => {
-      const validPid = new mongoose.Types.ObjectId();
-      const mockReqBody = {
-        post: {
-          upVotes: [],
-          downVotes: [],
-        },
-        pid: validPid.toString(),
-        creatorUsername: 'user',
-        username: 'new-user',
-      };
+    describe('POST /voteQuestion (Helper Function)', () => {
+      it('should return bad request error if post is missing in the request body', async () => {
+        const mockReqBody = {
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
 
-      addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'Error when upvoting' });
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
 
-      const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
 
-      expect(response.status).toBe(500);
+      it('should return bad request error if pid is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return bad request error if creatorUsername is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          username: 'some-user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return bad request error if username is missing in the request body', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+        };
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe('Invalid request');
+      });
+
+      it('should return server error if addVoteToQuestion throws an error', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        addVoteToQuestionSpy.mockRejectedValueOnce(new Error('Error while voting'));
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(500);
+        expect(response.text).toBe('upvote failed: Error while voting');
+      });
+
+      it('should return server error if addVoteToQuestion returns an error object', async () => {
+        const mockReqBody = {
+          post: { upVotes: [], downVotes: [] },
+          pid: '65e9b5a995b6c7045a30d823',
+          creatorUsername: 'user',
+          username: 'some-user',
+        };
+
+        addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'Vote operation failed' });
+
+        const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+        expect(response.status).toBe(500);
+        expect(response.text).toBe('upvote failed: Vote operation failed');
+      });
     });
   });
 
@@ -736,9 +981,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id: Error while fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
 
     it('should return bad request error if an error occurs when fetching and updating the question', async () => {
@@ -761,9 +1004,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id: Error while fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
   });
 

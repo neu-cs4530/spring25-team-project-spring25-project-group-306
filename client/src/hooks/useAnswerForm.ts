@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import { addAnswer, upvoteAnswer } from '../services/answerService';
@@ -15,7 +15,7 @@ import uploadImage from '../services/imageUploadService';
  * @returns postAnswer - the function to submit the answer after validation.
  */
 const useAnswerForm = () => {
-  const { subforumId, qid } = useParams();
+  const { qid } = useParams();
   const navigate = useNavigate();
 
   const { user } = useUserContext();
@@ -23,6 +23,8 @@ const useAnswerForm = () => {
   const [textErr, setTextErr] = useState<string>('');
   const [questionID, setQuestionID] = useState<string>('');
   const [image, setImage] = useState<string | null>(null);
+  const [imageMsg, setImageMsg] = useState<string>('No Image Uploaded');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     if (!qid) {
@@ -71,28 +73,44 @@ const useAnswerForm = () => {
 
     if (resAnswer && resAnswer._id) {
       // navigate to the question that was answered
-      navigate(`/subforums/${subforumId}/question/${questionID}`);
+      navigate(`/question/${questionID}`);
     }
   };
 
-  /**
-   * Function to handle file input changes and upload the selected image.
-   * It sets the image state to the uploaded image URL or an error message.
-   *
-   * @param e - The change event from the file input.
-   */
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) {
+  // Function to copy code to clipboard
+  const copyToClipboard = async (imageUrl: string | null) => {
+    if (!imageUrl) {
+      setImageMsg('No image uploaded');
       return;
     }
-    setImage('Uploading...');
+    setImageMsg('Copying to clipboard...');
+    await navigator.clipboard.writeText(`![Image_Label](${imageUrl})`);
+    setCopySuccess(true);
+  };
+
+  /**
+   * Function to handle file input change and upload the image.
+   *
+   * @param e - The event object from the file input change.
+   */
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+      setImageMsg('No file selected');
+      return;
+    }
+    setImageMsg('Uploading...');
     const file = e.target.files[0];
 
     try {
-      const imageURL = await uploadImage(file);
-      setImage(imageURL);
+      const uploadedImage = await uploadImage(file);
+      setImage(uploadedImage);
+      await copyToClipboard(uploadedImage); // Copy the image URL to clipboard
+      setImageMsg(
+        'Image link copied to clipboard! Paste it in your question text to embed it in the question.',
+      );
+      setCopySuccess(true);
     } catch (err) {
-      setTextErr('Error uploading image');
+      setImageMsg('Failed to upload image');
     }
   };
 
@@ -103,6 +121,12 @@ const useAnswerForm = () => {
     postAnswer,
     handleFileChange,
     image,
+    setImage,
+    imageMsg,
+    setImageMsg,
+    copySuccess,
+    setCopySuccess,
+    setTextErr,
   };
 };
 

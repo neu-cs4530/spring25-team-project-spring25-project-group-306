@@ -118,7 +118,7 @@ const answerController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const downvoteAnswer = async (req: VoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'downvote');
+    await handleVote(req, res, 'downvote');
   };
 
   /**
@@ -193,15 +193,21 @@ const answerController = (socket: FakeSOSocket) => {
     }
 
     try {
-      const result = deleteAnswerById(aid);
+      const result = await deleteAnswerById(aid);
 
       if (result && 'error' in result) {
         throw new Error(result.error as string);
       }
 
-      res.json(result);
+      const populatedResult = await populateDocument(aid, 'answer');
+
+      if ('error' in populatedResult) {
+        throw new Error(populatedResult.error);
+      }
+
+      res.json(populatedResult);
     } catch (err) {
-      res.status(500).send(`Error when deleting answer: ${(err as Error).message}`);
+      res.status(500).send(`Error when deleting answer`);
     }
   };
 

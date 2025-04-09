@@ -46,6 +46,8 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
     tagErr,
     postQuestion,
     handleFileChange,
+    imageMsg,
+    setImageMsg,
   } = useNewQuestion();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +84,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
               })),
             askedBy: user.username,
             askDateTime: new Date(),
-            image: image || undefined,
             subforumId, // Include the subforumId
           };
 
@@ -136,9 +137,9 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
   };
 
   // Handle image upload completely on the client side
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    handleFileChange(e);
+    await handleFileChange(e);
     if (!file) return;
 
     // Check file type
@@ -160,7 +161,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
         const imageData = event.target.result as string;
         setLocalImagePreview(imageData);
         // Also set the image in the hook to ensure it's included in the question
-        setImage(imageData);
         setError(null);
       }
     };
@@ -248,13 +248,14 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
                 onClick={() => {
                   setImage(null);
                   setLocalImagePreview(null);
+                  setImageMsg('No Image Uploaded'); // Clear the image message
                 }}
                 disabled={isSubmitting}>
                 Remove Image
               </button>
             </div>
           )}
-          <p>Link: {image}</p>
+          <p>{imageMsg}</p>
         </div>
 
         <button type='submit' className='submit-button' disabled={isSubmitting}>
