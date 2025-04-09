@@ -181,116 +181,110 @@ const simplifyQuestion = (question: PopulatedDatabaseQuestion) => ({
 
 const EXPECTED_QUESTIONS = MOCK_POPULATED_QUESTIONS.map(question => simplifyQuestion(question));
 
-
 describe('Test questionController', () => {
-
   describe('GET /getQuestion', () => {
     it('should return all questions when no filters are applied', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
       filterQuestionsBySearchSpy.mockReturnValueOnce(MOCK_POPULATED_QUESTIONS);
-  
+
       const response = await supertest(app).get('/question/getQuestion');
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual(EXPECTED_QUESTIONS);
       expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
       expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, undefined);
     });
-  
+
     it('should filter questions by subforumId', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
-  
+
       const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
       const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
         q => q.subforumId?.toString() === subforumId,
       );
-  
-      const response = await supertest(app)
-        .get('/question/getQuestion')
-        .query({ subforumId });
-  
+
+      const response = await supertest(app).get('/question/getQuestion').query({ subforumId });
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
       expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
     });
-  
+
     it('should filter questions by askedBy', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
-  
-      const askedBy = MOCK_POPULATED_QUESTIONS[1].askedBy;
+
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[1];
       const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(q => q.askedBy === askedBy);
-  
-      const response = await supertest(app)
-        .get('/question/getQuestion')
-        .query({ askedBy });
-  
+
+      const response = await supertest(app).get('/question/getQuestion').query({ askedBy });
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
       expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
     });
-  
+
     it('should filter questions by search term', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
       filterQuestionsBySearchSpy.mockReturnValueOnce([MOCK_POPULATED_QUESTIONS[0]]);
-  
+
       const search = 'Question 1';
-  
-      const response = await supertest(app)
-        .get('/question/getQuestion')
-        .query({ search });
-  
+
+      const response = await supertest(app).get('/question/getQuestion').query({ search });
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual([simplifyQuestion(MOCK_POPULATED_QUESTIONS[0])]);
       expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
       expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(MOCK_POPULATED_QUESTIONS, search);
     });
-  
+
     it('should filter questions by multiple criteria', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
-  
+
       const subforumId = MOCK_POPULATED_QUESTIONS[0].subforumId?.toString();
-      const askedBy = MOCK_POPULATED_QUESTIONS[0].askedBy;
+      const { askedBy } = MOCK_POPULATED_QUESTIONS[0];
       const search = 'Question 1';
-  
+
       const filteredQuestions = MOCK_POPULATED_QUESTIONS.filter(
         q =>
           q.subforumId?.toString() === subforumId &&
           q.askedBy === askedBy &&
           q.title.includes(search),
       );
-  
+
       filterQuestionsBySearchSpy.mockReturnValueOnce(filteredQuestions);
-  
+
       const response = await supertest(app)
         .get('/question/getQuestion')
         .query({ subforumId, askedBy, search });
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual(filteredQuestions.map(simplifyQuestion));
       expect(getQuestionsByOrderSpy).toHaveBeenCalledWith(undefined);
       expect(filterQuestionsBySearchSpy).toHaveBeenCalledWith(
-        MOCK_POPULATED_QUESTIONS.filter(q => q.subforumId?.toString() === subforumId && q.askedBy === askedBy),
+        MOCK_POPULATED_QUESTIONS.filter(
+          q => q.subforumId?.toString() === subforumId && q.askedBy === askedBy,
+        ),
         search,
       );
     });
-  
+
     it('should return 500 if getQuestionsByOrder throws an error', async () => {
       getQuestionsByOrderSpy.mockRejectedValueOnce(new Error('Error fetching questions'));
-  
+
       const response = await supertest(app).get('/question/getQuestion');
-  
+
       expect(response.status).toBe(500);
       expect(response.text).toBe('Error when fetching questions by filter');
     });
-  
+
     it('should return 500 if filterQuestionsBySearch throws an error', async () => {
       getQuestionsByOrderSpy.mockResolvedValueOnce(MOCK_POPULATED_QUESTIONS);
       filterQuestionsBySearchSpy.mockImplementationOnce(() => {
         throw new Error('Error filtering questions');
       });
-  
+
       const response = await supertest(app).get('/question/getQuestion');
-  
+
       expect(response.status).toBe(500);
       expect(response.text).toBe('Error when fetching questions by filter');
     });
@@ -319,7 +313,9 @@ describe('Test questionController', () => {
     it('should return server error if deleteQuestionById throws an error', async () => {
       const validQid = new mongoose.Types.ObjectId().toString();
 
-      jest.spyOn(questionUtil, 'deleteQuestionById').mockRejectedValueOnce(new Error('Deletion failed'));
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockRejectedValueOnce(new Error('Deletion failed'));
 
       const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
 
@@ -330,7 +326,9 @@ describe('Test questionController', () => {
     it('should return server error if deleteQuestionById returns an error object', async () => {
       const validQid = new mongoose.Types.ObjectId().toString();
 
-      jest.spyOn(questionUtil, 'deleteQuestionById').mockResolvedValueOnce({ error: 'Question not found' });
+      jest
+        .spyOn(questionUtil, 'deleteQuestionById')
+        .mockResolvedValueOnce({ error: 'Question not found' });
 
       const response = await supertest(app).delete(`/question/deleteQuestion/${validQid}`);
 
@@ -478,39 +476,37 @@ describe('Test questionController', () => {
       // Asserting the response
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
-    })
-    
+    });
+
     it('should update the question count of the subforum the question belonged to', async () => {
       const mockSubforumId = new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe');
       const mockUpdatedSubforum = {
-      _id: mockSubforumId,
-      questionCount: 5,
+        _id: mockSubforumId,
+        questionCount: 5,
       };
 
       const mockQuestionWithSubforum = {
-      ...mockQuestion,
-      subforumId: mockSubforumId,
+        ...mockQuestion,
+        subforumId: mockSubforumId,
       };
 
       jest.spyOn(tagUtil, 'processTags').mockResolvedValue([dbTag1, dbTag2]);
       jest.spyOn(questionUtil, 'saveQuestion').mockResolvedValueOnce(mockDatabaseQuestion);
       jest.spyOn(databaseUtil, 'populateDocument').mockResolvedValueOnce(mockPopulatedQuestion);
-      jest
-      .spyOn(SubforumModel, 'findByIdAndUpdate')
-      .mockResolvedValueOnce(mockUpdatedSubforum);
+      jest.spyOn(SubforumModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedSubforum);
 
       // Making the request
       const response = await supertest(app)
-      .post('/question/addQuestion')
-      .send(mockQuestionWithSubforum);
+        .post('/question/addQuestion')
+        .send(mockQuestionWithSubforum);
 
       // Asserting the response
       expect(response.status).toBe(200);
       expect(response.body).toEqual(simplifyQuestion(mockPopulatedQuestion));
       expect(SubforumModel.findByIdAndUpdate).toHaveBeenCalledWith(
-      mockSubforumId,
-      { $inc: { questionCount: 1 } },
-      { new: true },
+        mockSubforumId,
+        { $inc: { questionCount: 1 } },
+        { new: true },
       );
     });
   });
@@ -966,9 +962,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
 
     it('should return bad request error if an error occurs when fetching and updating the question', async () => {
@@ -991,9 +985,7 @@ describe('Test questionController', () => {
 
       // Asserting the response
       expect(response.status).toBe(500);
-      expect(response.text).toBe(
-        'Error when fetching question by id',
-      );
+      expect(response.text).toBe('Error when fetching question by id');
     });
   });
 

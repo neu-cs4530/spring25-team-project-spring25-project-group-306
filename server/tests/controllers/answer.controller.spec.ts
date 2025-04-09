@@ -311,7 +311,7 @@ describe('POST /upvoteAnswer', () => {
       username: 'test',
     };
 
-    voteAnswerSpy.mockResolvedValueOnce({error: 'Error when upvoting answer'});
+    voteAnswerSpy.mockResolvedValueOnce({ error: 'Error when upvoting answer' });
 
     const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
 
@@ -353,12 +353,11 @@ describe('POST /downvoteAnswer', () => {
 
 describe('DELETE /deleteAnswer/:aid', () => {
   const deleteAnswerSpy = jest.spyOn(answerUtil, 'deleteAnswerById');
-  const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
 
-  const validAid = new mongoose.Types.ObjectId();
+  const validAidDelete = new mongoose.Types.ObjectId();
 
   const mockAnswer = {
-    _id: validAid,
+    _id: validAidDelete,
     text: 'This is a test answer',
     ansBy: 'dummyUserId',
     ansDateTime: new Date('2024-06-03'),
@@ -368,17 +367,17 @@ describe('DELETE /deleteAnswer/:aid', () => {
   };
 
   it('should delete an answer and return the updated answer list', async () => {
-
     deleteAnswerSpy.mockResolvedValueOnce(mockAnswer);
     popDocSpy.mockResolvedValueOnce(mockAnswer);
 
-    const response = await supertest(app).delete(`/answer/deleteAnswer/${validAid}`);
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${validAidDelete}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       ...mockAnswer,
       ansDateTime: mockAnswer.ansDateTime.toISOString(),
-      _id: validAid.toString()});
+      _id: validAidDelete.toString(),
+    });
   });
 
   it('should return server error if answer ID is missing', async () => {

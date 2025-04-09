@@ -178,9 +178,11 @@ describe('Test subforumController', () => {
 
     it('should return 400 if moderators array contains an empty string', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
-      const response = await supertest(app).put(`/subforums/${subforumId}`).send({
-        moderators: ['mod1', ''],
-      });
+      const response = await supertest(app)
+        .put(`/subforums/${subforumId}`)
+        .send({
+          moderators: ['mod1', ''],
+        });
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
         error: 'All moderator usernames must be non-empty strings',
@@ -189,10 +191,12 @@ describe('Test subforumController', () => {
 
     it('should return 400 if members array contains an empty string', async () => {
       const subforumId = new mongoose.Types.ObjectId().toString();
-      const response = await supertest(app).put(`/subforums/${subforumId}`).send({
-        members: ['mod1', ''],
-        public: false,
-      });
+      const response = await supertest(app)
+        .put(`/subforums/${subforumId}`)
+        .send({
+          members: ['mod1', ''],
+          public: false,
+        });
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
         error: 'All member usernames must be non-empty strings',
