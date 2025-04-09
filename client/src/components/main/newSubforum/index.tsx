@@ -23,8 +23,6 @@ const NewSubforum: React.FC = () => {
     setModerators,
     members,
     setMembers,
-    rules,
-    setRules,
     isPublic,
     setIsPublic,
     titleErr,
@@ -32,7 +30,6 @@ const NewSubforum: React.FC = () => {
     tagsErr,
     moderatorsErr,
     membersErr,
-    rulesErr,
     error,
     createSubforum,
     userList,
@@ -129,19 +126,6 @@ const NewSubforum: React.FC = () => {
           <div className='hint'>
             List usernames of moderators who will help manage this subforum
           </div>
-        </div>
-
-        <div className='form-group'>
-          <label htmlFor='rules'>Rules</label>
-          <textarea
-            id='rules'
-            value={rules}
-            onChange={e => setRules(e.target.value)}
-            placeholder='Enter subforum rules (one per line)'
-            className={rulesErr ? 'error' : ''}
-          />
-          {rulesErr && <div className='error-message'>{rulesErr}</div>}
-          <div className='hint'>Add up to 10 rules to guide participation (optional)</div>
         </div>
 
         <div className='form-group'>

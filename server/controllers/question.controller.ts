@@ -60,11 +60,7 @@ const questionController = (socket: FakeSOSocket) => {
       const resqlist: PopulatedDatabaseQuestion[] = filterQuestionsBySearch(qlist, search);
       res.json(resqlist);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when fetching questions by filter`);
-      }
+      res.status(500).send(`Error when fetching questions by filter`);
     }
   };
 
@@ -101,11 +97,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('viewsUpdate', q);
       res.json(q);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when fetching question by id: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when fetching question by id`);
-      }
+      res.status(500).send(`Error when fetching question by id`);
     }
   };
 
@@ -164,7 +156,7 @@ const questionController = (socket: FakeSOSocket) => {
       // If the question is associated with a subforum, update the subforum's questionCount
       if (question.subforumId) {
         await SubforumModel.findByIdAndUpdate(
-          question.subforumId,
+          new ObjectId(question.subforumId),
           { $inc: { questionCount: 1 } },
           { new: true },
         );
@@ -180,11 +172,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('questionUpdate', populatedQuestion as PopulatedDatabaseQuestion);
       res.json(populatedQuestion);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.status(500).send(`Error when saving question: ${err.message}`);
-      } else {
-        res.status(500).send(`Error when saving question`);
-      }
+      res.status(500).send(`Error when saving question`);
     }
   };
 
@@ -226,7 +214,7 @@ const questionController = (socket: FakeSOSocket) => {
       socket.emit('voteUpdate', { pid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json(status);
     } catch (err) {
-      res.status(500).send(`Error when ${voteType}ing: ${(err as Error).message}`);
+      res.status(500).send(`${voteType} failed: ${(err as Error).message}`);
     }
   };
 

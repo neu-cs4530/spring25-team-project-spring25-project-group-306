@@ -20,8 +20,6 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     setDescription,
     tags,
     setTags,
-    rules,
-    setRules,
     moderators,
     setModerators,
     members,
@@ -31,7 +29,6 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
     titleErr,
     descriptionErr,
     tagsErr,
-    rulesErr,
     moderatorsErr,
     membersErr,
     loading,
@@ -130,18 +127,6 @@ const SubforumSettings: React.FC<{ subforumId: string }> = ({ subforumId }) => {
             </ul>
           </div>
           {moderatorsErr && <div className='error-message'>{moderatorsErr}</div>}
-        </div>
-
-        <div className='form-group'>
-          <label htmlFor='rules'>Rules (one per line)</label>
-          <textarea
-            id='rules'
-            value={rules}
-            onChange={e => setRules(e.target.value)}
-            placeholder='Enter rules (one per line)'
-            className={rulesErr ? 'error' : ''}
-          />
-          {rulesErr && <div className='error-message'>{rulesErr}</div>}
         </div>
 
         <div className='form-group'>
