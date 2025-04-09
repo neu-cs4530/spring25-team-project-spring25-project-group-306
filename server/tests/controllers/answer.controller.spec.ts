@@ -279,6 +279,44 @@ describe('POST /upvoteAnswer', () => {
 
     expect(response.status).toBe(400);
   });
+
+  it('should return an internal server error if addVoteToAnswer method throws an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+    const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validAid,
+      creatorUsername: 'user',
+      username: 'test',
+    };
+
+    voteAnswerSpy.mockRejectedValueOnce(new Error('Error when upvoting answer'));
+
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+
+  it('should return an internal server error if addVoteToAnswer method returns an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+    const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validAid,
+      creatorUsername: 'user',
+      username: 'test',
+    };
+
+    voteAnswerSpy.mockResolvedValueOnce({error: 'Error when upvoting answer'});
+
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
 });
 
 describe('POST /downvoteAnswer', () => {
@@ -310,5 +348,82 @@ describe('POST /downvoteAnswer', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockAnswer);
+  });
+});
+
+describe('DELETE /deleteAnswer/:aid', () => {
+  const deleteAnswerSpy = jest.spyOn(answerUtil, 'deleteAnswerById');
+  const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
+
+  const validAid = new mongoose.Types.ObjectId();
+
+  const mockAnswer = {
+    _id: validAid,
+    text: 'This is a test answer',
+    ansBy: 'dummyUserId',
+    ansDateTime: new Date('2024-06-03'),
+    comments: [],
+    upVotes: [],
+    downVotes: [],
+  };
+
+  it('should delete an answer and return the updated answer list', async () => {
+
+    deleteAnswerSpy.mockResolvedValueOnce(mockAnswer);
+    popDocSpy.mockResolvedValueOnce(mockAnswer);
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${validAid}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      ...mockAnswer,
+      ansDateTime: mockAnswer.ansDateTime.toISOString(),
+      _id: validAid.toString()});
+  });
+
+  it('should return server error if answer ID is missing', async () => {
+    const response = await supertest(app).delete('/answer/deleteAnswer/');
+
+    expect(response.status).toBe(404); // Express returns 404 for missing route parameters
+  });
+
+  it('should return bad request error if answer ID is invalid', async () => {
+    const invalidAid = 'invalidObjectId';
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${invalidAid}`);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when deleting answer');
+  });
+
+  it('should return database error in response if deleteAnswerById method throws an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+
+    deleteAnswerSpy.mockResolvedValueOnce({ error: 'Error when deleting answer' });
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${validAid}`);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when deleting answer');
+  });
+
+  it('should return database error in response if populateDocument method throws an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+
+    deleteAnswerSpy.mockResolvedValueOnce(mockAnswer);
+    popDocSpy.mockResolvedValueOnce({ error: 'Error when populating document' });
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${validAid}`);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when deleting answer');
+  });
+
+  it('should return a 400 error if aid is null', async () => {
+    const nullAid = undefined;
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${nullAid}`);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when deleting answer');
   });
 });

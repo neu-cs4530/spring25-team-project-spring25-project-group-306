@@ -123,6 +123,23 @@ describe('Test subforumController', () => {
           'Invalid subforum data. Title, description, and at least one moderator username are required.',
       });
     });
+
+    it('should return 500 if saveSubforum throws an error', async () => {
+      const mockSubforum = {
+        title: 'Test Subforum',
+        description: 'Test Description',
+        moderators: ['mod1'],
+        members: ['user1'],
+        public: true,
+      };
+
+      saveSubforumSpy.mockRejectedValueOnce(new Error('Database error'));
+
+      const response = await supertest(app).post('/subforums').send(mockSubforum);
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: 'Failed to create subforum' });
+    });
   });
 
   describe('PUT /:id', () => {
@@ -156,6 +173,29 @@ describe('Test subforumController', () => {
         ...mockUpdatedSubforum,
         createdAt: mockUpdatedSubforum.createdAt.toISOString(),
         updatedAt: mockUpdatedSubforum.updatedAt.toISOString(),
+      });
+    });
+
+    it('should return 400 if moderators array contains an empty string', async () => {
+      const subforumId = new mongoose.Types.ObjectId().toString();
+      const response = await supertest(app).put(`/subforums/${subforumId}`).send({
+        moderators: ['mod1', ''],
+      });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        error: 'All moderator usernames must be non-empty strings',
+      });
+    });
+
+    it('should return 400 if members array contains an empty string', async () => {
+      const subforumId = new mongoose.Types.ObjectId().toString();
+      const response = await supertest(app).put(`/subforums/${subforumId}`).send({
+        members: ['mod1', ''],
+        public: false,
+      });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        error: 'All member usernames must be non-empty strings',
       });
     });
 

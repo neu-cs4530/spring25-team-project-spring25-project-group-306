@@ -108,10 +108,6 @@ const subforumController = (socket: FakeSOSocket) => {
    * @param {Response} res - The response object
    */
   const createSubforum = async (req: CreateSubforumRequest, res: Response): Promise<void> => {
-    if (!req.body) {
-      res.status(400).json({ error: 'No request body provided' });
-      return;
-    }
 
     if (!isSubforumValid(req.body)) {
       res.status(400).json({

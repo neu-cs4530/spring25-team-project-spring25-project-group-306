@@ -187,13 +187,8 @@ const answerController = (socket: FakeSOSocket) => {
   const deleteAnswer = async (req: DeleteAnswerRequest, res: Response): Promise<void> => {
     const { aid } = req.params;
 
-    if (!aid) {
-      res.status(400).send('Invalid request');
-      return;
-    }
-
     try {
-      const result = deleteAnswerById(aid);
+      const result = await deleteAnswerById(aid);
 
       if ('error' in result) {
         throw new Error(result.error as string);
@@ -201,13 +196,13 @@ const answerController = (socket: FakeSOSocket) => {
 
       const populatedResult = await populateDocument(aid, 'answer');
 
-      if (populatedResult && 'error' in populatedResult) {
+      if ('error' in populatedResult) {
         throw new Error(populatedResult.error);
       }
 
       res.json(populatedResult);
     } catch (err) {
-      res.status(500).send(`Error when deleting answer: ${(err as Error).message}`);
+      res.status(500).send(`Error when deleting answer`);
     }
   };
 
