@@ -18,7 +18,7 @@ Run `npm install` in the root directory to install all dependencies for the `cli
 The schemas for the database are documented in the directory `server/models/schema`.
 A class diagram for the schema definition is shown below:
 
-![Class Diagram](class-diagram.png)
+![Class Diagram](class-diagram.jpeg)
 
 ## API Routes
 
@@ -27,6 +27,9 @@ A class diagram for the schema definition is shown below:
 | Endpoint   | Method | Description      |
 | ---------- | ------ | ---------------- |
 | /addAnswer | POST   | Add a new answer |
+| /downvoteAnswer| POST| downvote an answer|
+| /upvoteAnswer| POST| upvote an answer|
+| /deleteAnswer/:aid| DELETE| delete an answer|
 
 ### `/comment`
 
@@ -50,6 +53,8 @@ A class diagram for the schema definition is shown below:
 | /addQuestion      | POST   | Add a new question              |
 | /upvoteQuestion   | POST   | Upvote a question               |
 | /downvoteQuestion | POST   | Downvote a question             |
+| /pinUnpinQuestion | POST   | Pin/Unpin a question            |
+| /deleteQuestion/:qid | POST | Delete a question              |
 
 ### `/tag`
 
@@ -100,11 +105,12 @@ A class diagram for the schema definition is shown below:
 | /:id     | PUT    | Update a subforum by ID |
 | /:id     | DELETE | Delete a subforum by ID |
 
-### `/images`
+### `/`
 
 | Endpoint | Method | Description        |
 | -------- | ------ | ------------------ |
-| /upload  | POST   | Create a new image |
+| /imageUpload  | POST   | Create a new image |
+| /execute | POST   | compile and run code |
 
 ## Running Stryker Mutation Testing
 
