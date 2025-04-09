@@ -106,7 +106,7 @@ const useAnswerForm = () => {
       setImage(uploadedImage);
       await copyToClipboard(uploadedImage); // Copy the image URL to clipboard
       setImageMsg(
-        'Image link copied to clipboard! Paste it in your question text to embed it in the question.',
+        'Image link copied to clipboard! Paste it in your answer text to embed it in the answer.',
       );
       setCopySuccess(true);
     } catch (err) {
