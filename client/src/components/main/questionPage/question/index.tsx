@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import './index.css';
 import { getMetaData } from '../../../../tool';
 import { PopulatedDatabaseQuestion } from '../../../../types/types';
-import useAnswerPage from '../../../../hooks/useAnswerPage';
 
 /**
  * Interface representing the props for the Question component.
@@ -24,7 +23,7 @@ interface QuestionProps {
  */
 const QuestionView = ({ question }: QuestionProps) => {
   const navigate = useNavigate();
-  const { subforumId } = useAnswerPage();
+
   /**
    * Function to navigate to the home page with the specified tag as a search parameter.
    *
@@ -43,7 +42,7 @@ const QuestionView = ({ question }: QuestionProps) => {
    * @param questionID - The ID of the question to navigate to.
    */
   const handleAnswer = (questionID: ObjectId) => {
-    navigate(`/subforums/${subforumId}/question/${questionID}`);
+    navigate(`/question/${questionID}`);
   };
 
   return (

@@ -56,7 +56,7 @@ const SubforumDetailsPage: React.FC = () => {
    */
   const handleQuestionClick = (question: Question): void => {
     if (question._id && subforumId) {
-      navigate(`/subforums/${subforumId}/question/${question._id}`);
+      navigate(`/question/${question._id}`);
     }
   };
 
