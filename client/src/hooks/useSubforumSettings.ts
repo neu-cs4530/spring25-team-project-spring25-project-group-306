@@ -26,7 +26,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
   const [rules, setRules] = useState('');
-  const [moderators, setModerators] = useState('');
+  const [moderators, setModerators] = useState(['']);
   const [members, setMembers] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [titleErr, setTitleErr] = useState('');
@@ -85,7 +85,7 @@ const useSubforumSettings = (subforumId: string | undefined) => {
         setDescription(data.description);
         setTags(data.tags?.join(' ') || '');
         setRules(data.rules?.join('\n') || '');
-        setModerators(data.moderators.join('\n'));
+        setModerators(data.moderators);
         setMembers(data.members?.join('\n') || '');
         setIsPublic(data.public);
         setError(null);
@@ -146,10 +146,8 @@ const useSubforumSettings = (subforumId: string | undefined) => {
       setRulesErr('');
     }
 
-    const moderatorsList = moderators
-      .split('\n')
-      .map(mod => mod.trim())
-      .filter(mod => mod !== '');
+    const moderatorsList = moderators.map(mod => mod.trim()).filter(mod => mod !== '');
+
     if (moderatorsList.length === 0) {
       setModeratorsErr('Must have at least one moderator');
       isValid = false;
@@ -178,14 +176,16 @@ const useSubforumSettings = (subforumId: string | undefined) => {
 
     const tagList = tags.split(' ').filter(tag => tag.trim() !== '');
     const rulesList = rules.split('\n').filter(rule => rule.trim() !== '');
-    const moderatorsList = moderators
-      .split('\n')
-      .map(mod => mod.trim())
-      .filter(mod => mod !== '');
+    const moderatorsList = moderators.map(mod => mod.trim()).filter(mod => mod !== '');
     const membersList = members
       .split('\n')
       .map(member => member.trim())
       .filter(member => member !== '');
+
+    // Ensure current user is included as a moderator and member
+    if (!moderatorsList.includes(user.username)) {
+      moderatorsList.push(user.username);
+    }
 
     if (!membersList.includes(user.username)) {
       membersList.push(user.username);

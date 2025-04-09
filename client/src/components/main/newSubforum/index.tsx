@@ -35,18 +35,29 @@ const NewSubforum: React.FC = () => {
     rulesErr,
     error,
     createSubforum,
+    userList,
   } = useNewSubforum();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     createSubforum();
+  };
+
+  const handleModeratorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newModerators = e.target.value.split(',').map(mod => mod.trim());
+    const updatedModerators = Array.from(new Set([...moderators, ...newModerators]));
+    setModerators(updatedModerators);
+  };
+
+  const handleMembersChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const membersArray = e.target.value.split(',').map(member => member.trim());
+    setMembers(membersArray);
   };
 
   return (
     <div className='new-subforum-container'>
       <h1>Create a New Subforum</h1>
       {error && <div className='error-message'>{error}</div>}
-      <form onSubmit={handleSubmit} className='new-subforum-form'>
+      <div className='new-subforum-form'>
         <div className='form-group'>
           <label htmlFor='title'>Title *</label>
           <input
@@ -91,14 +102,29 @@ const NewSubforum: React.FC = () => {
         </div>
 
         <div className='form-group'>
-          <label htmlFor='moderators'>Moderators *</label>
-          <textarea
+          <label htmlFor='moderators'>Add Moderators *</label>
+          <select
             id='moderators'
-            value={moderators}
-            onChange={e => setModerators(e.target.value)}
-            placeholder='Enter usernames (one per line)'
-            className={moderatorsErr ? 'error' : ''}
-          />
+            value={moderators[-1]}
+            onChange={handleModeratorChange}
+            className={moderatorsErr ? 'error' : ''}>
+            {userList.map(member => (
+              <option
+                key={member.username}
+                value={member.username}
+                className={moderators.includes(member.username) ? 'selected' : ''}>
+                {member.username}
+              </option>
+            ))}
+          </select>
+          <div className='moderator-list'>
+            <h3>Current Moderators</h3>
+            <ul>
+              {moderators.map(moderator => (
+                <li key={moderator}>{moderator}</li>
+              ))}
+            </ul>
+          </div>
           {moderatorsErr && <div className='error-message'>{moderatorsErr}</div>}
           <div className='hint'>
             List usernames of moderators who will help manage this subforum
@@ -153,7 +179,7 @@ const NewSubforum: React.FC = () => {
             <textarea
               id='members'
               value={members}
-              onChange={e => setMembers(e.target.value)}
+              onChange={e => handleMembersChange(e)}
               placeholder='Enter member usernames (one per line)'
               className={membersErr ? 'error' : ''}
             />
@@ -168,11 +194,11 @@ const NewSubforum: React.FC = () => {
           <button type='button' onClick={() => navigate('/subforums')} className='cancel-button-1'>
             Cancel
           </button>
-          <button type='submit' className='submit-button-1'>
+          <button type='button' onClick={() => handleSubmit()} className='submit-button-1'>
             Create Subforum
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
