@@ -82,7 +82,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
               })),
             askedBy: user.username,
             askDateTime: new Date(),
-            image: image || undefined,
             subforumId, // Include the subforumId
           };
 
