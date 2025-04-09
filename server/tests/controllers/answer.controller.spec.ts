@@ -334,6 +334,44 @@ describe('Answer Controller', () => {
     });
   });
 
+  it('should return an internal server error if addVoteToAnswer method throws an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+    const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validAid,
+      creatorUsername: 'user',
+      username: 'test',
+    };
+
+    voteAnswerSpy.mockRejectedValueOnce(new Error('Error when upvoting answer'));
+
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+
+  it('should return an internal server error if addVoteToAnswer method returns an error', async () => {
+    const validAid = new mongoose.Types.ObjectId().toString();
+    const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validAid,
+      creatorUsername: 'user',
+      username: 'test',
+    };
+
+    voteAnswerSpy.mockResolvedValueOnce({ error: 'Error when upvoting answer' });
+
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+
   describe('POST /downvoteAnswer', () => {
     it('should downvote an answer', async () => {
       const validAid = new mongoose.Types.ObjectId();
@@ -401,44 +439,6 @@ describe('Answer Controller', () => {
     });
   });
 
-  // describe('DELETE /deleteAnswer/:aid', () => {
-  //   it('should delete an answer successfully', async () => {
-  //     const mockDatabaseAnswer: DatabaseAnswer = {
-  //       _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
-  //       text: 'New Answer Text',
-  //       ansBy: 'answer_user',
-  //       ansDateTime: new Date('2024-06-06'),
-  //       upVotes: [],
-  //       downVotes: [],
-  //       comments: [],
-  //     };
-
-  //     deleteAnswerByIdSpy.mockResolvedValueOnce(mockDatabaseAnswer);
-
-  //     const response = await supertest(app).delete(`/answer/deleteAnswer/${mockDatabaseAnswer._id}`);
-
-  //     expect(response.status).toBe(200);
-  //   });
-
-  //   it('should return bad request error if the answer id is not in the correct format', async () => {
-  //     // const mockDatabaseAnswer: DatabaseAnswer = {
-  //     //   _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
-  //     //   text: 'New Answer Text',
-  //     //   ansBy: 'answer_user',
-  //     //   ansDateTime: new Date('2024-06-06'),
-  //     //   upVotes: [],
-  //     //   downVotes: [],
-  //     //   comments: [],
-  //     // };
-
-  //     // deleteAnswerByIdSpy.mockResolvedValueOnce(mockDatabaseAnswer);
-
-  //     const response = await supertest(app).delete(`/answer/deleteAnswer/${'invalid_id'}`);
-
-  //     expect(response.status).toBe(400);
-  //   });
-  // });
-
   describe('DELETE /deleteAnswer/:aid', () => {
     const deleteAnswerSpy = jest.spyOn(answerUtil, 'deleteAnswerById');
 
@@ -479,8 +479,8 @@ describe('Answer Controller', () => {
 
       const response = await supertest(app).delete(`/answer/deleteAnswer/${invalidAid}`);
 
-      expect(response.status).toBe(400);
-      expect(response.text).toBe('Invalid ID format');
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting answer');
     });
 
     it('should return database error in response if deleteAnswerById method throws an error', async () => {
@@ -510,8 +510,8 @@ describe('Answer Controller', () => {
       const nullAid = undefined;
       const response = await supertest(app).delete(`/answer/deleteAnswer/${nullAid}`);
 
-      expect(response.status).toBe(400);
-      expect(response.text).toBe('Invalid ID format');
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Error when deleting answer');
     });
   });
 });

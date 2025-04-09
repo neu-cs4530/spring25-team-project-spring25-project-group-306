@@ -187,11 +187,6 @@ const answerController = (socket: FakeSOSocket) => {
   const deleteAnswer = async (req: DeleteAnswerRequest, res: Response): Promise<void> => {
     const { aid } = req.params;
 
-    if (!ObjectId.isValid(aid)) {
-      res.status(400).send('Invalid ID format');
-      return;
-    }
-
     try {
       const result = await deleteAnswerById(aid);
 
