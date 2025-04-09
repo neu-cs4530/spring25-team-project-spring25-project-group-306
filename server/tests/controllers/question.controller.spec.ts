@@ -850,6 +850,25 @@ describe('Test questionController', () => {
 
       expect(response.status).toBe(400);
     });
+
+    it('should return bad request error if addVoteToAnswer errors', async () => {
+      const validPid = new mongoose.Types.ObjectId();
+      const mockReqBody = {
+        post: {
+          upVotes: [],
+          downVotes: [],
+        },
+        pid: validPid.toString(),
+        creatorUsername: 'user',
+        username: 'new-user',
+      };
+
+      addVoteToQuestionSpy.mockResolvedValueOnce({ error: 'Error when downvoting' });
+
+      const response = await supertest(app).post('/question/downvoteQuestion').send(mockReqBody);
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe('GET /getQuestionById/:qid', () => {

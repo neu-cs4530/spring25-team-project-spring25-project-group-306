@@ -171,6 +171,11 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
   }
 };
 
+/**
+ * Deletes a question from the database.
+ * @param {Question} qid - The question id to delete
+ * @returns {Promise<QuestionResponse>} - The deleted question or error message
+ */
 export const deleteQuestionById = async (qid: string): Promise<QuestionResponse> => {
   try {
     const result: DatabaseQuestion | null = await QuestionModel.findByIdAndDelete(qid).lean();

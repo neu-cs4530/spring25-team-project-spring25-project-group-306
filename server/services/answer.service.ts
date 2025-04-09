@@ -127,20 +127,20 @@ export const addVoteToAnswer = async (
 
     if (voteType === 'upvote') {
       if (alreadyDownvoted) {
-        msg = 'Question upvoted successfully';
+        msg = 'Answer upvoted successfully';
         karmaChange = 2;
       } else if (!alreadyUpvoted) {
-        msg = 'Question upvoted successfully';
+        msg = 'Answer upvoted successfully';
         karmaChange = 1;
       } else {
         msg = 'Upvote cancelled successfully';
         karmaChange = -1;
       }
     } else if (alreadyUpvoted) {
-      msg = 'Question downvoted successfully';
+      msg = 'Answer downvoted successfully';
       karmaChange = -2;
     } else if (!alreadyDownvoted) {
-      msg = 'Question downvoted successfully';
+      msg = 'Answer downvoted successfully';
       karmaChange = -1;
     } else {
       msg = 'Downvote cancelled successfully';
@@ -162,6 +162,11 @@ export const addVoteToAnswer = async (
   }
 };
 
+/**
+ * Deletes a answer from the database.
+ * @param {Question} qid - The answer id to delete
+ * @returns {Promise<QuestionResponse>} - The deleted answer or error message
+ */
 export const deleteAnswerById = async (aid: string): Promise<AnswerResponse> => {
   if (!aid) {
     return { error: 'Invalid answer ID' };

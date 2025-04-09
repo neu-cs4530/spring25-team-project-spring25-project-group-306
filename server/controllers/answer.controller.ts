@@ -118,7 +118,7 @@ const answerController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const downvoteAnswer = async (req: VoteRequest, res: Response): Promise<void> => {
-    handleVote(req, res, 'downvote');
+    await handleVote(req, res, 'downvote');
   };
 
   /**
@@ -190,7 +190,7 @@ const answerController = (socket: FakeSOSocket) => {
     try {
       const result = await deleteAnswerById(aid);
 
-      if ('error' in result) {
+      if (result && 'error' in result) {
         throw new Error(result.error as string);
       }
 

@@ -161,7 +161,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
         const imageData = event.target.result as string;
         setLocalImagePreview(imageData);
         // Also set the image in the hook to ensure it's included in the question
-        setImage(imageData);
         setError(null);
       }
     };
