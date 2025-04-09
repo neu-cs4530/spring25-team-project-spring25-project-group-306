@@ -178,6 +178,7 @@ const useNewQuestion = () => {
     imageMsg,
     copySuccess,
     setCopySuccess,
+    setImageMsg,
   };
 };
 

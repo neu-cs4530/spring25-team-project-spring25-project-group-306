@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { validateHyperlink } from '../tool';
 import { addAnswer, upvoteAnswer } from '../services/answerService';
@@ -126,6 +126,7 @@ const useAnswerForm = () => {
     setImageMsg,
     copySuccess,
     setCopySuccess,
+    setTextErr,
   };
 };
 

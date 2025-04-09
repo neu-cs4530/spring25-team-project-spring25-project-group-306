@@ -47,6 +47,7 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
     postQuestion,
     handleFileChange,
     imageMsg,
+    setImageMsg,
   } = useNewQuestion();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +84,6 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
               })),
             askedBy: user.username,
             askDateTime: new Date(),
-            image: image || undefined,
             subforumId, // Include the subforumId
           };
 
@@ -249,6 +249,7 @@ const NewQuestion: React.FC<NewQuestionProps> = ({ subforumId, onQuestionAdded }
                 onClick={() => {
                   setImage(null);
                   setLocalImagePreview(null);
+                  setImageMsg('No Image Uploaded'); // Clear the image message
                 }}
                 disabled={isSubmitting}>
                 Remove Image
