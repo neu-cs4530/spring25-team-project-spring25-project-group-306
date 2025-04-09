@@ -162,6 +162,11 @@ export const addVoteToAnswer = async (
   }
 };
 
+/**
+ * Deletes a answer from the database.
+ * @param {Question} qid - The answer id to delete
+ * @returns {Promise<QuestionResponse>} - The deleted answer or error message
+ */
 export const deleteAnswerById = async (aid: string): Promise<AnswerResponse> => {
   if (!aid) {
     return { error: 'Invalid answer ID' };
@@ -200,10 +205,10 @@ export const addAnswerToQuestion = async (
     );
 
     if (result === null) {
-      throw new Error('Error when adding answer to answer');
+      throw new Error('Error when adding answer to question');
     }
     return result;
   } catch (error) {
-    return { error: 'Error when adding answer to answer' };
+    return { error: 'Error when adding answer to question' };
   }
 };

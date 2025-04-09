@@ -4,11 +4,13 @@ import { ObjectId } from 'mongodb';
 import { app } from '../../app';
 import * as answerUtil from '../../services/answer.service';
 import * as databaseUtil from '../../utils/database.util';
+import { DatabaseAnswer } from '../../types/types';
 
 const saveAnswerSpy = jest.spyOn(answerUtil, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(answerUtil, 'addAnswerToQuestion');
 const popDocSpy = jest.spyOn(databaseUtil, 'populateDocument');
 const voteAnswerSpy = jest.spyOn(answerUtil, 'addVoteToAnswer');
+const deleteAnswerByIdSpy = jest.spyOn(answerUtil, 'deleteAnswerById');
 
 describe('POST /addAnswer', () => {
   it('should add a new answer to the question', async () => {
@@ -270,14 +272,23 @@ describe('POST /upvoteAnswer', () => {
     expect(response.status).toBe(400);
   });
 
-  it('should return bad request error if answer ID is missing', async () => {
+  it('should return bad request error if addVoteToAnswer errors', async () => {
+    const validPid = new mongoose.Types.ObjectId();
     const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validPid.toString(),
+      creatorUsername: 'user',
       username: 'test',
     };
 
-    const response = await supertest(app).post('/answer/downvoteAnswer').send(mockReqBody);
+    voteAnswerSpy.mockResolvedValueOnce({ error: 'Error when adding answer to question' });
 
-    expect(response.status).toBe(400);
+    const response = await supertest(app).post('/answer/upvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
   });
 });
 
@@ -310,5 +321,78 @@ describe('POST /downvoteAnswer', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockAnswer);
+  });
+
+  it('should return bad request error if answer ID is missing', async () => {
+    const mockReqBody = {
+      username: 'test',
+    };
+
+    const response = await supertest(app).post('/answer/downvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return bad request error if request body is missing', async () => {
+    const response = await supertest(app).post('/answer/downvoteAnswer');
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should return bad request error if addVoteToAnswer errors', async () => {
+    const validPid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      post: {
+        upVotes: [],
+        downVotes: [],
+      },
+      pid: validPid.toString(),
+      creatorUsername: 'user',
+      username: 'test',
+    };
+
+    voteAnswerSpy.mockResolvedValueOnce({ error: 'Error when adding answer to question' });
+
+    const response = await supertest(app).post('/answer/downvoteAnswer').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+  });
+});
+
+describe('DELETE /deleteAnswer/:aid', () => {
+  it('should delete an answer successfully', async () => {
+    const mockDatabaseAnswer: DatabaseAnswer = {
+      _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
+      text: 'New Answer Text',
+      ansBy: 'answer_user',
+      ansDateTime: new Date('2024-06-06'),
+      upVotes: [],
+      downVotes: [],
+      comments: [],
+    };
+
+    deleteAnswerByIdSpy.mockResolvedValueOnce(mockDatabaseAnswer);
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${mockDatabaseAnswer._id}`);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should return bad request error if the answer id is not in the correct format', async () => {
+    // const mockDatabaseAnswer: DatabaseAnswer = {
+    //   _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
+    //   text: 'New Answer Text',
+    //   ansBy: 'answer_user',
+    //   ansDateTime: new Date('2024-06-06'),
+    //   upVotes: [],
+    //   downVotes: [],
+    //   comments: [],
+    // };
+
+    // deleteAnswerByIdSpy.mockResolvedValueOnce(mockDatabaseAnswer);
+
+    const response = await supertest(app).delete(`/answer/deleteAnswer/${'invalid_id'}`);
+
+    expect(response.status).toBe(400);
   });
 });
