@@ -24,7 +24,9 @@ const useNewQuestion = () => {
   const [title, setTitle] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [tagNames, setTagNames] = useState<string>('');
-  const [image, setImage] = useState<string | null>('No Image Uploaded');
+  const [image, setImage] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [imageMsg, setImageMsg] = useState<string>('No Image Uploaded');
 
   const [titleErr, setTitleErr] = useState<string>('');
   const [textErr, setTextErr] = useState<string>('');
@@ -122,6 +124,17 @@ const useNewQuestion = () => {
     }
   };
 
+  // Function to copy code to clipboard
+  const copyToClipboard = async (imageUrl: string | null) => {
+    if (!imageUrl) {
+      setImageMsg('No image uploaded');
+      return;
+    }
+    setImageMsg('Copying to clipboard...');
+    await navigator.clipboard.writeText(`![Image_Label](${imageUrl})`);
+    setCopySuccess(true);
+  };
+
   /**
    * Function to handle file input change and upload the image.
    *
@@ -129,17 +142,22 @@ const useNewQuestion = () => {
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
-      setImage('No File Selected');
+      setImageMsg('No file selected');
       return;
     }
-    setImage('Uploading...');
+    setImageMsg('Uploading...');
     const file = e.target.files[0];
 
     try {
-      const imageURL = await uploadImage(file);
-      setImage(imageURL);
+      const uploadedImage = await uploadImage(file);
+      setImage(uploadedImage);
+      await copyToClipboard(uploadedImage); // Copy the image URL to clipboard
+      setImageMsg(
+        'Image link copied to clipboard! Paste it in your question details to embed it in the question.',
+      );
+      setCopySuccess(true);
     } catch (err) {
-      setImage('Failed to upload image');
+      setImageMsg('Failed to upload image');
     }
   };
 
@@ -157,6 +175,9 @@ const useNewQuestion = () => {
     tagErr,
     postQuestion,
     handleFileChange,
+    imageMsg,
+    copySuccess,
+    setCopySuccess,
   };
 };
 
