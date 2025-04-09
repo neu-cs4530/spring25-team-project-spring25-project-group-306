@@ -1,9 +1,58 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/fE-a_qEp)
 The individual and team project for this class are designed to mirror the experiences of a software engineer joining a new development team: you will be “onboarded” to our codebase, make several individual contributions, and then form a team to propose, develop and implement new features. The codebase that we’ll be developing on is a Fake Stack Overflow project (let’s call it HuskyFlow). You will get an opportunity to work with the starter code which provides basic skeleton for the app and then additional features will be proposed and implemented by you! All implementation will take place in the TypeScript programming language, using React for the user interface.
 
-## Getting Started
+## Build Instructions
+Clone the GitHub repository using the following command:
 
-Run `npm install` in the root directory to install all dependencies for the `client`, `server`, and `shared` folders.
+git clone https://github.com/neu-cs4530/spring25-team-project-spring25-project-group-306.git
+
+Starting in the root of the repository directory, run this series of commands:
+
+```
+cd server && npm install
+cd ../client && npm install
+cd ../shared && npm install
+cd ../testing && npm install
+```
+
+Create a file named .env in the client root and add the following environment variables:
+
+```
+REACT_APP_SERVER_URL=http://localhost:8000
+```
+
+Create a file named .env in the server root and add the following environment variables:
+
+```
+MONGODB_URI=mongodb://127.0.0.1:27017
+CLIENT_URL=http://localhost:3000
+PORT=8000
+AWS_ACCESS_KEY_ID=AKIA2OP6WA2KPVPRV3FZ
+AWS_SECRET_ACCESS_KEY=LWFrJ/gJE1Np/zbfqhcZRzwJqQjNcN/YQ4bzYPQc
+AWS_REGION=us-east-1
+AWS_S3_BUCKET_NAME=fakesoimgs
+JDOODLE_API_URL = https://api.jdoodle.com/v1/execute
+JDOODLE_CLIENT_ID = e399c7b149f48f5545400db501d4266c
+JDOODLE_CLIENT_SECRET = 6b114d6c8810d0eb1580b2ee1b0e43a5c4ef712be99287ec803f3e5d30a317a4
+```
+
+Again, starting from the root directory, run these commands to host the server on your local machine:
+
+```
+cd server && npm run start
+```
+
+Similarly, host the client on your local machine using these commands:
+
+```
+cd client && npm run start
+```
+
+Run our backend tests using these commands:
+
+```
+cd server && npm run test
+```
 
 { : .note } Refer to [IP1](https://neu-se.github.io/CS4530-Spring-2025/assignments/ip1) and [IP2](https://neu-se.github.io/CS4530-Spring-2025/assignments/ip2) for further instructions related to setting up MongoDB, setting environment variables, and running the client and server.
 
